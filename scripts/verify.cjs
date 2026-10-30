@@ -1,8 +1,9 @@
 const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
 const release=JSON.parse(fs.readFileSync('dist/release.json'));assert.equal(release.environment,'staging');
-assert.equal(fs.readdirSync('dist').length,8);
+assert.equal(fs.readdirSync('dist').length,10);
 for(const [name,hash] of Object.entries(release.assets))assert.equal(crypto.createHash('sha256').update(fs.readFileSync('dist/'+name)).digest('hex'),hash);
 const main=fs.readFileSync('dist/main.js','utf8');assert(main.includes('₹1,49,999'));assert(!main.includes('data-download="report"'));assert(main.includes('Witness examination & appreciation of evidence'));
 assert(main.includes('Findings, representations and inquiry report'));assert(main.includes('Where both parties are employees'));assert(main.includes('Section 11(1) sets no fixed representation period'));
 assert(main.includes('Section 11(1) — procedure; Section 11(4) — time limit'));assert(fs.readFileSync('dist/index.html','utf8').includes('community.js'));
+assert(fs.readFileSync('dist/checkout.js','utf8').includes('/api/payments/'));assert(fs.readFileSync('dist/checkout.html','utf8').includes('STAGING · RAZORPAY TEST MODE'));
 console.log('Staging asset hashes and public boundaries verified.');

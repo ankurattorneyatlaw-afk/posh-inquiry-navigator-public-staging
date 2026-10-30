@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "2.6.0-community-staging",
+  "version": "2.6.1-community-checkout-staging",
   "environment": "staging",
   "assets": {
     "index.html": "022fa95810d9c4e36519ab5fd291570fd0c98e84d87e2854c7831e08ebba3735",
@@ -8,6 +8,8 @@
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "6c2713e113da7776b5821c412436bd0bc09f59e1bd3dccb25da65d2b400af0c9",
-    "main.js": "781ade5ad3f15e21dd652f902c20af1d9223397ad614bd45c55a40a307d39abd"
+    "checkout.html": "741883870d8f076b3153041c8db1f2a3251c2f2d360344fd30d88e59bef022bc",
+    "checkout.js": "3d85823d029e1473b9eb757a60cf1e86e1069cc1ae1fedd783573cd6baa4a254",
+    "main.js": "e49cc1af195a2b07c22634dacfcbad962dd6633cf6b87df3c187588d00cad674"
   }
 }
