@@ -25,5 +25,9 @@ const server = http.createServer(async(req,res)=>{
   res.setHeader('Content-Type',({'html':'text/html; charset=utf-8','js':'text/javascript; charset=utf-8','css':'text/css; charset=utf-8','json':'application/json','txt':'text/plain'})[name.split('.').pop()]);
   res.writeHead(200);res.end(req.method==='HEAD'?undefined:fs.readFileSync(path.join(root,name)));
 });
+server.requestTimeout=15000;
+server.headersTimeout=10000;
+server.keepAliveTimeout=5000;
+server.maxRequestsPerSocket=100;
 server.listen(Number(process.env.PORT || 4173),process.env.RENDER ? '0.0.0.0' : '127.0.0.1',()=>console.log('POSH Inquiry Navigator staging ready'));
 process.on('SIGTERM',()=>server.close());

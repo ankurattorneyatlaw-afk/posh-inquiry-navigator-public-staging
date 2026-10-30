@@ -78,6 +78,8 @@ function demoPage(){
 
 function navigate(){let path=routeName();document.title=({woman:'Aggrieved Woman Guidance',respondent:'Respondent Guidance',demo:'Inquiry Stages and Timelines',community:'Community'}[path]||'POSH Inquiry Navigator')+' | The Cosmic Energizers';if(path==='community'||path.startsWith('community/')){window.NavigatorCommunity.render(app,path);scrollTo(0,0)}else if(['woman','respondent'].includes(path)){wizard(path);scrollTo(0,0)}else if(path==='demo'){demoPage();scrollTo(0,0)}else{home();if(path!=='home'){setTimeout(()=>document.getElementById(path)?.scrollIntoView({block:'start',behavior:'smooth'}),20);}else scrollTo(0,0)}}
 window.addEventListener('hashchange',navigate);
+document.addEventListener('click',e=>{if(e.target.closest('.mobile-menu a'))document.querySelector('.mobile-menu')?.removeAttribute('open');});
+document.addEventListener('keydown',e=>{const menu=document.querySelector('.mobile-menu[open]');if(e.key==='Escape'&&menu){menu.removeAttribute('open');menu.querySelector('summary').focus();}});
 document.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t)return;
  if(t.dataset.answer&&t.dataset.value!==undefined){const role=routeName();if(!states[role])return;const id=t.dataset.answer,v=t.dataset.value;
