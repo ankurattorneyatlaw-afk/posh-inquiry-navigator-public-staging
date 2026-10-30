@@ -7,4 +7,5 @@ assert(main.includes('Findings, representations and inquiry report'));assert(mai
 assert(main.includes('Section 11(1) — procedure; Section 11(4) — time limit'));assert(fs.readFileSync('dist/index.html','utf8').includes('community.js'));
 assert(fs.readFileSync('dist/checkout.js','utf8').includes('/api/payments/'));assert(fs.readFileSync('dist/checkout.html','utf8').includes('STAGING · RAZORPAY TEST MODE'));
 assert(fs.readFileSync('dist/community.js','utf8').includes('Load more answers'));assert(fs.readFileSync('dist/index.html','utf8').includes('Mobile navigation'));
+assert(main.includes('an NDA is not a statutory condition for filing a complaint'));assert(main.includes('Committee constitution, potential conflicts and complaint requirements'));
 console.log('Staging asset hashes and public boundaries verified.');

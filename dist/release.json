@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "2.6.2-reviewed-staging",
+  "version": "2.6.3-reviewed-confidentiality-staging",
   "environment": "staging",
   "assets": {
     "index.html": "52ddb7170a88e9f18df862d23fd2ec5036bb15259b9b53b5700847d3809ba35f",
@@ -10,6 +10,6 @@
     "community.js": "89e509a6d6ad5472ef7d5e179aad6626b3817a22dc39d43a01079e0bd3f91f76",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "3a78006a125b1011eef7c89c9c6216d316384d82dd7def146c6e0b7838f4621b",
-    "main.js": "9d040effb4cce053c2142a3916e09150301656094af4d5c59cf4e84d5dd4af7b"
+    "main.js": "f8863961b0eb6b8ac9e7ea7697bc43c330e67c8c0a83e7147c415b90776a7022"
   }
 }
