@@ -1,0 +1,12 @@
+{
+  "product": "POSH Inquiry Navigator",
+  "version": "2.5.1-staging",
+  "environment": "staging",
+  "assets": {
+    "index.html": "30d6d4aefb1a0afdbe3768f5311df6fd65796eeed3326f326a8bd86ea555bb5c",
+    "styles.css": "94b7161640ee57b288e1bd422102ae1130d858bdc35a9d654c6e66b64e6903b3",
+    "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
+    "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
+    "main.js": "0c018b6efa69bf62792d2a7fd66280906d1e25a7759c11739e03affeff0fe953"
+  }
+}
