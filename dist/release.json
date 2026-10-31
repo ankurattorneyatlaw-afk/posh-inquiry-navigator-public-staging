@@ -1,17 +1,17 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "2.9.0-indexed-reference-staging",
+  "version": "2.9.1-reviewed-navigation-staging",
   "environment": "staging",
   "assets": {
     "index.html": "eb0dc52ac2796aa3540cbbc8c0b17125944d09602bfd4f58309f92ce2750233b",
-    "styles.css": "42d764a1171c6f0ed79200a43a0904a5e16b4c503850cfd92cf41245d5f32f07",
+    "styles.css": "fca5c4def725c14a58d490690fa41a7570b7b3a87e67afb4b49245d05c63dbc3",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "library.js": "3638ad4f89e68c060659667d4ee17bd4e15bd4dceca8d24cb2c56d51686847c0",
+    "library.js": "7cf29ed9c41c061f81ad27b2bb980fbfa1c013d3449d1fb786d236789e9e7377",
     "faq.js": "91e056f43af8f5019d9f33c5bfa1f76cf1f74d8826edeb281b7166658b019107",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "3a78006a125b1011eef7c89c9c6216d316384d82dd7def146c6e0b7838f4621b",
-    "main.js": "5bc9e7bff571d88d768a44ce9874cb0c8e7553ab1e6649325e79b8bb922b713d"
+    "main.js": "1907f04e80d2c99dfb26cacb3700711ab22786a4ab349c88b7b41e735e3ecc48"
   }
 }
