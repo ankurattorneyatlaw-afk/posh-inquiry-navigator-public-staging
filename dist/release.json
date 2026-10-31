@@ -1,16 +1,16 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "2.7.1-gap-review-staging",
+  "version": "2.8.0-constitution-shebox-staging",
   "environment": "staging",
   "assets": {
-    "index.html": "9590e94cee3fa9b8b810c5ef5961aa80dd400570c7f9c7f706245435a3c3eb20",
-    "styles.css": "7e30e1148c96d518acacccd56f066ecb1c16b8c37adfb529a597a3755dd9e6b9",
+    "index.html": "ffc895b0c323f93e6eacf886c2e895dbf075527e2a6cbdd78e267f2650755fc8",
+    "styles.css": "3797701cb3f29adf861859fc59c067445d75a88929ddd56b5b220b3cfa9c3a10",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
-    "community.js": "89e509a6d6ad5472ef7d5e179aad6626b3817a22dc39d43a01079e0bd3f91f76",
-    "faq.js": "630b5e8505c56a84089a5c2b05f9fc741c9b170663f7f2e26c40c6a25632310f",
+    "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
+    "faq.js": "bda9226318c57532368b5791cdae5ca9e32c6095cbd184363a0b1ec1cecd848d",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "3a78006a125b1011eef7c89c9c6216d316384d82dd7def146c6e0b7838f4621b",
-    "main.js": "33e58df814a050bd2fc0cd1c361c140e6313cf3468f8189665c907b5adf54940"
+    "main.js": "a4f5d4bbfd2db6cfcde74eb15c822579576d546d516e3ec6625436344a3376d7"
   }
 }
