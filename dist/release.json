@@ -1,16 +1,16 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "2.7.0-faq-staging",
+  "version": "2.7.1-gap-review-staging",
   "environment": "staging",
   "assets": {
-    "index.html": "46e676126af540f7a43fb06a7d12379bd9cf5baffa88194e9ead895f8de36858",
-    "styles.css": "80272450247545b905a526790d271cb1ff068cab2a4aaaff584d8179293e32f2",
+    "index.html": "9590e94cee3fa9b8b810c5ef5961aa80dd400570c7f9c7f706245435a3c3eb20",
+    "styles.css": "7e30e1148c96d518acacccd56f066ecb1c16b8c37adfb529a597a3755dd9e6b9",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "89e509a6d6ad5472ef7d5e179aad6626b3817a22dc39d43a01079e0bd3f91f76",
-    "faq.js": "3addc00ca5386a17dcf0e824f9ffdae652a1f518631def7cd50c8fce6471bc45",
+    "faq.js": "630b5e8505c56a84089a5c2b05f9fc741c9b170663f7f2e26c40c6a25632310f",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "3a78006a125b1011eef7c89c9c6216d316384d82dd7def146c6e0b7838f4621b",
-    "main.js": "cb5c7c8607ec490b363407197b8732e8c2f142eb1c077414a0f1219f60a8c651"
+    "main.js": "33e58df814a050bd2fc0cd1c361c140e6313cf3468f8189665c907b5adf54940"
   }
 }
