@@ -1,6 +1,6 @@
 const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
 const release=JSON.parse(fs.readFileSync('dist/release.json'));assert.equal(release.environment,'staging');
-assert.equal(fs.readdirSync('dist').length,11);
+assert.equal(fs.readdirSync('dist').length,12);
 for(const [name,hash] of Object.entries(release.assets))assert.equal(crypto.createHash('sha256').update(fs.readFileSync('dist/'+name)).digest('hex'),hash);
 const main=fs.readFileSync('dist/main.js','utf8');assert(main.includes('₹1,49,999'));assert(!main.includes('data-download="report"'));assert(main.includes('Witness examination & appreciation of evidence'));
 assert(main.includes('Findings, representations and inquiry report'));assert(main.includes('Where both parties are employees'));assert(main.includes('Section 11(1) sets no fixed representation period'));
@@ -10,3 +10,5 @@ assert(fs.readFileSync('dist/community.js','utf8').includes('Load more answers')
 assert(main.includes('an NDA is not a statutory condition for filing a complaint'));assert(main.includes('Committee constitution, potential conflicts and complaint requirements'));
 const faq=require('../dist/faq.js');assert.equal(faq.items.length,82);assert.equal(faq.topics.length,12);assert(fs.readFileSync('dist/index.html','utf8').includes('faq.js'));
 console.log('Staging asset hashes and public boundaries verified.');
+
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,30);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
