@@ -1,6 +1,7 @@
 'use strict';
 const {createHmac,timingSafeEqual,randomBytes}=require('node:crypto');
-const plans={essential:{name:'Inquiry Essential',amount:2499900,months:6,users:2},professional:{name:'Inquiry Professional',amount:4999900,months:9,users:5},advanced:{name:'Inquiry Advanced',amount:8999900,months:12,users:8}};
+const catalogue=require(require('node:fs').existsSync(require('node:path').join(__dirname,'../plans.js'))?'../plans.js':'../dist/plans.js');
+const plans=catalogue.checkoutPlans;
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 function createPaymentHandler({keyId=process.env.RAZORPAY_KEY_ID,secret=process.env.RAZORPAY_KEY_SECRET,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',fetchImpl=fetch,now=Date.now}={}){
  const configured=!!(keyId?.startsWith('rzp_test_')&&secret);let count=0,start=now();
@@ -9,7 +10,7 @@ function createPaymentHandler({keyId=process.env.RAZORPAY_KEY_ID,secret=process.
  async function gateway(path,body){const r=await fetchImpl('https://api.razorpay.com/v1/'+path,{method:body?'POST':'GET',headers:{Authorization:'Basic '+Buffer.from(keyId+':'+secret).toString('base64'),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('gateway');return r.json()}
  return async(req,res,url)=>{
   if(!url.pathname.startsWith('/api/payments/'))return false;
-  if(url.pathname==='/api/payments/config'&&req.method==='GET'){send(res,200,{mode:'test',configured,livePaymentsEnabled:false,plans});return true;}
+  if(url.pathname==='/api/payments/config'&&req.method==='GET'){send(res,200,{mode:'test',configured,livePaymentsEnabled:false,catalogueVersion:catalogue.version,plans});return true;}
   if(req.method!=='POST'){send(res,405,{error:'Method not allowed.'});return true;}
   if(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||'')){send(res,403,{error:'Use the staging checkout page.'});return true;}
   if(!configured){send(res,503,{error:'Test checkout has not been enabled yet. No payment has been taken.'});return true;}

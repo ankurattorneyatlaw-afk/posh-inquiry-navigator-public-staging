@@ -1,17 +1,18 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "2.9.1-reviewed-navigation-staging",
+  "version": "3.0.0-plan-catalogue-staging",
   "environment": "staging",
   "assets": {
-    "index.html": "eb0dc52ac2796aa3540cbbc8c0b17125944d09602bfd4f58309f92ce2750233b",
-    "styles.css": "fca5c4def725c14a58d490690fa41a7570b7b3a87e67afb4b49245d05c63dbc3",
+    "index.html": "a4985fde14096c259f75911eb2a669386bf5e8fa45c389fdb9ee1db7d9016da7",
+    "styles.css": "e893e5c5dce593e9bd49c0f0c5c5b0e88af039c47ff14234e4ab72cb29957ddc",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "library.js": "7cf29ed9c41c061f81ad27b2bb980fbfa1c013d3449d1fb786d236789e9e7377",
-    "faq.js": "91e056f43af8f5019d9f33c5bfa1f76cf1f74d8826edeb281b7166658b019107",
+    "library.js": "4178da22d49f9eecb9c1398a7d20ea97f175d9301c4e681251ba2fc47c8eb22b",
+    "faq.js": "8720e94d5534f1f42dfad7be77802fbe14dcad1cc89d1b5bf9ca868f3e08cbad",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
-    "checkout.js": "3a78006a125b1011eef7c89c9c6216d316384d82dd7def146c6e0b7838f4621b",
-    "main.js": "1907f04e80d2c99dfb26cacb3700711ab22786a4ab349c88b7b41e735e3ecc48"
+    "checkout.js": "d07b5d3e8cb81d6aba28af29caffe8eb8778d96852a939ea15ead64b1c5fd18e",
+    "plans.js": "0d0a8f788f3fb65f4b4d84acc6e2a44d1f2870ee9586a97f6df6ca9a1e5e9a34",
+    "main.js": "289c0d0a0d2e8905fe003fa1fa2178ebe8b6a0b8f3f044c7a548fa725d141960"
   }
 }
