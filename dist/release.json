@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "3.1.2-unified-labels-staging",
+  "version": "3.1.3-clean-faq-staging",
   "environment": "staging",
   "assets": {
     "index.html": "a279be3c1d424a8df676cee8e4d3503a6d663403b8afc281f4bf2f0d2b0fca68",
@@ -13,7 +13,7 @@
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "d07b5d3e8cb81d6aba28af29caffe8eb8778d96852a939ea15ead64b1c5fd18e",
     "plans.js": "cc66d942c90fa7f7b3a842e71c1dc3c5951f3062f98457db1e02b07c321eee32",
-    "finder.js": "156a934daac530cf0a78ad449a0608766654f0e972e7654bf1beef9244f15fa6",
+    "finder.js": "e41de4648f6cf7487ec713768b93791f992ed74ca846c2b484631fe7b4470ff0",
     "main.js": "289c0d0a0d2e8905fe003fa1fa2178ebe8b6a0b8f3f044c7a548fa725d141960"
   }
 }
