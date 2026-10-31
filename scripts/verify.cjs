@@ -11,4 +11,4 @@ assert(main.includes('an NDA is not a statutory condition for filing a complaint
 const faq=require('../dist/faq.js');assert.equal(faq.items.length,82);assert.equal(faq.topics.length,12);assert(fs.readFileSync('dist/index.html','utf8').includes('faq.js'));
 console.log('Staging asset hashes and public boundaries verified.');
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,30);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,42);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
