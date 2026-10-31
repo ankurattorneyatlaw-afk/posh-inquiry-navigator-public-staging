@@ -1,19 +1,20 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "3.1.3-clean-faq-staging",
+  "version": "3.2.0-complete-faq-staging",
   "environment": "staging",
   "assets": {
-    "index.html": "a279be3c1d424a8df676cee8e4d3503a6d663403b8afc281f4bf2f0d2b0fca68",
-    "styles.css": "41ee22732ced5794d45614a2d787b6a5ca7c4c472db06312149ca417b84c9cb7",
+    "index.html": "72f09c1ba6ed9033e95813cf9668f83001dd196061e99ab587ee37903dfba0d1",
+    "styles.css": "14666654277532a1e8104b5ab66b35d69734ef350bbdc4a964ba255e6d057711",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "library.js": "47abaa266298e8ecd57f32edd85c048e2c93ab6c926900a237e02036a9f162c4",
-    "faq.js": "5736e73bcc8f09c811200668a2cab2924a8d0743adc5da6a83d89703c42d352f",
+    "library.js": "5a5d60baeacc3246b23ea44c0327ba4b4d3b502928f361bc07f4229cc5e56d8b",
+    "faq.js": "6ee321e684b60930606d3682a42d3a75ec881c7cebb3f0541afea66dc997eef0",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "d07b5d3e8cb81d6aba28af29caffe8eb8778d96852a939ea15ead64b1c5fd18e",
     "plans.js": "cc66d942c90fa7f7b3a842e71c1dc3c5951f3062f98457db1e02b07c321eee32",
-    "finder.js": "e41de4648f6cf7487ec713768b93791f992ed74ca846c2b484631fe7b4470ff0",
+    "finder.js": "f3fb12f12717bd2a86fa9353c81b3e9be2bc328b18c43e6914c9b32e806400f8",
+    "legal.js": "33960c4aff8a10d7300bb51cae832a9b1a2db5bb8b564c162eb87daeb49334fd",
     "main.js": "289c0d0a0d2e8905fe003fa1fa2178ebe8b6a0b8f3f044c7a548fa725d141960"
   }
 }
