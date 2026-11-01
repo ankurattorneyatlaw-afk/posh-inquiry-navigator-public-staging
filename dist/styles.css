@@ -338,4 +338,79 @@ body:has(#checkout-plan) .plan-licensing{font-size:16px;padding:20px;margin:24px
 body:has(#checkout-plan) .plan-licensing h3{font-size:23px;line-height:1.4}
 body:has(#checkout-plan) .plan-licensing li{margin:12px 0}
 
+/* Focused homepage: one audience choice, clear product value and an institutional next step. */
+body[data-page="home"] .section{padding-top:76px;padding-bottom:76px}
+.home-hero .hero-shell{min-height:0;padding-top:72px;padding-bottom:72px;gap:64px}
+.home-hero h1{font-size:clamp(40px,4vw,68px);line-height:1.14;max-width:none;margin-bottom:24px}
+.home-hero .hero-content{min-width:0}
+#app .home-hero .hero-content>p:not(.hero-disclaimer){max-width:56ch;font-size:calc(19px * var(--reading-scale));line-height:1.8}
+.home-hero .hero-buttons{margin-top:28px}
+.home-hero .hero-buttons .btn{min-height:52px;padding:13px 22px}
+.home-hero .home-workspace-preview{max-width:600px;width:100%;padding:30px;background:#f8f8f4;color:#17344c;border:1px solid #d8e0de;backdrop-filter:none;box-shadow:0 26px 60px #07172740;margin:0 0 0 auto}
+.workspace-preview-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;font-weight:750;letter-spacing:.08em}
+.workspace-preview-badge{background:#f0e3c9;border-radius:20px;padding:5px 10px;color:#6b4d22;font-size:11px;letter-spacing:.05em}
+.home-workspace-preview h2{font:500 clamp(29px,2.5vw,38px)/1.2 Georgia,serif;letter-spacing:-.025em;color:#17344c;margin:20px 0 10px}
+#app .home-hero .workspace-preview-intro{font-size:calc(14px * var(--reading-scale));color:#4b6170;line-height:1.65;margin-bottom:22px}
+.workspace-preview-steps{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.workspace-preview-steps li{display:flex;align-items:center;gap:14px;padding:15px;background:#fff;border:1px solid #dce3e0;border-radius:10px}
+.workspace-preview-steps li>span{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:8px;background:#eef2ee;color:#70512a;font-weight:750;font-size:13px}
+.workspace-preview-steps strong{display:block;font-size:calc(16px * var(--reading-scale));line-height:1.5;color:#193a50}
+.workspace-preview-steps small{display:block;font-size:calc(14px * var(--reading-scale));line-height:1.65;color:#4d6575;margin-top:3px}
+.workspace-preview-foot{font-size:calc(13px * var(--reading-scale));line-height:1.7;color:#536675;margin-top:19px;padding-top:16px;border-top:1px solid #d8dfdb}
+.home-proof-strip .assurance-inner{justify-content:space-between;padding-top:19px;padding-bottom:19px;gap:14px 28px}
+.home-proof-strip .assurance-inner span{font-size:calc(14px * var(--reading-scale));color:#2c495a}
+.home-section-heading{display:grid;grid-template-columns:1.1fr .9fr;align-items:end;gap:60px;margin-bottom:34px}
+.home-section-heading h2{font-size:clamp(32px,3vw,46px);line-height:1.18;margin-bottom:0;color:#18334c}
+.home-section-heading .eyebrow{margin-bottom:16px}
+.home-section-heading>p{max-width:58ch;margin:0;color:#4b6272}
+.home-value-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.home-value-grid article{padding:28px;border:1px solid #dce3df;border-radius:13px;background:#fff}
+.home-value-number{display:block;color:#73562e;font-size:13px;letter-spacing:.08em;font-weight:750;margin-bottom:22px}
+.home-value-grid h3{font-size:23px;line-height:1.35;color:#18384e;margin-bottom:13px}
+.home-value-grid p{margin:0;color:#4b6272}
+.home-section-action{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:28px}
+.home-section-action>span{font-size:15px;color:#526b7a}
+.home-process-section{background:#eef2ef;border-block:1px solid #dce5df}
+.home-process-layout{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.home-process-layout h2{font-size:clamp(32px,3vw,46px);line-height:1.2;color:#18384e}
+.home-process-layout>div>p{max-width:58ch;color:#4c6474}
+#app .home-process-note{font-size:calc(14px * var(--reading-scale));margin:16px 0 0;color:#4b665b}
+.home-process-preview{background:#fff;border:1px solid #d3ddd6;border-radius:15px;padding:28px}
+.home-preview-label{font-size:12px;letter-spacing:.1em;color:#73552b;font-weight:750}
+.home-process-preview ol{list-style:none;padding:0;margin:18px 0 8px}
+.home-process-preview li{display:flex;gap:18px;align-items:flex-start;padding:19px 0;border-bottom:1px solid #e0e7e2}
+.home-process-preview li>span{font:700 18px/1.7 Georgia,serif;color:#886b3c;flex:0 0 28px}
+.home-process-preview strong{display:block;font-size:calc(17px * var(--reading-scale));color:#1d4055}
+.home-process-preview small{display:block;font-size:calc(15px * var(--reading-scale));line-height:1.7;color:#4b6372;margin-top:4px}
+.home-process-preview>a{display:flex;justify-content:space-between;gap:10px;padding-top:18px;font-weight:750;font-size:16px;color:#204d5e}
+.home-guidance-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.home-guidance-grid .journey-card{min-height:0;padding:30px}
+.home-guidance-grid .journey-card h3{font-family:inherit;font-size:26px;font-weight:700;line-height:1.35}
+.home-guidance-grid .journey-card p{color:#4b6272;max-width:65ch}
+#app .home-guidance-note{font-size:calc(14px * var(--reading-scale));line-height:1.8;color:#536b7b;max-width:120ch;margin:22px 0 0}
+.home-knowledge-section{background:#f2f0e9}
+.home-knowledge-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:70px;align-items:start}
+.home-knowledge-layout h2{font-size:clamp(32px,3vw,46px);line-height:1.2;color:#18384e}
+.home-knowledge-layout>div>p{max-width:65ch;color:#4b6272}
+.home-knowledge-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.home-source-panel{padding:28px;border:1px solid #d6ddd5;border-radius:13px;background:#fff}
+.home-source-panel h3{font-size:24px;line-height:1.4;color:#193c50;margin-bottom:14px}
+#app .home-source-panel p{font-size:calc(16px * var(--reading-scale));line-height:1.8;color:#4b6272}
+.home-source-panel a{display:block;border-top:1px solid #e0e5e1;padding:13px 0;font-size:16px;font-weight:650;color:#285164}
+.home-community-line{display:flex;justify-content:space-between;align-items:center;gap:28px;margin-top:34px;padding-top:30px;border-top:1px solid #d5ded7}
+.home-community-line strong{font-size:20px;color:#244455}
+#app .home-community-line p{font-size:calc(15px * var(--reading-scale));line-height:1.8;margin:6px 0 0;max-width:85ch}
+.home-community-line>a{flex-shrink:0}
+.home-responsibility{padding:22px 0;background:#fbfaf7}
+.home-privacy-details{border:1px solid #d6dfdc;border-radius:10px;padding:15px 20px;background:#fff}
+.home-privacy-details>summary{font-weight:700;color:#25465a;cursor:pointer;min-height:30px}
+.home-privacy-details>.trust-grid{margin-top:24px}
+.home-closing .closing-inner>div:first-child{max-width:850px}
+.home-closing h2{font-size:clamp(32px,3vw,46px);line-height:1.2}
+.home-closing p{color:#d6e3e9;max-width:70ch}
+.home-closing .closing-inner>div:last-child{flex-direction:column;min-width:270px}
+@media(max-width:1050px){.home-hero .hero-shell{gap:32px}.home-section-heading,.home-process-layout,.home-knowledge-layout{gap:32px}.home-value-grid article{padding:23px}.home-value-grid h3{font-size:21px}}
+@media(max-width:850px){body[data-page="home"] .section{padding-top:54px;padding-bottom:54px}.home-hero .hero-shell{grid-template-columns:1fr;padding-top:44px;padding-bottom:44px;gap:34px}.home-hero .home-workspace-preview{max-width:none;margin:0}.home-section-heading,.home-process-layout,.home-knowledge-layout{grid-template-columns:1fr;gap:28px}.home-value-grid{grid-template-columns:1fr}.home-value-grid article{padding:25px}.home-value-number{margin-bottom:13px}.home-guidance-grid{grid-template-columns:1fr}.home-community-line{align-items:flex-start;flex-direction:column}.home-proof-strip .assurance-inner{justify-content:flex-start}.home-closing .closing-inner>div:last-child{width:100%;min-width:0}}
+@media(max-width:520px){.home-hero .hero-shell{padding-left:18px;padding-right:18px}.home-hero h1{font-size:clamp(37px,9vw,46px)}.home-hero .hero-buttons{flex-direction:column}.home-hero .hero-buttons .btn{width:100%}.home-hero .home-workspace-preview{padding:23px 18px}.workspace-preview-top{font-size:10px;letter-spacing:.05em}.workspace-preview-steps li{padding:13px 11px;gap:10px}.home-guidance-grid .journey-card,.home-process-preview,.home-source-panel{padding:23px 19px}.home-guidance-grid .card-bottom{flex-wrap:wrap;gap:12px}.home-knowledge-actions .btn,.home-section-action .btn{width:100%}.home-privacy-details{padding:15px}.home-proof-strip .assurance-inner span{font-size:13px}}
+
 .staging-notice{padding:10px 16px;background:#102039;color:#fff;text-align:center;font:600 12px/1.5 system-ui;}
