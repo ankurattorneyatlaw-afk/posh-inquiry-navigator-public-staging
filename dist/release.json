@@ -1,10 +1,10 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "3.5.2-wide-inquiry-staging",
+  "version": "3.5.3-refined-inquiry-staging",
   "environment": "staging",
   "assets": {
     "index.html": "09df00eacbfd1a4f5d03e9522a9ca1f8649000b5feadf3eb0ce5b77787c80d45",
-    "styles.css": "4c6e1296bb00436b077131af4a9ab5ab8d162d12f19f89ed2edca12492fc32a0",
+    "styles.css": "bc1ef6b706da268008fac8c6d4d0455f2b15b0c724960f63b24edfb15f1af0a7",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
@@ -16,6 +16,6 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "legal.js": "d8fd9265cb035b95826d2b1843d1f47762c335c7f97be4af14b7decaf39a6c34",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "main.js": "a72d173f348968b404c9ad6bc35eee7ef1d692dfca42a3781effd37a897018e1"
+    "main.js": "ae8987ef9e63f0f527daa50a38ef42f9096945439ba7b6053674b5fdc448656e"
   }
 }
