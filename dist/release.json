@@ -1,10 +1,10 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "3.8.0-focused-homepage-staging",
+  "version": "3.9.0-clear-entry-plan-differences-staging",
   "environment": "staging",
   "assets": {
-    "index.html": "ca2610e2bded3c8883555b979d98cc5e6c1988ba1ca14e158c4ce9eb13276138",
-    "styles.css": "255b377ac4b6169e9a75dbdfa43b48162d926f9fab0538741a109fa68a08d0d6",
+    "index.html": "f2b813f57f927e716844ce97a3b893bd8579bdbecad1942bf444322ea2f66e00",
+    "styles.css": "0b49a9764dc8fe7a7d250b71c1ec391a8d3d7ad3ba1bf56a3f1f8c9c78265786",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
@@ -12,10 +12,10 @@
     "faq.js": "627babe8e9a9527842d4dc0de092bce109abd506820b858dbcd3c9b22d74fae4",
     "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
     "checkout.js": "5be91bd1a77a4c17fd3d991ea82121051e210ea14e17d5c2155afd14fba3ff6a",
-    "plans.js": "3f9564b14de97df43cf58bdf2bfb72eae3c9f24343c2a854a48706bf162051bb",
+    "plans.js": "33042ad9df9e3bd9883393c18235f82abfe8f0b5e3b77108b148d9c557ff4e7d",
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "legal.js": "d8fd9265cb035b95826d2b1843d1f47762c335c7f97be4af14b7decaf39a6c34",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "main.js": "e380d54729dad95594cc8ce88bd20108377fa176c5581bd17a9bdb3d4a6ad622"
+    "main.js": "d62b2fe6b0e4298d255e0cad084e05ca4f377caff949970cc0fdc967c4f324e2"
   }
 }
