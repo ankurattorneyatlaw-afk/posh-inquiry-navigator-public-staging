@@ -11,10 +11,10 @@ assert(main.includes('an NDA is not a statutory condition for filing a complaint
 const faq=require('../dist/faq.js');assert.equal(faq.items.length,110);assert.equal(faq.topics.length,13);assert(fs.readFileSync('dist/index.html','utf8').includes('faq.js'));
 console.log('Staging asset hashes and public boundaries verified.');
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,14);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,19);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,110);assert.equal(finder.records.length,439);
 
 for(const c of library.cases){assert.equal(c.verificationLevel,"primary-verified");assert.match(c.sourceSha256,/^[a-f0-9]{64}$/);for(const k of ["identity","primaryText","proposition","pinpoint","disposition"])assert.equal(c.verification[k],true);}
-assert(!library.cases.some(c=>["C09","C21","C29","C37","C38","C50"].includes(c.id)));
+assert(!library.cases.some(c=>["C09","C29","C37","C38","C50"].includes(c.id)));

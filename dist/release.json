@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "3.4.0-verified-judgments-staging",
+  "version": "3.5.0-expanded-verified-judgments-staging",
   "environment": "staging",
   "assets": {
     "index.html": "09df00eacbfd1a4f5d03e9522a9ca1f8649000b5feadf3eb0ce5b77787c80d45",
@@ -8,14 +8,14 @@
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "library.js": "1774230b81b4a53f1e3290cf8927b1497031ae762d73e48c7894e8ac39d72193",
-    "faq.js": "7314aef3cb87e4d81e1e7b19a76cc90b90f777f850aa40558704d1469a1c3bf1",
+    "library.js": "597c56c93b5caae1095be80debab5c27ce42d1faffc94c6da38f2293490bab59",
+    "faq.js": "627babe8e9a9527842d4dc0de092bce109abd506820b858dbcd3c9b22d74fae4",
     "checkout.html": "71b7d8af50bf4d92f734601edded39dcf8a50b20c691792efac8ee678b09f2ca",
     "checkout.js": "d07b5d3e8cb81d6aba28af29caffe8eb8778d96852a939ea15ead64b1c5fd18e",
     "plans.js": "cc66d942c90fa7f7b3a842e71c1dc3c5951f3062f98457db1e02b07c321eee32",
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "legal.js": "d8fd9265cb035b95826d2b1843d1f47762c335c7f97be4af14b7decaf39a6c34",
-    "cases.js": "4f5933a4fb602ae6f292236b364ef4bc3092a135a8e2d11b2da3752f2a228a39",
+    "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "main.js": "09f7dd868659498ebc3641cbf49c52b0357a705565a5318b2c5925fee954e735"
   }
 }
