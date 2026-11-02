@@ -4,7 +4,7 @@
   "environment": "staging",
   "assets": {
     "index.html": "9c886dc0f7c5762a4c613122cc65c6ae39cfe58aecd05368d0e7634f523ec32b",
-    "styles.css": "fda3b760b4a975d72928fc34bade80f6c93f21fd666280b33d2271fc7263b082",
+    "styles.css": "aa0324007aa2ad3a747c921cc1d527804fbf742889a1e2ef1881505c5eb74d7b",
     "engine.js": "b14f1de323dc3866d3be30782884cf7d9f7871ad391750fd72d9f96be663b7b1",
     "docx.js": "38f1554e2650da2d5fbf723a6cf13b30f7d6efd12ec36753e764ee3f24ed0558",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
@@ -16,6 +16,6 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "main.js": "8183d3baebb2e6fb40c19c4bc4e9d8a631292f9b7e78156a9b3caae34d50f406"
+    "main.js": "2cd45994f9388a31bd39844b28644f8f3137e83bbde0bff72f59f68dcbe79358"
   }
 }
