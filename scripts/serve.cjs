@@ -2,6 +2,7 @@
 const http = require('node:http');
 const community=require('./community-api.cjs').createCommunityHandler();
 const payments=require('./payment-api.cjs').createPaymentHandler();
+const enquiries=require('./enquiry-api.cjs').createEnquiryHandler();
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname,'../dist');
@@ -16,6 +17,7 @@ const server = http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
   let parsed; try {parsed=new URL(req.url,'http://localhost');} catch {res.writeHead(400);res.end();return;}
+  if(await enquiries(req,res,parsed))return;
   if(await community(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
   if(parsed.pathname==='/checkout.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
