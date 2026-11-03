@@ -38,7 +38,7 @@ LATE_REPLY_REVIEW:['Late reply procedural review','A late reply does not by itse
 OBJECTION_REASONING_REVIEW:['Procedural objection and remedy','Material objections require a reasoned response, not silent dismissal.','Identify and document the particular objection.;Consider lawful recusal, disclosure or correction.;Document competent reasoned determination.','conditions_verified|Objection addressed or lawfully remedied|NEXT;external_review|Independent legal or competent-authority review|OUTCOME'],
 FACT_UNCERTAINTY_REVIEW:['Unknown essential fact','Unknown facts cannot be silently treated as confirmed; correct the source answer here.','Identify exactly which information is unknown.;Seek reliable clarification without filling gaps by assumption.','fact_clarified|Clarification obtained — amend original answer|EDIT']
 };
-const REV=Object.fromEntries(Object.entries(RULES).map(([id,[title,issue,checks,actions]])=>[id,{id,title,issue,checks:checks.split(';'),actions:actions.split(';').map(s=>{const [id,label,target]=s.split('|');return{id,label,target}})}]));
+const REV=Object.fromEntries(Object.entries(RULES).map(([id,[title,issue,checks,actions]])=>[id,{id,title,issue,checks:checks.split(';'),actions:actions.split(/;(?=[a-z_]+\|)/).map(s=>{const [id,label,target]=s.split('|');return{id,label,target}})}]));
 const DEFAULT={P01:'written',P02:'single_within_3_months',P03:'employee',P04:'same_organisation',P05:'ic',P06:'valid',P07:'specific_2n_conduct',P08:'complete',P09:'none',P10:'recorded',P11:'no',P13:'sent_with_copy',P14:'served',P15:'received_in_time',P16:'complete_denial',P17:'none'};
 const EXAMPLES=[
 ['manual','Start from the beginning','P01',{}],
