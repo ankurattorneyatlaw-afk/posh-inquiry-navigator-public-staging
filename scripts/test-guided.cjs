@@ -7,7 +7,18 @@ function run(scenario,answer,action,nextQuestion){
     if(!nodes.has(id))nodes.set(id,{id,innerHTML:'',textContent:'',value:'',disabled:false,handlers:{},addEventListener(event,handler){this.handlers[event]=handler},focus(){},scrollIntoView(){}});
     return nodes.get(id);
   }
-  vm.runInNewContext(source,{document:{getElementById:get}},{timeout:3000});
+  const injected=source.replace(/\}\)\(\);\s*$/,'globalThis.__model={Q,REV};})();');
+  assert.notEqual(injected,source,'Model verification hook absent');
+  const sandbox={document:{getElementById:get}};
+  vm.runInNewContext(injected,sandbox,{timeout:3000});
+  assert.equal(sandbox.__model.Q.length,17,'Incorrect foundational stage count');
+  const validTargets=new Set(['NEXT','NOTICE','CONCILIATION','NO_REPLY','REPLY_RECEIVED','OUTCOME','EDIT']);
+  for(const review of Object.values(sandbox.__model.REV)){
+    assert(review.actions.length>0,'Review has no continuation: '+review.id);
+    for(const action of review.actions){
+      assert(action.id&&action.label&&validTargets.has(action.target),'Invalid next target in '+review.id+': '+JSON.stringify(action));
+    }
+  }
   const drop=get('g-scenario'),body=get('g-body');
   drop.value=scenario;drop.handlers.change({target:{value:scenario}});
   assert(body.innerHTML.includes('g-choices'),scenario+': stage question missing');
