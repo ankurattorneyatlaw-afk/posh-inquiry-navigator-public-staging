@@ -128,7 +128,8 @@ reviewScenario('jurisdiction_concern','disputed','conditions_verified','Does the
  c.resolution('yes');c.action('approved');
  assert(c.body.innerHTML.includes('Change originating answer'),'Unapproved finding must require inline correction');
  // No direct advance with an undecided committee finding.
- c.check();c.click({id:'g-proceed'});
+ assert(!c.body.innerHTML.includes('data-check="0"'),'Unapproved finding must not expose automatic safeguard checkboxes');
+ c.click({id:'g-proceed'});
  assert(c.body.innerHTML.includes('Committee findings required'),'Unapproved finding bypassed');
 }
 
