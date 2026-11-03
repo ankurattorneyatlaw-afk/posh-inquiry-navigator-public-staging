@@ -96,6 +96,18 @@ let initialInfo=status===''?'<div class="g-soft"><h3>Select the actual status of
 
 $('g-body').innerHTML='<h2>'+safe(q.prompt)+'</h2><p>Recorded fictional answer: <strong>'+safe(res.original.label)+'</strong></p><div class="g-review"><span class="g-label">Review and correction · '+safe(q.id)+'</span><h3>'+safe(r.title)+'</h3><p class="g-review-note">'+safe(r.issue)+'</p></div><h3>Has this issue been resolved now?</h3><div class="g-status" role="group" aria-label="Resolution status"><button class="g-toggle" data-status="yes" aria-pressed="'+(status==='yes')+'">Yes</button><button class="g-toggle" data-status="no" aria-pressed="'+(status==='no')+'">No</button><button class="g-toggle" data-status="unsure" aria-pressed="'+(status==='unsure')+'">Not sure</button></div>'+initialInfo+noInfo+unsureInfo+optionBlock+checklist+'<div class="g-button-row">'+actionButton+'</div>'+changeAnswerForm(q);
 }
+function invalidateFrom(stage){
+ const isConciliation=stage.startsWith('C'),number=Number(stage.slice(1));
+ for(const record of [answers,decisions]){
+   for(const key of Object.keys(record)){
+     if(isConciliation){
+       if(key.startsWith('C')&&Number(key.slice(1))>=number)delete record[key];
+     }else if(key.startsWith('C')||(key.startsWith('P')&&Number(key.slice(1))>=number)){
+       delete record[key];
+     }
+   }
+ }
+}
 function resetTo(target,mods){answers={};decisions={};status='';chosenAction='';checked=new Set();workSteps=new Set();uncertainSteps=new Set();followupDetail='';lastKey='';for(const q of Q){if(q.id.startsWith('C'))break;if(!target.startsWith('C')&&Number(q.id.slice(1))>=Number(target.slice(1)))break;if(DEFAULT[q.id])answers[q.id]=DEFAULT[q.id]}Object.assign(answers,Object.fromEntries(Object.entries(mods).filter(([stage])=>Number(stage.slice(1))<Number(target.slice(1)))));render()}
 $('g-scenario').innerHTML=EXAMPLES.map(([id,title])=>'<option value="'+safe(id)+'">'+safe(title)+'</option>').join('');
 $('g-scenario').addEventListener('change',e=>{let row=EXAMPLES.find(x=>x[0]===e.target.value)||EXAMPLES[0];resetTo(row[2],row[3])});
@@ -103,13 +115,13 @@ $('g-restart').addEventListener('click',()=>{let row=EXAMPLES.find(x=>x[0]===$('
 $('g-body').addEventListener('click',e=>{const t=e.target;
 if(t.id==='g-print-preview'){if(compute().kind==='final')window.print();return}
 if(t.id==='g-reset-inline'){ $('g-scenario').value='manual';resetTo('P01',{});return}
-if(t.dataset.answer){let s=compute().q?.id;if(!s)return;let pos=Number(s.slice(1));for(const k of Object.keys(answers))if(Number(k.slice(1))>=pos)delete answers[k];for(const k of Object.keys(decisions))if(Number(k.slice(1))>=pos)delete decisions[k];answers[s]=t.dataset.answer;lastKey='';render();return}
+if(t.dataset.answer){let s=compute().q?.id;if(!s)return;invalidateFrom(s);answers[s]=t.dataset.answer;lastKey='';render();return}
 if(t.dataset.status){status=t.dataset.status;chosenAction='';checked=new Set();followupDetail='';render();return}
 if(t.dataset.helpAction){followupDetail=t.dataset.helpAction;render();return}
 if(t.id==='g-reassess'){status='';followupDetail='';render();return}
 if(t.id==='g-show-verification'){if(uncertainSteps.size){followupDetail='uncertainty-verify';render()}return}
 if(t.id==='g-record-unknown'){followupDetail='uncertainty-hold';render();return}
-if(t.id==='g-correct'){let s=compute().q?.id;let correction=$('g-correction')?.value;if(!s||!Q.find(x=>x.id===s)?.opts.some(o=>o.value===correction))return;let pos=Number(s.slice(1));for(const k of Object.keys(answers))if(Number(k.slice(1))>=pos)delete answers[k];for(const k of Object.keys(decisions))if(Number(k.slice(1))>=pos)delete decisions[k];answers[s]=correction;lastKey='';render();return}
+if(t.id==='g-correct'){let s=compute().q?.id;let correction=$('g-correction')?.value;if(!s||!Q.find(x=>x.id===s)?.opts.some(o=>o.value===correction))return;invalidateFrom(s);answers[s]=correction;lastKey='';render();return}
 if(t.id==='g-proceed'){const r=compute();if(r.kind!=='review'||status!=='yes')return;const a=r.actions.find(x=>x.id===chosenAction);if(!a)return;if(a.target==='EDIT'){const edit=$('g-correction');if(edit){edit.focus();edit.scrollIntoView({block:'center',behavior:'smooth'})}return}if(checked.size!==r.r.checks.length)return;decisions[r.q.id]={trigger:r.original.value,action:a.id,confirmed:true};lastKey='';render();return}
 });
 $('g-body').addEventListener('change',e=>{let t=e.target;if(t.name==='g-action-choice'){chosenAction=t.value;checked=new Set();render();return}if(t.dataset.workStep!==undefined){const i=Number(t.dataset.workStep);if(t.checked)workSteps.add(i);else workSteps.delete(i);const p=$('g-work-progress');if(p)p.textContent=workSteps.size+' of '+(compute().r?.checks.length||0)+' actions noted for follow-up (not proof of legal completion).';return}
