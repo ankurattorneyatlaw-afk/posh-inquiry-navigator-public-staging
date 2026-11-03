@@ -26,13 +26,21 @@ const server = http.createServer(async(req,res)=>{
   if(await community(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
   if(parsed.pathname==='/checkout.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-  const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
+  const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
   if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
   if (!allowed.has(name)) {res.writeHead(404);res.end();return;}
   if(release.search?.indexable&&['/','/index.html','/institutions','/institutions/','/institutions.html'].includes(parsed.pathname))res.setHeader('X-Robots-Tag','index, follow');
   if(name.endsWith('.html')){const html=fs.readFileSync(path.join(root,name),'utf8'),hashes=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m=>"'sha256-"+crypto.createHash('sha256').update(m[1]).digest('base64')+"'");if(hashes.length)res.setHeader('Content-Security-Policy',csp.replace("script-src 'self'","script-src 'self' "+hashes.join(' ')));}
   res.setHeader('Content-Type',({'html':'text/html; charset=utf-8','js':'text/javascript; charset=utf-8','css':'text/css; charset=utf-8','json':'application/json','txt':'text/plain','xml':'application/xml; charset=utf-8','svg':'image/svg+xml','png':'image/png'})[name.split('.').pop()]);
-  res.writeHead(200);res.end(req.method==='HEAD'?undefined:fs.readFileSync(path.join(root,name)));
+  // Surface the integrated workflow in the existing site without modifying the signed static release assets.
+  let payload=fs.readFileSync(path.join(root,name));
+  if(name==='index.html'){
+    let document=payload.toString('utf8');
+    document=document.replace('<nav aria-label="Main navigation" class="desktop-nav">','<nav aria-label="Main navigation" class="desktop-nav"><a href="/guided">Guided IC/LC Inquiry</a>');
+    document=document.replace('<nav aria-label="Mobile navigation">','<nav aria-label="Mobile navigation"><a href="/guided">Guided IC/LC Inquiry</a>');
+    payload=Buffer.from(document,'utf8');
+  }
+  res.writeHead(200);res.end(req.method==='HEAD'?undefined:payload);
 });
 server.requestTimeout=15000;
 server.headersTimeout=10000;
