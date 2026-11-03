@@ -1,6 +1,6 @@
 const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
 const release=JSON.parse(fs.readFileSync('dist/release.json'));assert.equal(release.environment,'staging');
-assert.equal(fs.readdirSync('dist').length,22);assert.equal(release.search.indexable,false);assert.match(fs.readFileSync('dist/robots.txt','utf8'),/Disallow: \//);const institution=fs.readFileSync('dist/institutions.html','utf8');assert(institution.includes('Run a fair POSH inquiry.'));assert(institution.includes('Multiple POSH certifications from government institutions'));assert(institution.includes('application/ld+json'));assert(institution.includes('/institutions'));assert(fs.existsSync('scripts/analytics-api.cjs'));
+assert.equal(fs.readdirSync('dist').length,23);assert.equal(release.search.indexable,false);assert.match(fs.readFileSync('dist/robots.txt','utf8'),/Disallow: \//);const institution=fs.readFileSync('dist/institutions.html','utf8');assert(institution.includes('Run a fair POSH inquiry.'));assert(institution.includes('Multiple POSH certifications from government institutions'));assert(institution.includes('application/ld+json'));assert(institution.includes('/institutions'));assert(fs.existsSync('scripts/analytics-api.cjs'));
 for(const [name,hash] of Object.entries(release.assets))assert.equal(crypto.createHash('sha256').update(fs.readFileSync('dist/'+name)).digest('hex'),hash);
 const main=fs.readFileSync('dist/main.js','utf8');assert.equal(require('../dist/plans.js').catalogue.find(p=>p.id==='institutional').displayPrice,'₹1,49,999');assert(!main.includes('data-download="report"'));assert(main.includes('Witness examination & appreciation of evidence'));
 assert(main.includes('Findings, representations and inquiry report'));assert(main.includes('Where both parties are employees'));assert(main.includes('Section 11(1) sets no fixed representation period'));
@@ -13,6 +13,13 @@ console.log('Staging asset hashes and public boundaries verified.');
 const guidedHtml=fs.readFileSync('dist/guided.html','utf8'),guidedCode=fs.readFileSync('dist/guided.js','utf8');
 assert(guidedHtml.includes('Has this issue been resolved now?'));
 new (require('node:vm').Script)(guidedCode,{filename:'dist/guided.js'});
+const continuationCode=fs.readFileSync('dist/guided-continuation.js','utf8');
+new (require('node:vm').Script)(continuationCode,{filename:'dist/guided-continuation.js'});
+assert(guidedHtml.includes('guided-continuation.js'));
+assert(!guidedHtml.includes('P01–P17 · Demonstration only'));
+assert(continuationCode.includes('Conciliation closure and implementation record'));
+assert(continuationCode.includes('Inquiry report and administrative closure'));
+
 assert(guidedHtml.includes('No real cases or identities'));
 for(const stage of ['P01','P05','P11','P14','P15','P16','P17'])assert(guidedCode.includes(stage));
 for(const review of ['SERVICE_PROOF_REVIEW','REPLY_OPPORTUNITY_REVIEW','COMMITTEE_CORRECTION_REVIEW','HUMAN_LIMITATION_REVIEW','FACT_UNCERTAINTY_REVIEW'])assert(guidedCode.includes(review));
