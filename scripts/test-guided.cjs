@@ -1,67 +1,143 @@
-/* Integration smoke tests run by npm run build; synthetic paths, not legal validation. */
+/* Browser-equivalent synthetic interaction regression tests, never real case content. */
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const source=fs.readFileSync('dist/guided.js','utf8');
-function run(scenario,answer,action,nextQuestion){
-  const nodes=new Map();
-  function get(id){
-    if(!nodes.has(id))nodes.set(id,{id,innerHTML:'',textContent:'',value:'',disabled:false,handlers:{},addEventListener(event,handler){this.handlers[event]=handler},focus(){},scrollIntoView(){}});
-    return nodes.get(id);
-  }
-  const injected=source.replace(/\}\)\(\);\s*$/,'globalThis.__model={Q,REV};})();');
-  assert.notEqual(injected,source,'Model verification hook absent');
-  const sandbox={document:{getElementById:get}};
-  vm.runInNewContext(injected,sandbox,{timeout:3000});
-  assert.equal(sandbox.__model.Q.length,17,'Incorrect foundational stage count');
-  const validTargets=new Set(['NEXT','NOTICE','CONCILIATION','NO_REPLY','REPLY_RECEIVED','OUTCOME','EDIT']);
-  assert.equal(Object.keys(sandbox.__model.REV).length,15,'Review registry changed unexpectedly');
-  for(const review of Object.values(sandbox.__model.REV)){
-    assert(review.actions.length>0,'Review has no continuation: '+review.id);
-    for(const action of review.actions){
-      assert(action.id&&action.label&&validTargets.has(action.target),'Invalid next target in '+review.id+': '+JSON.stringify(action));
-    }
-  }
-  const drop=get('g-scenario'),body=get('g-body');
-  drop.value=scenario;drop.handlers.change({target:{value:scenario}});
-  assert(body.innerHTML.includes('g-choices'),scenario+': stage question missing');
-  body.handlers.click({target:{id:'',dataset:{answer}}});
-  assert(body.innerHTML.includes('Has this issue been resolved now?'),scenario+': expected on-screen review');
-  // A premature "proceed" click must not skip a review.
-  body.handlers.click({target:{id:'g-proceed',dataset:{}}});
-  assert(body.innerHTML.includes('Has this issue been resolved now?'),scenario+': bypassed unresolved review');
-  body.handlers.click({target:{id:'',dataset:{status:'no'}}});
-  assert(body.innerHTML.includes('What should happen now? Choose an action'),scenario+': No did not provide corrective action options');
-  assert(body.innerHTML.includes('data-help-action="request"'),scenario+': No action control missing');
-  body.handlers.click({target:{id:'',dataset:{helpAction:'request'}}});
-  assert(body.innerHTML.includes('Suggested action:'),scenario+': No action did not show guidance');
-  body.handlers.change({target:{dataset:{workStep:'0'},checked:true}});
-  assert(get('g-work-progress').textContent.startsWith('1 of '),scenario+': corrective step progress not updated');
-  body.handlers.click({target:{id:'',dataset:{status:'unsure'}}});
-  assert(body.innerHTML.includes('Not sure — identify what needs verification'),scenario+': Not sure was not differentiated from No');
-  assert(body.innerHTML.includes('data-uncertain-step="0"'),scenario+': unknown-item selection absent');
-  body.handlers.change({target:{dataset:{uncertainStep:'0'},checked:true}});
-  body.handlers.click({target:{id:'g-show-verification',dataset:{}}});
-  assert(body.innerHTML.includes('Points to verify:'),scenario+': verification assistance missing');
-  assert(body.innerHTML.includes('Review the source:'),scenario+': unknown fact verification details missing');
-  body.handlers.click({target:{id:'g-record-unknown',dataset:{}}});
-  assert(body.innerHTML.includes('Unresolved review route:'),scenario+': review referral action missing');
-  body.handlers.click({target:{id:'g-proceed',dataset:{}}});
-  assert(body.innerHTML.includes('Not sure — identify what needs verification'),scenario+': Not sure must not bypass safeguards');
-  body.handlers.click({target:{id:'',dataset:{status:'yes'}}});
-  assert(body.innerHTML.includes('Choose the legally reviewed outcome'),scenario+': next options missing');
-  body.handlers.change({target:{name:'g-action-choice',value:action,dataset:{}}});
-  // Three visible checks are mandatory in the present synthetic review families.
+const continuation=fs.readFileSync('dist/guided-continuation.js','utf8');
+const injected=source.replace(/\}\)\(\);\s*$/,'globalThis.__model={Q,REV};})();');
+assert.notEqual(injected,source,'Guided model inspection hook is unavailable');
+
+function launch(scenario='manual'){
+ const nodes=new Map();let prints=0;
+ function get(id){
+  if(!nodes.has(id))nodes.set(id,{id,innerHTML:'',textContent:'',value:'',disabled:false,handlers:{},
+    addEventListener(name,handler){this.handlers[name]=handler},focus(){},scrollIntoView(){}});
+  return nodes.get(id);
+ }
+ const sandbox={document:{getElementById:get},window:{print(){prints++}}};
+ vm.runInNewContext(continuation,sandbox,{timeout:3000});
+ vm.runInNewContext(injected,sandbox,{timeout:3000});
+ const model=sandbox.__model,drop=get('g-scenario'),body=get('g-body');
+ drop.value=scenario;drop.handlers.change({target:{value:scenario}});
+ const click=(properties)=>body.handlers.click({target:{id:'',dataset:{},...properties}});
+ const answer=(value)=>click({dataset:{answer:value}});
+ const resolution=(value)=>click({dataset:{status:value}});
+ const action=(value)=>body.handlers.change({target:{name:'g-action-choice',value,dataset:{}}});
+ const check=()=>{
   const required=(body.innerHTML.match(/data-check="[0-9]+"/g)||[]).length;
-  assert(required>=2,scenario+': missing confirmation prerequisites');
+  assert(required>=2,'No review prerequisites displayed');
   for(let i=0;i<required;i++)body.handlers.change({target:{dataset:{check:String(i)},checked:true}});
-  assert.equal(get('g-proceed').disabled,false,scenario+': prerequisite checkboxes did not unlock next step');
-  body.handlers.click({target:{id:'g-proceed',dataset:{}}});
-  assert(body.innerHTML.includes(nextQuestion),scenario+': correct continuation missing: '+body.innerHTML.slice(0,900));
+  assert.equal(get('g-proceed').disabled,false,'Reviewed prerequisites did not enable action');
+ };
+ return {get,model,body,answer,resolution,action,check,click,get printed(){return prints}};
 }
-run('no_reply','no_reply','opportunity_complete','Has any party raised a procedural objection?');
-run('notice_refused','refused','fresh_receipt','What is the reply status?');
-run('notice_undelivered','undelivered','fresh_receipt','What is the reply status?');
-run('electronic_service_disputed','service_disputed','fresh_receipt','What is the reply status?');
-run('incomplete_complaint','incomplete','conditions_verified','Which chronology best describes the alleged incidents?');
-run('limitation_concern','late_or_disputed_dates','within_period','Which workplace relationship is alleged?');
-run('jurisdiction_concern','disputed','conditions_verified','Does the committee satisfy constitution');
-console.log('Seven guided inquiry scenario tests passed across No, Not sure and Yes interactive review paths.');
+const registry=launch().model;
+assert.equal(registry.Q.length,50,'Expected P01-P47 plus C01-C03');
+assert.equal(Object.keys(registry.REV).length,32,'All foundational and continuation review types required');
+const validTargets=new Set(['NEXT','NOTICE','CONCILIATION','NO_REPLY','REPLY_RECEIVED','OUTCOME','EDIT','C01']);
+const knownStages=new Set(registry.Q.map(q=>q.id).concat(['P48','C04']));
+for(const q of registry.Q){
+ assert(q.prompt&&q.law&&q.opts.length>0,'Invalid stage '+q.id);
+ for(const opt of q.opts){
+  assert(opt.value&&opt.label&&opt.next,'Incomplete option in '+q.id);
+  assert(knownStages.has(opt.next)||registry.REV[opt.next],'Missing route '+q.id+' / '+opt.value+' → '+opt.next);
+ }
+}
+for(const r of Object.values(registry.REV)){
+ assert(r.actions.length>0&&r.checks.length>0,'Review without assistance: '+r.id);
+ for(const a of r.actions)assert(a.id&&a.label&&validTargets.has(a.target),'Invalid reviewed continuation in '+r.id+': '+JSON.stringify(a));
+}
+assert.equal(registry.REV.SETTLEMENT_CLOSURE_REVIEW.actions[0].target,'C01','Settlement must enter documented closure route');
+assert.equal(registry.REV.FINDINGS_APPROVAL_REVIEW.actions[0].target,'EDIT','Unapproved findings must not pass to recommendations');
+
+function reviewScenario(scenario,answerValue,reviewAction,expectedNext){
+ const c=launch(scenario);
+ assert(c.body.innerHTML.includes('g-choices'),scenario+' initial question absent');
+ c.answer(answerValue);
+ assert(c.body.innerHTML.includes('Has this issue been resolved now?'),scenario+' review not shown');
+ c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('Has this issue been resolved now?'),scenario+' bypassed pending review');
+ c.resolution('no');
+ assert(c.body.innerHTML.includes('What should happen now? Choose an action'),scenario+' No corrective actions missing');
+ c.click({dataset:{helpAction:'request'}});
+ assert(c.body.innerHTML.includes('Suggested action:'),scenario+' No guidance unavailable');
+ c.body.handlers.change({target:{dataset:{workStep:'0'},checked:true}});
+ assert(c.get('g-work-progress').textContent.startsWith('1 of '),scenario+' follow-up tracking not updated');
+ c.resolution('unsure');
+ assert(c.body.innerHTML.includes('Not sure — identify what needs verification'),scenario+' uncertainty pathway missing');
+ c.body.handlers.change({target:{dataset:{uncertainStep:'0'},checked:true}});
+ c.click({id:'g-show-verification'});
+ assert(c.body.innerHTML.includes('Points to verify:'),scenario+' verification not actionable');
+ c.click({id:'g-record-unknown'});
+ assert(c.body.innerHTML.includes('Unresolved review route:'),scenario+' review escalation missing');
+ c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('Not sure — identify what needs verification'),scenario+' unknown review bypassed');
+ c.resolution('yes');
+ c.action(reviewAction);
+ c.check();
+ c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes(expectedNext),scenario+' next step missing: '+c.body.innerHTML.slice(0,800));
+}
+reviewScenario('no_reply','no_reply','opportunity_complete','Has any party raised a procedural objection?');
+reviewScenario('notice_refused','refused','fresh_receipt','What is the reply status?');
+reviewScenario('notice_undelivered','undelivered','fresh_receipt','What is the reply status?');
+reviewScenario('electronic_service_disputed','service_disputed','fresh_receipt','What is the reply status?');
+reviewScenario('incomplete_complaint','incomplete','conditions_verified','Which chronology best describes the alleged incidents?');
+reviewScenario('limitation_concern','late_or_disputed_dates','within_period','Which workplace relationship is alleged?');
+reviewScenario('jurisdiction_concern','disputed','conditions_verified','Does the committee satisfy constitution');
+
+{const c=launch('conciliation_closure_demo');
+ assert(c.body.innerHTML.includes('What occurred in the lawful conciliation route?'));
+ c.answer('settlement_recorded');
+ assert(c.body.innerHTML.includes('Conciliation settlement and follow-up'),'Settlement must be independently reviewed');
+ c.resolution('yes');c.action('settlement_recorded');c.check();c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('Has the voluntary Section 10 settlement'),'Did not reach settlement recording');
+ c.answer('recorded');
+ assert(c.body.innerHTML.includes('Has the settlement been forwarded'),'Did not reach distribution');
+ c.answer('completed');
+ assert(c.body.innerHTML.includes('What is the implementation status'),'Did not reach implementation');
+ c.answer('implemented');
+ assert(c.body.innerHTML.includes('Conciliation closure and implementation record'),'No genuine Section 10 closure destination');
+ assert(!c.body.innerHTML.includes('P18 Handoff'),'Unexpected old handoff');
+ c.click({id:'g-print-preview'});
+ assert.equal(c.printed,1,'Print preview handler missing');
+}
+
+{const c=launch('inquiry_report_demo');
+ assert(c.body.innerHTML.includes('Has the complete inquiry closure checklist'),'P47 scenario not reachable');
+ c.answer('complete');
+ assert(c.body.innerHTML.includes('Inquiry report and administrative closure'),'No P48 inquiry report destination');
+ assert(c.body.innerHTML.includes('Allegation-wise evidence appreciation'),'Inquiry report outline missing');
+ assert(c.body.innerHTML.includes('Not proved'),'Committee-selected synthetic finding missing');
+ assert(!c.body.innerHTML.includes('P18 Handoff'),'Old development handoff remains');
+}
+
+{const c=launch('inquiry_from_p18');
+ for(let p=18;p<=47;p++){
+  const stage='P'+String(p).padStart(2,'0');
+  const q=registry.Q.find(x=>x.id===stage);
+  assert(c.body.innerHTML.includes(q.prompt),'Inquiry halted at '+stage);
+  c.answer(q.opts[0].value);
+ }
+ assert(c.body.innerHTML.includes('Inquiry report and administrative closure'),'Full P18–P47 navigation does not complete');
+}
+
+{const c=launch('inquiry_from_p18');
+ for(let p=18;p<35;p++){const q=registry.Q.find(x=>x.id==='P'+String(p).padStart(2,'0'));c.answer(q.opts[0].value)}
+ assert(c.body.innerHTML.includes('What allegation-wise findings'));
+ c.answer('pending');
+ assert(c.body.innerHTML.includes('Committee findings required'));
+ c.resolution('yes');c.action('approved');
+ assert(c.body.innerHTML.includes('Change originating answer'),'Unapproved finding must require inline correction');
+ // No direct advance with an undecided committee finding.
+ c.check();c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('Committee findings required'),'Unapproved finding bypassed');
+}
+
+{const c=launch('conciliation_closure_demo');
+ c.answer('settlement_recorded');
+ c.resolution('yes');c.action('settlement_recorded');c.check();c.click({id:'g-proceed'});
+ c.answer('recorded');c.answer('completed');c.answer('breached');
+ assert(c.body.innerHTML.includes('Conciliation non-compliance'),'Breach must be reviewed');
+ c.resolution('yes');c.action('breach_and_inquiry');c.check();c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('What is the status of forwarding the complaint'),'Breach did not route into inquiry');
+}
+console.log('Guided flow tests: 7 exception scenarios, 2 terminal outcomes, P18–P47, findings gate and settlement breach PASS.');
