@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "4.7.0-institutional-conversion-ctas-staging",
+  "version": "4.8.0-required-enquiry-identity-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -20,7 +20,7 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "main.js": "70f1d3e530915fa41e9c15ff2f16b7e5cefc5acc8a14ff70760f921a82541209",
+    "main.js": "ff350a6e64e2abbb9e59028607664664dfc3084525f42f6b78ef44d16e0a220f",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "institutions.html": "8db66ba25788e5876d4bb04e5899359e576f068df115ee278bf6bfc1eb6e3d38",
     "social-preview.png": "e5b16dcc53862b0c6fc627061f84d67da30358396b6606d4ecec99d89810db28",
