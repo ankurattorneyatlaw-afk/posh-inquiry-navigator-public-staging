@@ -31,8 +31,8 @@ function launch(scenario='manual',timeline=null){
  return {get,model,body,answer,resolution,action,check,click,get printed(){return prints}};
 }
 const registry=launch().model;
-assert.equal(registry.Q.length,50,'Expected P01-P47 plus C01-C03');
-assert.equal(Object.keys(registry.REV).length,32,'All foundational and continuation review types required');
+assert.equal(registry.Q.length,51,'Expected P01-P47 plus conciliation information and C01-C03');
+assert.equal(Object.keys(registry.REV).length,33,'All foundational and continuation review types required');
 const validTargets=new Set(['NEXT','NOTICE','CONCILIATION','NO_REPLY','REPLY_RECEIVED','OUTCOME','EDIT','C01']);
 const knownStages=new Set(registry.Q.map(q=>q.id).concat(['P48','C04']));
 for(const q of registry.Q){
