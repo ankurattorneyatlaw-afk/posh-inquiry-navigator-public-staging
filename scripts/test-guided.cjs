@@ -24,7 +24,7 @@ function run(scenario,answer,action,nextQuestion){
   // Three visible checks are mandatory in the present synthetic review families.
   for(let i=0;i<3;i++)body.handlers.change({target:{dataset:{check:String(i)},checked:true}});
   body.handlers.click({target:{id:'g-proceed',dataset:{}}});
-  assert(body.innerHTML.includes(nextQuestion),scenario+': correct continuation missing');
+  assert(body.innerHTML.includes(nextQuestion),scenario+': correct continuation missing: '+body.innerHTML.slice(0,900));
 }
 run('no_reply','no_reply','opportunity_complete','Has any party raised a procedural objection?');
 run('notice_refused','refused','fresh_receipt','What is the reply status?');
