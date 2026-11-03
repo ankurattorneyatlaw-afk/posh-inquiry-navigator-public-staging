@@ -47,6 +47,7 @@ for(const r of Object.values(registry.REV)){
 }
 assert.equal(registry.REV.SETTLEMENT_CLOSURE_REVIEW.actions[0].target,'C01','Settlement must enter documented closure route');
 assert.equal(registry.REV.FINDINGS_APPROVAL_REVIEW.actions[0].target,'EDIT','Unapproved findings must not pass to recommendations');
+assert(registry.REV.SETTLEMENT_BREACH_ROUTE.checks.some(c=>c.includes('aggrieved woman')),'A settlement breach cannot progress without statutory complainant notification check');
 
 function reviewScenario(scenario,answerValue,reviewAction,expectedNext){
  const c=launch(scenario);
