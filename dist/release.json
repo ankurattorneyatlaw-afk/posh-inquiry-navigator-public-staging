@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "4.4.0-fair-process-sales-narrative-staging",
+  "version": "4.5.0-value-before-proof-staging",
   "environment": "staging",
   "assets": {
     "index.html": "9c886dc0f7c5762a4c613122cc65c6ae39cfe58aecd05368d0e7634f523ec32b",
@@ -16,6 +16,6 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "main.js": "2cd45994f9388a31bd39844b28644f8f3137e83bbde0bff72f59f68dcbe79358"
+    "main.js": "982b2aa8b346e86b1154ce4847bb981869331219e35cdf82587a1cf7235b03cd"
   }
 }
