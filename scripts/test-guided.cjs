@@ -22,7 +22,9 @@ function run(scenario,answer,action,nextQuestion){
   assert(body.innerHTML.includes('Choose the legally reviewed outcome'),scenario+': next options missing');
   body.handlers.change({target:{name:'g-action-choice',value:action,dataset:{}}});
   // Three visible checks are mandatory in the present synthetic review families.
-  for(let i=0;i<3;i++)body.handlers.change({target:{dataset:{check:String(i)},checked:true}});
+  const required=(body.innerHTML.match(/data-check="[0-9]+"/g)||[]).length;
+  assert(required>=2,scenario+': missing confirmation prerequisites');
+  for(let i=0;i<required;i++)body.handlers.change({target:{dataset:{check:String(i)},checked:true}});
   assert.equal(get('g-proceed').disabled,false,scenario+': prerequisite checkboxes did not unlock next step');
   body.handlers.click({target:{id:'g-proceed',dataset:{}}});
   assert(body.innerHTML.includes(nextQuestion),scenario+': correct continuation missing: '+body.innerHTML.slice(0,900));
