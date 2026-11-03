@@ -466,3 +466,6 @@ body[data-page="home"] .section{padding-top:76px;padding-bottom:76px}
 body[data-page="institutional"] .analytics-consent{bottom:105px}@media(max-width:700px){body[data-page="institutional"] .analytics-consent{bottom:95px}}
 
 .staging-notice{padding:10px 16px;background:#102039;color:#fff;text-align:center;font:600 12px/1.5 system-ui;}
+.timeline-workspace{max-width:1000px;padding:32px 20px}.timeline-workspace form{margin:24px 0;padding:20px;border:1px solid #cbd5e1;border-radius:12px}.timeline-workspace label{display:block;margin:12px 0}.timeline-workspace input:not([type=checkbox]),.timeline-workspace select{display:block;width:100%;padding:10px;border:1px solid #94a3b8;border-radius:6px}.timeline-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.timeline-alert{padding:16px;margin:12px 0;background:#f1f5f9;border-left:4px solid #b7791f}.timeline-workspace pre{white-space:pre-wrap;overflow-wrap:anywhere}.timeline-workspace details{margin:15px 0}.timeline-workspace #timeline-error{color:#a41919}
+
+#g-documents select{width:100%;padding:12px;margin:12px 0;border:1px solid #8fa1b2;border-radius:7px}#g-documents h4{margin:16px 0 4px}#g-timeline-panel,#g-documents-panel{margin-bottom:18px}#g-documents p{max-width:1000px}

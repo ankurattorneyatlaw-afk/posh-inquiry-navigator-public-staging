@@ -5,14 +5,15 @@ const continuation=fs.readFileSync('dist/guided-continuation.js','utf8');
 const injected=source.replace(/\}\)\(\);\s*$/,'globalThis.__model={Q,REV};})();');
 assert.notEqual(injected,source,'Guided model inspection hook is unavailable');
 
-function launch(scenario='manual'){
+function launch(scenario='manual',timeline=null){
  const nodes=new Map();let prints=0;
  function get(id){
   if(!nodes.has(id))nodes.set(id,{id,innerHTML:'',textContent:'',value:'',disabled:false,handlers:{},
-    addEventListener(name,handler){this.handlers[name]=handler},focus(){},scrollIntoView(){}});
+    addEventListener(name,handler){this.handlers[name]=handler},querySelector(){return null},focus(){},scrollIntoView(){}});
   return nodes.get(id);
  }
- const sandbox={document:{getElementById:get},window:{print(){prints++}}};
+ const sandbox={document:{getElementById:get},window:{print(){prints++},addEventListener(){}}};
+ if(timeline)sandbox.window.NavigatorTimelineUI={getResult:()=>timeline,render(){}};
  vm.runInNewContext(continuation,sandbox,{timeout:3000});
  vm.runInNewContext(injected,sandbox,{timeout:3000});
  const model=sandbox.__model,drop=get('g-scenario'),body=get('g-body');
@@ -143,3 +144,7 @@ reviewScenario('jurisdiction_concern','disputed','conditions_verified','Does the
  assert(c.body.innerHTML.includes('What is the status of forwarding the complaint'),'Breach did not route into inquiry');
 }
 console.log('Guided flow tests: 7 exception scenarios, 2 terminal outcomes, P18–P47, findings gate and settlement breach PASS.');
+
+{const c=launch('inquiry_report_demo',{canClose:false,flow:'inquiry-report-pending'});c.answer('complete');assert(c.body.innerHTML.includes('Timeline review required before completion'));assert(!c.body.innerHTML.includes('id="g-print-preview"'));}
+{const c=launch('inquiry_report_demo',{canClose:true,flow:'conciliation-complete'});c.answer('complete');assert(c.body.innerHTML.includes('Timeline review required before completion'));}
+{const c=launch('inquiry_report_demo',{canClose:true,flow:'inquiry-report-complete'});c.answer('complete');assert(c.body.innerHTML.includes('Inquiry report and administrative closure'));}
