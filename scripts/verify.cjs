@@ -1,6 +1,6 @@
 const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
 const release=JSON.parse(fs.readFileSync('dist/release.json'));assert.equal(release.environment,'staging');
-assert.equal(fs.readdirSync('dist').length,16);
+assert.equal(fs.readdirSync('dist').length,20);assert.equal(release.search.indexable,false);assert.match(fs.readFileSync('dist/robots.txt','utf8'),/Disallow: \//);const institution=fs.readFileSync('dist/institutions.html','utf8');assert(institution.includes('Run a fair POSH inquiry.'));assert(institution.includes('Multiple POSH certifications from government institutions'));assert(institution.includes('application/ld+json'));assert(institution.includes('/institutions'));assert(fs.existsSync('scripts/analytics-api.cjs'));
 for(const [name,hash] of Object.entries(release.assets))assert.equal(crypto.createHash('sha256').update(fs.readFileSync('dist/'+name)).digest('hex'),hash);
 const main=fs.readFileSync('dist/main.js','utf8');assert.equal(require('../dist/plans.js').catalogue.find(p=>p.id==='institutional').displayPrice,'₹1,49,999');assert(!main.includes('data-download="report"'));assert(main.includes('Witness examination & appreciation of evidence'));
 assert(main.includes('Findings, representations and inquiry report'));assert(main.includes('Where both parties are employees'));assert(main.includes('Section 11(1) sets no fixed representation period'));
