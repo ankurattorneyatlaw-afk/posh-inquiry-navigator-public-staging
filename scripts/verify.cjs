@@ -22,6 +22,7 @@ const serverSource=fs.readFileSync('scripts/serve.cjs','utf8');
 assert(serverSource.includes("'/guided':'guided.html'"));
 assert(serverSource.includes('<a href="/guided">Guided IC/LC Inquiry</a>'));
 console.log('Integrated guided inquiry staging safeguards verified.');
+require('./test-guided.cjs');
 
 
 const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,19);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
