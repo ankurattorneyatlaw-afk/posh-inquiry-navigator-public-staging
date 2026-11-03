@@ -47,14 +47,24 @@ body{background:#f3f5f8;color:var(--ink);margin:0}
 .g-edit{border-top:1px solid #ced7e1;padding:15px 0;margin-top:18px}
 .g-edit select{border:1px solid #9badbf;background:white;border-radius:6px;padding:9px;max-width:100%}
 .g-footer{text-align:center;padding:26px;color:#61748b;font-size:12px}
+@media print {
+ body{background:white!important;color:#111!important}
+ .g-top,.g-header,.g-toolbar,.g-left,.g-right,.g-intro,.g-button-row,.g-mini,.g-footer{display:none!important}
+ .g-shell{padding:0;max-width:none;margin:0}
+ .g-layout{display:block}
+ .g-panel{box-shadow:none;border:0;padding:0}
+ .g-success{background:white!important;border-left:2px solid black;padding:6px 10px}
+ h1,h2,h3{color:#111!important}
+ @page{size:A4;margin:22mm}
+}
 .g-help h4{margin:13px 0 3px}
 @media(max-width:1080px){.g-layout{grid-template-columns:minmax(170px,1fr) minmax(350px,3fr)}.g-right{grid-column:1/-1}}
 @media(max-width:700px){.g-shell{padding:21px 4%}.g-layout{display:block}.g-left{display:none}.g-panel{margin-bottom:13px}.g-choices{grid-template-columns:1fr}.g-toolbar select{width:100%;min-width:0}}
-</style><script src="/guided.js" defer></script></head><body>
+</style><script src="/guided-continuation.js" defer></script><script src="/guided.js" defer></script></head><body>
 <a class="skip" href="#main">Skip to inquiry</a>
 <div class="g-top"><span>POSH INQUIRY NAVIGATOR · CURRENT RENDER STAGING</span><span>FICTIONAL DEMONSTRATION · DO NOT ENTER ACTUAL CASE INFORMATION</span></div>
 <header class="g-header"><a class="g-brand" href="/">POSH <span>Inquiry Navigator</span></a><nav aria-label="Site navigation"><a href="/">Home</a><a href="/#demo">Free stages</a><a href="/institutions">Institutions</a></nav></header>
-<main id="main" class="g-shell"><div class="g-intro"><div><span class="g-label">Structured IC/LC workflow · Alpha 3.1</span><h1>Guided IC / LC inquiry</h1><p>When an issue remains unresolved, stay on this screen, examine the checklist, then answer <b>“Has this issue been resolved now?”</b> before taking the appropriate next step. Facts, statutory decisions and authority remain with the competent committee.</p></div><span class="g-pill">P01–P17 · Demonstration only</span></div>
+<main id="main" class="g-shell"><div class="g-intro"><div><span class="g-label">Structured IC/LC workflow · Staging</span><h1>Guided IC / LC inquiry</h1><p>Follow the fictional inquiry through to its appropriate completed-case route: <strong>Section 10 conciliation closure</strong> or a <strong>committee-authorised inquiry report and administrative closure</strong>. When an issue arises, use the inline review tools on the same screen instead of hitting a dead end. The competent committee alone decides the actual case.</p></div><span class="g-pill">P01–P47 · Fictional procedural preview</span></div>
 <div class="g-toolbar"><label for="g-scenario">Fictional test scenario</label><select id="g-scenario"><option value="manual">Start at P01 (choose answers)</option></select><button class="g-btn secondary" type="button" id="g-restart">Restart this scenario</button><span class="g-mini" id="g-progress" aria-live="polite"></span></div>
 <div class="g-layout"><aside class="g-panel g-left"><span class="g-label">Stage progress</span><ol id="g-stages" class="g-stages"></ol></aside><section class="g-panel" aria-live="polite"><span class="g-label" id="g-current">P01</span><div id="g-body"><h2>Loading workflow…</h2></div><p class="g-mini">This tool cannot receive formal complaints, make findings or issue operative notices. No real cases or identities.</p></section><aside class="g-panel g-right"><span class="g-label">Legal & procedural guidance</span><h2>Fair process</h2><div id="g-help"><p>Choose a fictional scenario to review relevant safeguards.</p></div><p class="g-mini">Application of the Central Rules, sector-specific rules and High Court decisions requires independent legal verification.</p></aside></div>
 </main><footer class="g-footer">Existing POSH Inquiry Navigator staging · Not approved for confidential or operational use · Human decisions always required</footer></body></html>
