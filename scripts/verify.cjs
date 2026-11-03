@@ -12,6 +12,7 @@ const faq=require('../dist/faq.js');assert.equal(faq.items.length,110);assert.eq
 console.log('Staging asset hashes and public boundaries verified.');
 const guidedHtml=fs.readFileSync('dist/guided.html','utf8'),guidedCode=fs.readFileSync('dist/guided.js','utf8');
 assert(guidedHtml.includes('Has this issue been resolved now?'));
+new (require('node:vm').Script)(guidedCode,{filename:'dist/guided.js'});
 assert(guidedHtml.includes('No real cases or identities'));
 for(const stage of ['P01','P05','P11','P14','P15','P16','P17'])assert(guidedCode.includes(stage));
 for(const review of ['SERVICE_PROOF_REVIEW','REPLY_OPPORTUNITY_REVIEW','COMMITTEE_CORRECTION_REVIEW','HUMAN_LIMITATION_REVIEW','FACT_UNCERTAINTY_REVIEW'])assert(guidedCode.includes(review));
