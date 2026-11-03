@@ -179,7 +179,7 @@
       'Resolve material evidence gaps and objections.',
       'Record allegation-wise reasons and committee deliberation.',
       'Obtain competent approval before preparing recommendations.'
-    ],[['approved','Committee-entered findings and reasons approved','NEXT']]),
+    ],[['approved','Findings must now be entered or corrected on this screen','EDIT']]),
     RECOMMENDATIONS_REVIEW:R('RECOMMENDATIONS_REVIEW','Recommendations and compensation review','Discipline and compensation cannot be assigned automatically.',[
       'Separate findings from recommendations and Section 15 factors.',
       'Identify available options under applicable service rules.',
