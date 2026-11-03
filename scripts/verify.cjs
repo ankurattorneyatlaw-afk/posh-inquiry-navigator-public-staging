@@ -11,7 +11,7 @@ assert(main.includes('an NDA is not a statutory condition for filing a complaint
 const faq=require('../dist/faq.js');assert.equal(faq.items.length,110);assert.equal(faq.topics.length,13);assert(fs.readFileSync('dist/index.html','utf8').includes('faq.js'));
 console.log('Staging asset hashes and public boundaries verified.');
 const guidedHtml=fs.readFileSync('dist/guided.html','utf8'),guidedCode=fs.readFileSync('dist/guided.js','utf8');
-assert(guidedHtml.includes('Has this issue been resolved now?'));
+assert(guidedCode.includes('Has this issue been resolved now?'));
 new (require('node:vm').Script)(guidedCode,{filename:'dist/guided.js'});
 const continuationCode=fs.readFileSync('dist/guided-continuation.js','utf8');
 new (require('node:vm').Script)(continuationCode,{filename:'dist/guided-continuation.js'});
