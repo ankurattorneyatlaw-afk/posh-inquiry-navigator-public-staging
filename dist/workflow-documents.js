@@ -249,7 +249,7 @@ function forStage(stage,answer){
  if(stage==='P08')return ['complainant-notice','complainant-notice-control','clarification'];
  if(stage==='P10A')return answer==='already_inquiry'?['committee-declines']:['conciliation-information'];
  if(stage==='P09'||stage==='P29')return ['none','unknown'].includes(answer)?[]:['interim-request','interim-recommendation'];
- if(stage==='P11')return ['yes_written','yes_oral_needs_confirmation'].includes(answer)?['conciliation-request','committee-accepts','committee-declines']:answer==='already_inquiry'?['committee-declines']:answer==='unknown'?['conciliation-information']:['woman-declines'];
+ if(stage==='P11')return ['yes_written','yes_oral_needs_confirmation'].includes(answer)?['conciliation-request','committee-accepts','committee-declines','respondent-accepts','respondent-declines']:answer==='already_inquiry'?['committee-declines']:answer==='unknown'?['conciliation-information']:['woman-declines'];
  if(stage==='P12')return answer==='settlement_recorded'?['settlement-record','settlement-forwarding']:answer==='settlement_breached'?['settlement-breach']:['committee-declines'];
  if(stage==='P20')return answer==='repeated_absence'?['attendance','adjournment','absence-safeguards']:answer==='single_absence'?['attendance','adjournment']:['attendance','minutes'];
  if(stage==='P21')return answer==='not_applicable'?[]:['absence-safeguards'];
