@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const source=fs.readFileSync('dist/guided.js','utf8');
 const continuation=fs.readFileSync('dist/guided-continuation.js','utf8');
-const injected=source.replace(/\}\)\(\);\s*$/,'globalThis.__model={Q,REV};})();');
+const injected=source.replace(/\}\)\(\);\s*$/,'globalThis.__model={Q,REV,loadReview(stage,value){documentTrail=[];answers={};decisions={};for(const q of Q){if(q.id===stage)break;if(q.id.startsWith("C"))continue;answers[q.id]=DEFAULT[q.id]||q.opts[0].value;}if(stage==="P12")answers.P11="yes_written";if(stage.startsWith("C")){answers.P11="yes_written";answers.P12="settlement_recorded";decisions.P12={trigger:"settlement_recorded",action:"settlement_recorded",confirmed:true};answers.C01="recorded";answers.C02="completed";}answers[stage]=value;lastKey="";render();}};})();');
 assert.notEqual(injected,source,'Guided model inspection hook is unavailable');
 
 function launch(scenario='manual',timeline=null){
@@ -148,3 +148,20 @@ console.log('Guided flow tests: 7 exception scenarios, 2 terminal outcomes, P18â
 {const c=launch('inquiry_report_demo',{canClose:false,flow:'inquiry-report-pending'});c.answer('complete');assert(c.body.innerHTML.includes('Timeline review required before completion'));assert(!c.body.innerHTML.includes('id="g-print-preview"'));}
 {const c=launch('inquiry_report_demo',{canClose:true,flow:'conciliation-complete'});c.answer('complete');assert(c.body.innerHTML.includes('Timeline review required before completion'));}
 {const c=launch('inquiry_report_demo',{canClose:true,flow:'inquiry-report-complete'});c.answer('complete');assert(c.body.innerHTML.includes('Inquiry report and administrative closure'));}
+
+// Audit every declared exceptional destination: a usable open route, never a third completion.
+let openRoutes=0;
+for(const q of registry.Q)for(const opt of q.opts){const r=registry.REV[opt.next];if(!r)continue;for(const a of r.actions.filter(a=>a.target==='OUTCOME')){
+ const c=launch();c.model.loadReview(q.id,opt.value);
+ if(!c.body.innerHTML.includes('Has this issue been resolved now?'))throw Error('Unreachable review audit '+q.id+' '+opt.value);
+ c.resolution('yes');
+ if(!c.body.innerHTML.includes('value="'+a.id+'"'))continue;
+ c.action(a.id);c.check();c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('Open procedural follow-up'),q.id+' referral left blank');
+ for(const text of ['How to follow this lawful route','Record next follow-up','Review response and reassess','receiving authority','review date'])assert(c.body.innerHTML.includes(text),q.id+' missing '+text);
+ assert(!c.body.innerHTML.includes('g-print-preview'));
+ c.click({id:'g-route-reassess'});assert(c.body.innerHTML.includes('Has this issue been resolved now?'));
+ openRoutes++;
+}}
+for(const value of ['different_organisation','outsider']){const c=launch('external_respondent');c.answer(value);assert(c.body.innerHTML.includes('Special jurisdiction and duties'));c.resolution('yes');c.action('conditions_verified');c.check();c.click({id:'g-proceed'});assert(c.body.innerHTML.includes('Which forum is being considered?'));}
+assert(openRoutes>5);console.log('All '+openRoutes+' exceptional route destinations offer guidance, owned follow-up and reassessment; external respondent routes continue after verified competence.');
