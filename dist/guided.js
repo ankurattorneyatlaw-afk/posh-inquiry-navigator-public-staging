@@ -68,6 +68,8 @@ const EXAMPLES=[
 ['complete_admission','Complete admission','P16',{P16:'full_admission'}],
 ['complete_denial','Complete denial','P16',{P16:'complete_denial'}],
 ['partial_admission','Partial admission','P16',{P16:'qualified_or_partial_admission'}],
+['complaint_followup_demo','Complainant clarification and procedural notice','P08',{}],
+['respondent_notice_demo','Respondent complaint notice and enclosures','P13',{}],
 ['external_respondent','Respondent from another organisation or visitor','P04',{}],
 ['employer_respondent','Employer named as respondent','P04',{P04:'employer_or_senior_management'}],
 ['conciliation_requested','Conciliation requested','P12',{P11:'yes_written',P12:'no_agreement'}],

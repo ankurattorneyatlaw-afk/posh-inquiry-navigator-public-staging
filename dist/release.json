@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "4.12.0-open-referral-followup-staging",
+  "version": "4.13.0-module-a-notices-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -18,7 +18,7 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "guided-continuation.js": "3c9b01ebb7dec5578fc704ec6f422c2468ba45d7558806bffceda82b98d9e954",
     "guided.html": "82bc4131ff066e35b125c7287e01d5252a3ddedd94688c705687fe02e3f4cf1e",
-    "guided.js": "16af4b0fbeaffe402db873860ee229c99229db5c7450059dd7a2a0e27e5cb3cf",
+    "guided.js": "17cb641b22b848d1206637cc61fc8125aea2a8e69f0dddfbc80ca72d75cc0748",
     "index.html": "5a7b268b1398c15e00aebecba77b35ae57f2c985b45375041240fd229e03a0a3",
     "institutions.html": "8db66ba25788e5876d4bb04e5899359e576f068df115ee278bf6bfc1eb6e3d38",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
@@ -31,6 +31,6 @@
     "styles.css": "2ece523a43fd918c3dbc80cae9892c208fcf47545c062c250e98e1b7edf96c6b",
     "timeline-ui.js": "d5a66dcf07954c4fb02429c03f1f5688fbe8c1a505bbb6954e9b6ebcf52f28df",
     "timeline.js": "3970be6313b593417ba049b95dd764a8d7aab30fe3d6396753db84382a3505c6",
-    "workflow-documents.js": "6592c594676e1be087b2918a5e45a7e14ce4108a208bacad1e4476162579af35"
+    "workflow-documents.js": "701d693983966b1d657a007c245e0cc3c91d4ee854b3a1e6df7a841e05e9263c"
   }
 }
