@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.2.0-focused-guided-workflow",
+  "version": "5.2.1-member-route-review",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -21,7 +21,7 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "guided-continuation.js": "179062560fdbc90617d563b08d7c544de1d08efd6fc681663a96d483f09b2265",
     "guided.html": "b107bfe47a533820aaa2ff1d6f72ef2e3489e98e6205c6c20781b69f561dbd14",
-    "guided.js": "3c8211c68226074626e83c783bb9e150857d028508d50694e3fde834fa09a0d7",
+    "guided.js": "53d7e2cccf0dbd64737f0a7d7bd41c7fc068e4b7e94007a866e629dc8d0b0386",
     "index.html": "0ca0558210d5f3b5a1c4d040809f57ac07a8a348d50d04e224e867e3d10f19d6",
     "institutions.html": "aee3bbfcfa2d748d2a71935961fc66eb8dbde1f398b1f799b800bb83cdba2b1c",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
@@ -35,8 +35,8 @@
     "sitemap.xml": "68ab08991efaca902bcb8a6518106d8b29964c5651f39abbb7eb7c9713ca2770",
     "social-preview.png": "e5b16dcc53862b0c6fc627061f84d67da30358396b6606d4ecec99d89810db28",
     "styles.css": "2ece523a43fd918c3dbc80cae9892c208fcf47545c062c250e98e1b7edf96c6b",
-    "timeline-ui.js": "ff93738ec996dfe5f4e43c9b320c2db452217c253170a8c01f26a816ad27c9e9",
+    "timeline-ui.js": "8e5def24dc3501071873fe8d01244752957f7729e50ce020d772d1d6433d8d9b",
     "timeline.js": "565d6ce6f9936f9e08f44f8cc3f048500cb03c864fd2832cbbe0b5f18fefc475",
-    "workflow-documents.js": "1d5a61c6d60462594578ac8c3b19efe9ec31dc70bd102bc9eb566dac2a2e6526"
+    "workflow-documents.js": "0f64fe511b92743badac6b054c8e8b3f4631de35eedf72242cbe05d37750b710"
   }
 }
