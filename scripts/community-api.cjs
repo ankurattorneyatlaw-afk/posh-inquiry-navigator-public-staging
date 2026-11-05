@@ -1,4 +1,6 @@
 'use strict';
+const {clientNetwork}=require('./request-guards.cjs');
+
 const {randomUUID,randomBytes,createHmac}=require('node:crypto');
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const categories=['General','Inquiry process','Rights and safeguards','Committee practice'];
@@ -20,7 +22,7 @@ function createCommunityHandler({url=process.env.COMMUNITY_SUPABASE_URL,key=proc
  function allowed(req){
   const t=now();if(t-windowStart>900000){windowStart=t;globalCount=0;limits.clear();}
   if(++globalCount>100)return false;
-  const network=req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown';
+  const network=clientNetwork(req);
   const hash=createHmac('sha256',salt).update(String(network)).digest('hex');
   const count=(limits.get(hash)||0)+1;limits.set(hash,count);return count<=5;
  }
@@ -58,10 +60,10 @@ function createCommunityHandler({url=process.env.COMMUNITY_SUPABASE_URL,key=proc
    try{
     if(route==='/api/community/questions'){
      const title=validateText(data.title,10,160),body=validateText(data.body,20,2000);if(!categories.includes(data.category))throw Error('Choose a topic.');
-     await db('community_questions','',{id,title,body,category:data.category});
+     await db('community_questions','',{id,title,body,category:data.category,status:'pending'});
     }else if(route==='/api/community/answers'){
      if(!UUID.test(data.question_id||''))throw Error('Invalid question.');
-     const body=validateText(data.body,20,2000);await db('community_answers','',{id,question_id:data.question_id,body});
+     const body=validateText(data.body,20,2000);await db('community_answers','',{id,question_id:data.question_id,body,status:'pending'});
     }else if(route==='/api/community/reports'){
      if(!UUID.test(data.post_id||'')||!['question','answer'].includes(data.kind)||!reasons.includes(data.reason))throw Error('Choose a valid report reason.');
      await db('community_reports','',{post_id:data.post_id,kind:data.kind,reason:data.reason});

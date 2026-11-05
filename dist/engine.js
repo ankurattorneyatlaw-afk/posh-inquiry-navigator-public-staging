@@ -57,18 +57,28 @@
     if (when.in) return when.in[1].includes(state[when.in[0]]);
     return false;
   }
-  function activeQuestions(role,state,stage) { return questions.filter(q=>q.role===role && (!stage || q.stage===stage) && conditionMatches(q.when,state)); }
   function activeAnswers(role,state) {
-    const allowed = new Set(activeQuestions(role,state).map(q=>q.id));
-    return Object.fromEntries(Object.entries(state).filter(([k])=>allowed.has(k)));
+    const roleQuestions=questions.filter(q=>q.role===role);
+    let current=Object.fromEntries(Object.entries(state).filter(([k])=>roleQuestions.some(q=>q.id===k)));
+    // Remove descendants of an inactive branch as well as its immediate answer.
+    // Each pass only removes keys, so this reaches a fixed point in at most N passes.
+    for(let pass=0;pass<=roleQuestions.length;pass++){
+      const allowed=new Set(roleQuestions.filter(q=>conditionMatches(q.when,current)).map(q=>q.id));
+      const next=Object.fromEntries(Object.entries(current).filter(([k])=>allowed.has(k)));
+      if(Object.keys(next).length===Object.keys(current).length)return next;
+      current=next;
+    }
+    return current;
   }
-  function validAnswer(q, value) {
+  function activeQuestions(role,state,stage) { const current=activeAnswers(role,state);return questions.filter(q=>q.role===role && (!stage || q.stage===stage) && conditionMatches(q.when,current)); }
+  function indiaDay(now=new Date()){const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(now));const part=t=>parts.find(x=>x.type===t).value;return part('year')+'-'+part('month')+'-'+part('day');}
+  function validAnswer(q, value, now=new Date()) {
     if (value === undefined || value === null || value === '') return false;
     if (q.kind === 'multi') {const selected = Array.isArray(value) ? value : []; const choices=new Set((q.choices||[]).map(c=>c.value));return selected.length>0&&selected.every(v=>choices.has(v))&&(!selected.includes('none')&&!selected.includes('unsure')||selected.length===1);}
     if (q.kind === 'date') {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
       const dt = new Date(`${value}T00:00:00Z`);
-      return Number.isFinite(dt.getTime()) && dt.toISOString().slice(0,10) === value && value <= new Date().toISOString().slice(0,10);
+      return Number.isFinite(dt.getTime()) && dt.toISOString().slice(0,10) === value && value <= indiaDay(now);
     }
     return q.choices?.some(c => c.value === value) ?? true;
   }
@@ -84,11 +94,13 @@
     return all[0].id;
   }
   function addMonthsClamped(iso,n) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso||'')) return null;
-    const [y,m,d]=iso.split('-').map(Number), x = new Date(Date.UTC(y,m-1+n,1));
-    if(!Number.isFinite(x.getTime()))return null;
-    const last=new Date(Date.UTC(x.getUTCFullYear(),x.getUTCMonth()+1,0)).getUTCDate();
-    x.setUTCDate(Math.min(d,last)); return x.toISOString().slice(0,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||'')||!Number.isInteger(n))return null;
+    const source=new Date(iso+'T00:00:00Z');
+    if(!Number.isFinite(+source)||source.toISOString().slice(0,10)!==iso)return null;
+    const day=source.getUTCDate(),x=new Date(source);x.setUTCDate(1);x.setUTCMonth(x.getUTCMonth()+n);
+    if(!Number.isFinite(+x))return null;
+    const last=new Date(x);last.setUTCMonth(last.getUTCMonth()+1,0);x.setUTCDate(Math.min(day,last.getUTCDate()));
+    const result=x.toISOString().slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(result)?result:null;
   }
   const action=(priority,title,detail,source,owner='You',type='action')=>({priority,title,detail,source,owner,type});
   function answeredLabels(role, state) {
@@ -144,7 +156,7 @@
         'Create a private chronological list of incidents that may be sexual in nature; separate unrelated workplace disputes.',
         'For each entry: date or best estimate, location and available source record.', 'Determine the last relevant incident date before relying on a filing reference.');
       if(!nonsexual && s['w.lastDate']){
-        const d=s['w.lastDate'],first=addMonthsClamped(d,3),outer=addMonthsClamped(d,6),today=new Date().toISOString().slice(0,10),filed=s['w.filed']==='yes';
+        const d=s['w.lastDate'],first=addMonthsClamped(d,3),outer=addMonthsClamped(d,6),today=indiaDay(),filed=s['w.filed']==='yes';
         const passed3=first && today>first,passed6=outer&&today>outer;
         const timeline= `Date you entered: ${d}. Indicative three-calendar-month reference: ${first}. Possible additional three-calendar-month reference: ${outer}.`;
         let target='Compare your stated submission date with the incident date. Keep a sent copy and seek confirmation of actual receipt from the authority.';
@@ -281,5 +293,5 @@
     }
     return {actions:actions.sort((a,b)=>a.priority-b.priority),notices,eligibleDoc,s,answers:answeredLabels(role,s)};
   }
-  return {SOURCES,questions,stages,conditionMatches,activeQuestions,activeAnswers,validAnswer,stageReady,nextStage,previousStage,addMonthsClamped,outcome};
+  return {SOURCES,questions,stages,conditionMatches,activeQuestions,activeAnswers,indiaDay,validAnswer,stageReady,nextStage,previousStage,addMonthsClamped,outcome};
 });

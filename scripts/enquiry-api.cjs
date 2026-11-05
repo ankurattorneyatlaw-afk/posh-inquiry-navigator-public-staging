@@ -1,4 +1,6 @@
 "use strict";
+const {clientNetwork}=require('./request-guards.cjs');
+
 const {randomUUID,randomBytes,createHmac}=require('node:crypto');
 const roles=['IC / LC member','Presiding Officer / Chairperson','HR / employer representative','External Member / adviser','Other organisational role'];
 const plans=['unsure','essential','professional','advanced','institutional','enterprise','knowledge'];
@@ -9,13 +11,13 @@ function validateEnquiry(data){if(!data||typeof data!=='object'||Array.isArray(d
 function createEnquiryHandler({url=process.env.ENQUIRY_SUPABASE_URL||process.env.COMMUNITY_SUPABASE_URL,key=process.env.ENQUIRY_SUPABASE_KEY||process.env.COMMUNITY_SUPABASE_KEY,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',fetchImpl=fetch,now=Date.now,onSaved=async()=>{},notify=async()=>{}}={}){
  const salt=randomBytes(32),limits=new Map();let resetAt=now()+3600000,total=0;
  function send(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
- function allowed(req){const time=now();if(time>=resetAt){limits.clear();total=0;resetAt=time+3600000;}const network=String(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').split(',').pop().trim(),hash=createHmac('sha256',salt).update(network).digest('hex');const count=(limits.get(hash)||0)+1;limits.set(hash,count);return ++total<=100&&count<=5;}
+ function allowed(req){const time=now();if(time>=resetAt){limits.clear();total=0;resetAt=time+3600000;}if(++total>100)return false;const network=clientNetwork(req),hash=createHmac('sha256',salt).update(network).digest('hex');const count=(limits.get(hash)||0)+1;limits.set(hash,count);return count<=5;}
  return async(req,res,parsed)=>{if(!parsed.pathname.startsWith('/api/enquiries'))return false;try{
  if(parsed.pathname==='/api/enquiries/config'&&req.method==='GET'){send(res,200,{enabled:!!(url&&key),private:true});return true;}
  if(parsed.pathname!=='/api/enquiries'){send(res,404,{error:'Not found.'});return true;}
  if(req.method!=='POST'){send(res,405,{error:'Method not allowed.'});return true;}
  if(!url||!key){send(res,503,{error:'Requests are temporarily unavailable. Please try again later.'});return true;}
- if(req.headers.origin!==origin||!/^application\/json(?:;|$)/i.test(req.headers['content-type']||'')){send(res,403,{error:'Request not permitted.'});return true;}
+ if(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||'')){send(res,403,{error:'Request not permitted.'});return true;}
  if(!allowed(req)){res.setHeader('Retry-After','3600');send(res,429,{error:'Request limit reached. Please try again later.'});return true;}
  let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;if(size>4096){send(res,413,{error:'Request is too long.'});return true;}chunks.push(chunk);}
  let raw;try{raw=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{send(res,400,{error:'Check your request.'});return true;}

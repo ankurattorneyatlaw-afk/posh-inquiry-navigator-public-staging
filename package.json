@@ -6,7 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/verify.cjs",
+    "build": "node scripts/verify.cjs && node --test scripts/software.test.cjs",
     "start": "node scripts/serve.cjs"
   }
 }
