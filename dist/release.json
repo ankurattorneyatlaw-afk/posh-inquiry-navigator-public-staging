@@ -1,15 +1,15 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.4.1-verified-recovery",
+  "version": "5.5.0-paid-journey-review",
   "environment": "staging",
   "search": {
     "indexable": false,
     "origin": "https://posh-inquiry-navigator-staging.onrender.com"
   },
   "assets": {
-    "account-guard.js": "77039bd86e8eeaa4dc05f589407129346777c32ef41445cd1f5267ceb2f7c6cf",
+    "account-guard.js": "93bfce9a0d190011ba008a0ccaef6a83a5dd189e9fcb3eb74f1b188fc7acd476",
     "account.html": "7bdb371cbab6a2168132e269a3cf15d7a5c819db16696623f8900140768951d7",
-    "account.js": "6c4ff0190f1a70a13bd388dd0f740a6e17a988dfd7c46e717e48e1fe074bbceb",
+    "account.js": "7d4f9d0b52e4f1115358714f51c763a729817331f7cbc23c9c78b2b0ffa84790",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
@@ -20,8 +20,8 @@
     "faq.js": "627babe8e9a9527842d4dc0de092bce109abd506820b858dbcd3c9b22d74fae4",
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "guided-continuation.js": "179062560fdbc90617d563b08d7c544de1d08efd6fc681663a96d483f09b2265",
-    "guided.html": "d6725c9ae48eb304e5d0a8c1399a8a2a3da9e430d4142ef086e00b72e8562b63",
-    "guided.js": "b448e49e3bb64eb09360a9b4b24a587c5e7372e808a71863b8c24fc2dd69dd0a",
+    "guided.html": "87594a2386798e07bf40fd153a46e45c3544285cf643da31c88538755aa92c8b",
+    "guided.js": "10ec4cfd4d0de0e9087fa3b2808e2829b9f68701832a30e05f7139a8899cb6c1",
     "index.html": "9c066eacf2a152f88bd058d9252b1c829a0bb188f9b801911725935d505d6493",
     "individual-support.html": "94c1dc0042b585f8bd60415b4a8d1cf8f4e737e8192fabc0c31e9793da46a16e",
     "institutions.html": "aee3bbfcfa2d748d2a71935961fc66eb8dbde1f398b1f799b800bb83cdba2b1c",
@@ -39,6 +39,6 @@
     "styles.css": "2ece523a43fd918c3dbc80cae9892c208fcf47545c062c250e98e1b7edf96c6b",
     "timeline-ui.js": "3d4cc85dd7074670a79ae0f4f9fcf31206e695bf9aaba9d81e9af397dbfd9146",
     "timeline.js": "7b5dcb95ea0568932d4cea08cbc382c4ccb451067020276681eea8665829d076",
-    "workflow-documents.js": "e1d1a5e7639e6e42435f5521a02772efed1ad8ba320ab2c7f2170694d3fa5c7b"
+    "workflow-documents.js": "2ca3454caedaedd00c52580c64f8cd7c78ae6c2156faeaf14e14a988e7ae5560"
   }
 }

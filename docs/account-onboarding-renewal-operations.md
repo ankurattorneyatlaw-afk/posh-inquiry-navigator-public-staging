@@ -32,3 +32,14 @@ The default Save recovery file action uses the browser Save dialog when supporte
 Browsers without that capability can use browser download. The recovery link remains available during the tab session; the object URL is not revoked after one second. A requested download is not marked as saved. The member selects the completed file with Check the saved recovery file; its validated contents must match all current work before the warning clears. A stale file cannot verify later edits.
 
 For a clean resume test: save/check → close the inquiry tab → open a fresh paid inquiry tab → Resume from a file → select the checked JSON → review the summary → confirm replacement. Confirm workflow answers, document phase, actual timeline/history and unfinished fields. Draft form values are not automatically submitted as dates, events or legal decisions. Schema-1 and timeline-only exports remain supported, with missing draft fields cleared rather than carried over from the replaced tab.
+
+
+## Paid journey review (5.5.0)
+
+During an access hold, recovery controls move into the accessible verification dialog. A member can save, use the download fallback and check the resulting file even while inquiry editing is blocked. Restoring a different session stays disabled until access is verified. Rechecking returns the recovery panel to the original workspace without changing case selections or dates.
+
+Completion now offers save/check, route-specific completion documents and separate account/renewal navigation. A separate inquiry opens in a fresh tab with no inherited timeline; the completed session stays open. Use a separate proceeding only within the agreed licence scope.
+
+Renewal calendar alarms use a future interval appropriate to the remaining time, rather than placing a seven-day reminder in the past. Repeated downloads for the same plan/end time retain a stable calendar UID. Calendar applications control import, updates and alert delivery. No automatic renewal or email reminder is implied.
+
+If account verification fails temporarily, previous plan/owner controls are hidden until a successful refresh. Keep any existing inquiry tab open; do not assume a provider outage means expiry or purchase failure.
