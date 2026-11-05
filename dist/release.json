@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.5.0-paid-journey-review",
+  "version": "5.6.0-accessibility-and-resilience",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -8,8 +8,8 @@
   },
   "assets": {
     "account-guard.js": "93bfce9a0d190011ba008a0ccaef6a83a5dd189e9fcb3eb74f1b188fc7acd476",
-    "account.html": "7bdb371cbab6a2168132e269a3cf15d7a5c819db16696623f8900140768951d7",
-    "account.js": "7d4f9d0b52e4f1115358714f51c763a729817331f7cbc23c9c78b2b0ffa84790",
+    "account.html": "3a1823b1ed8ec807944fd2bf4d9782254dbedfcda0be0075a69ae8723dc641b3",
+    "account.js": "0c07880727c12bdfad9093e5676fcb85fda989c66b8374a61869236a405d7617",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
@@ -20,8 +20,8 @@
     "faq.js": "627babe8e9a9527842d4dc0de092bce109abd506820b858dbcd3c9b22d74fae4",
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "guided-continuation.js": "179062560fdbc90617d563b08d7c544de1d08efd6fc681663a96d483f09b2265",
-    "guided.html": "87594a2386798e07bf40fd153a46e45c3544285cf643da31c88538755aa92c8b",
-    "guided.js": "10ec4cfd4d0de0e9087fa3b2808e2829b9f68701832a30e05f7139a8899cb6c1",
+    "guided.html": "d8a637e081d63d60e3845807f1ea7367f781fb64db3e33ed8e65c5b4ad74ccec",
+    "guided.js": "c0cd642e3bec2bc70d06a0b486c73277ee0e696b8beb326852920fd8fa103def",
     "index.html": "9c066eacf2a152f88bd058d9252b1c829a0bb188f9b801911725935d505d6493",
     "individual-support.html": "94c1dc0042b585f8bd60415b4a8d1cf8f4e737e8192fabc0c31e9793da46a16e",
     "institutions.html": "aee3bbfcfa2d748d2a71935961fc66eb8dbde1f398b1f799b800bb83cdba2b1c",
@@ -33,11 +33,11 @@
     "privacy.html": "d59a12d613040a83d02333bb54c38e0f72705083e44748fb5730f52c8d51a8a9",
     "private-session-tools.js": "8941b253bfe7b887124ab9e75c529aef4218280b69484ad301aa8762d5602113",
     "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
-    "session-experience.js": "8e3d617c56977427eb4d6044e018d245d7ea2caa2a53b4185a7087925d813f03",
+    "session-experience.js": "c3b84183a4b6b777459ab235b9dbc263da7a4d0884648276fc545002f3f6b27c",
     "sitemap.xml": "68ab08991efaca902bcb8a6518106d8b29964c5651f39abbb7eb7c9713ca2770",
     "social-preview.png": "e5b16dcc53862b0c6fc627061f84d67da30358396b6606d4ecec99d89810db28",
     "styles.css": "2ece523a43fd918c3dbc80cae9892c208fcf47545c062c250e98e1b7edf96c6b",
-    "timeline-ui.js": "3d4cc85dd7074670a79ae0f4f9fcf31206e695bf9aaba9d81e9af397dbfd9146",
+    "timeline-ui.js": "0a43284b038a02d2790cc022f80244078c6b03e4ad4e368d766051d3e1394bcd",
     "timeline.js": "7b5dcb95ea0568932d4cea08cbc382c4ccb451067020276681eea8665829d076",
     "workflow-documents.js": "2ca3454caedaedd00c52580c64f8cd7c78ae6c2156faeaf14e14a988e7ae5560"
   }
