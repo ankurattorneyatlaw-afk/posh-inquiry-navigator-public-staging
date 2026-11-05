@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.0.0-role-workspaces-and-sandbox-purchases",
+  "version": "6.0.1-role-workspaces-and-sandbox-purchases",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -9,7 +9,7 @@
   "assets": {
     "account-guard.js": "d95614ba1a3865032dffe1d659556e9b309abc6322e77c5f1a612b1481394ffe",
     "account.html": "9bc507a0784e8e818e271d49f426ff5f916e57483c2fffa8dd2935b155d3e2f3",
-    "account.js": "bd4143f0c8b3e43187bea061aa74cf41a7ec71a7298abf159e8b11c4256b1c8d",
+    "account.js": "305d24431248fbe44970d120536edf5e518c5ea7cf3c5db5b87be1cea8998e12",
     "admin.html": "421d9e809b76075150d3e171c2fc4845ade30ef3c0dff118c0a6e3b56aa86b63",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
