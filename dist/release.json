@@ -1,19 +1,20 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.10.0-simple-signin-and-free-resources",
+  "version": "6.0.0-role-workspaces-and-sandbox-purchases",
   "environment": "staging",
   "search": {
     "indexable": false,
     "origin": "https://posh-inquiry-navigator-staging.onrender.com"
   },
   "assets": {
-    "account-guard.js": "3c5f6311b02eb0bd557f464d42f33979dfcf5bc83c3d824519f250b2147e3d95",
-    "account.html": "f2505e2de4cc9ab82b5a1bb4e37204045fc9a15366d363b3161921fe5a8328db",
-    "account.js": "127f2e96a5231767d8022082088bf38c8048e105eaa5062dfbcc0f60efeb5181",
+    "account-guard.js": "d95614ba1a3865032dffe1d659556e9b309abc6322e77c5f1a612b1481394ffe",
+    "account.html": "9bc507a0784e8e818e271d49f426ff5f916e57483c2fffa8dd2935b155d3e2f3",
+    "account.js": "bd4143f0c8b3e43187bea061aa74cf41a7ec71a7298abf159e8b11c4256b1c8d",
+    "admin.html": "421d9e809b76075150d3e171c2fc4845ade30ef3c0dff118c0a6e3b56aa86b63",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
-    "checkout.js": "090fa082f547d6a3fa06b78e631dc952bce3cc89bde93d4aad7780ee5ee1ef6b",
+    "checkout.html": "03fb0e3dfed4bc1735aaa9beee9bc34d489dadd1b6f205c94353ebaf990bdb42",
+    "checkout.js": "f7ed7be1c94bc1a5e0894e46f513a7de9e5cd102c11eaa60707546596f29958b",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "docx.js": "d707745f1ed5bdf0a753862bf87f454dc289f983655ec041e4fe5e1ed38acd2e",
     "engine.js": "6b0aaf5f41ec20f0b278875a0f70ea03f9c210c4e08b491de4a3de60931e3050",
@@ -23,12 +24,12 @@
     "guided.html": "3d72469fa81463353541a5c75a6cc5790cd43eec136de37ee8e32f1b541c5312",
     "guided.js": "0a7eefd9e9f4a8a4fa4ea89e9fd29504d1cd84e4538f59acf2ed64e5d4cc2d62",
     "help.html": "76bd5f073e2f64547ba44b2a9bd85d03c66a40365a06f0f3c1a6ea919cadef36",
-    "index.html": "9c066eacf2a152f88bd058d9252b1c829a0bb188f9b801911725935d505d6493",
+    "index.html": "e81dfe55a075c3eaafb41334f3ceb3ff9cccd870d92d36d8f0dca6021a62b85d",
     "individual-support.html": "94c1dc0042b585f8bd60415b4a8d1cf8f4e737e8192fabc0c31e9793da46a16e",
     "institutions.html": "aee3bbfcfa2d748d2a71935961fc66eb8dbde1f398b1f799b800bb83cdba2b1c",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
     "library.js": "597c56c93b5caae1095be80debab5c27ce42d1faffc94c6da38f2293490bab59",
-    "main.js": "f50e4c97a9313e374f638bc3509d6b84cd49ab5f7b88996dfa1d31b4f01dcdc5",
+    "main.js": "b183b888355e875eebfea5bb61a6e94528ace9cb8d1fd0dd707951deed7ecd8b",
     "plans.js": "31c8125e56f67ac4e98bfc2ef755e22899440e2bc06e0e5f3a9eac7b2c4634d4",
     "preview.html": "5b4642174ed5c935de17c2293a14b5de8df430d34eef66646c8af58783dc4147",
     "privacy.html": "d59a12d613040a83d02333bb54c38e0f72705083e44748fb5730f52c8d51a8a9",
@@ -41,6 +42,7 @@
     "styles.css": "f2934df431a5439b37ae886c6f63a6cf3f5003781c0ab6bb6fd0af30519b86ce",
     "timeline-ui.js": "0a43284b038a02d2790cc022f80244078c6b03e4ad4e368d766051d3e1394bcd",
     "timeline.js": "7b5dcb95ea0568932d4cea08cbc382c4ccb451067020276681eea8665829d076",
-    "workflow-documents.js": "2ca3454caedaedd00c52580c64f8cd7c78ae6c2156faeaf14e14a988e7ae5560"
+    "workflow-documents.js": "2ca3454caedaedd00c52580c64f8cd7c78ae6c2156faeaf14e14a988e7ae5560",
+    "workspace.html": "1203bc938bf566b05a5f5d3eec300cfc0b0dccd4d1cbe70cacb30aec1ba79fd2"
   }
 }
