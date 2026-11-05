@@ -1,5 +1,6 @@
 // Serves allowlisted public assets and validated community/test-payment API requests.
 const http = require('node:http');
+const accounts=require('./account-access.cjs').createAccountAccess();
 const community=require('./community-api.cjs').createCommunityHandler();
 const payments=require('./payment-api.cjs').createPaymentHandler();
 const analytics=require('./analytics-api.cjs').createAnalytics();
@@ -16,6 +17,7 @@ const server = http.createServer(async(req,res)=>{
   res.setHeader('Content-Security-Policy',csp);
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('X-Frame-Options','DENY');
+  if(process.env.RENDER)res.setHeader('Strict-Transport-Security','max-age=31536000');
   res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
   res.setHeader('Cache-Control','no-store');
@@ -26,13 +28,15 @@ const server = http.createServer(async(req,res)=>{
     res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'});res.end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok',product:release.product,version:release.version}));return;
   }
   if(parsed.pathname==='/institutions.html'||parsed.pathname==='/institutions/'){res.writeHead(301,{Location:'/institutions'});res.end();return;}
+  if(await accounts.handle(req,res,parsed))return;
   if(await analytics.handle(req,res,parsed))return;
   if(await enquiries(req,res,parsed))return;
   if(await community(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
   if(parsed.pathname==='/checkout.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-  const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
+  const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
   if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
+  if(await accounts.protect(req,res,name))return;
   if (!allowed.has(name)) {
     const page=(req.headers.accept||'').includes('text/html')||!path.extname(name)||name.endsWith('.html');
     res.writeHead(404,{'Content-Type':page?'text/html; charset=utf-8':'text/plain; charset=utf-8'});
@@ -43,10 +47,11 @@ const server = http.createServer(async(req,res)=>{
   res.setHeader('Content-Type',({'html':'text/html; charset=utf-8','js':'text/javascript; charset=utf-8','css':'text/css; charset=utf-8','json':'application/json','txt':'text/plain','xml':'application/xml; charset=utf-8','svg':'image/svg+xml','png':'image/png'})[name.split('.').pop()]);
   // Surface the integrated workflow in the existing site without modifying the signed static release assets.
   let payload=fs.readFileSync(path.join(root,name));
+  if(name==='guided.html'&&accounts.enabled){payload=Buffer.from(payload.toString('utf8').replace('<body>','<body data-account-required>').replace('CURRENT RENDER STAGING','ACCOUNT ACCESS').replace('FICTIONAL DEMONSTRATION · DO NOT ENTER ACTUAL CASE INFORMATION','PRIVATE BROWSER SESSION · USE CODES ONLY · NO CASE DATA IS STORED').replace('Structured IC/LC workflow · Staging','Structured IC/LC procedural guide').replace('Follow the fictional inquiry','Follow the procedural inquiry').replace('P01–P47 · Fictional procedural preview','P01–P47 · Committee decisions remain human').replace('No real cases or identities.','Keep identities and source records in your institution’s own secure records.').replace('Existing POSH Inquiry Navigator staging · Not approved for confidential or operational use · Human decisions always required','POSH Inquiry Navigator · No case data is transmitted or stored · Human decisions always required').replace('Fictional test scenario','Learning scenario (synthetic examples only)'),'utf8');}
   if(name==='index.html'){
     let document=payload.toString('utf8');
-    document=document.replace('<nav aria-label="Main navigation" class="desktop-nav">','<nav aria-label="Main navigation" class="desktop-nav"><a href="/guided">Guided IC/LC Inquiry</a>');
-    document=document.replace('<nav aria-label="Mobile navigation">','<nav aria-label="Mobile navigation"><a href="/guided">Guided IC/LC Inquiry</a>');
+    document=document.replace('<nav aria-label="Main navigation" class="desktop-nav">','<nav aria-label="Main navigation" class="desktop-nav"><a href="/guided">Guided IC/LC Inquiry</a><a href="/account">Account</a>');
+    document=document.replace('<nav aria-label="Mobile navigation">','<nav aria-label="Mobile navigation"><a href="/guided">Guided IC/LC Inquiry</a><a href="/account">Account</a>');
     payload=Buffer.from(document,'utf8');
   }
   res.writeHead(200);res.end(req.method==='HEAD'?undefined:payload);

@@ -227,7 +227,7 @@
     const esc=typeof encode==='function'?encode:s=>String(s);
     if(path==='C04'){
       return '<h2>Conciliation closure and implementation record</h2>'+
-        '<div class="g-success"><strong>Section 10 settlement route completed — fictional checklist</strong><p>This is not a finding of misconduct or an inquiry report. No further Section 11 inquiry follows a lawful settlement, subject to the statutory non-compliance route.</p></div>'+
+        '<div class="g-success"><strong>Section 10 settlement route completed — procedural checklist</strong><p>This is not a finding of misconduct or an inquiry report. No further Section 11 inquiry follows a lawful settlement, subject to the statutory non-compliance route.</p></div>'+
         '<h3>Draft closure-record structure (not ready to issue)</h3>'+
         '<ol><li>Committee and jurisdiction: [competent IC/LC and constitution order]</li><li>Voluntary request and date: [actual records]</li><li>Settlement terms and legal checks: [written terms, not a monetary basis]</li><li>Section 10(2) forwarding: [recipient, date and method]</li><li>Section 10(3) copies to parties: [documented distribution]</li><li>Employer/District Officer implementation: [evidence and status]</li><li>Closure review and restricted record custody: [authorised sign-off]</li></ol>'+
         '<p class="g-mini">All placeholders are intentionally blank. This is a non-operative checklist until a legally reviewed template and authorised records are supplied.</p>';
@@ -236,7 +236,7 @@
     const r={not_required:'No action recommendation indicated',reasoned:'Reasoned recommendations entered'}[answers.P36]||'Unreviewed';
     const c={not_applicable:'No compensation recommended after assessment',assessed:'Section 15 factors considered'}[answers.P37]||'Unreviewed';
     return '<h2>Inquiry report and administrative closure</h2>'+
-      '<div class="g-success"><strong>P01–P47 procedural walkthrough completed — fictional checklist</strong><p>The report remains a committee-authored and approved legal document. The software has not adjudicated facts or verified an actual case.</p></div>'+
+      '<div class="g-success"><strong>P01–P47 procedural walkthrough completed — procedural checklist</strong><p>The report remains a committee-authored and approved legal document. The software has not adjudicated facts or verified an actual case.</p></div>'+
       '<h3>Inquiry report outline (not a final legal report)</h3>'+
       '<ol><li>Committee authority and applicable law: [reviewed source and order]</li><li>Complaint chronology and allegation identifiers: [original source]</li><li>Notices, service and reply opportunities: [proof and dates]</li><li>Hearing minutes and actual Q&A: [verified testimony]</li><li>Documents, electronic records and witness matrix: [source index]</li><li>Allegation-wise evidence appreciation: [committee-entered reasons]</li><li>Committee-approved findings: <strong>'+esc(f)+'</strong> (synthetic selection only)</li><li>Disciplinary recommendations: '+esc(r)+' (synthetic selection only)</li><li>Compensation assessment: '+esc(c)+' (synthetic selection only)</li><li>Representations, report authentication and annexures: [applicable records]</li><li>Section 13 communication, implementation, appeals and custody: [actual records]</li></ol>'+
       '<p class="g-mini">Placeholders identify required real records. Do not copy this sample as an operative report.</p>';

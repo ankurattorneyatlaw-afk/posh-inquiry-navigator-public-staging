@@ -1,6 +1,6 @@
 # POSH Inquiry Navigator public staging deployment
 
-Public guidance, the integrated Guided IC/LC Inquiry staging workflow, blank Word drafts and a minimal server. The paid multi-user workspace is not activated. No confidential records, credentials, QA documents or private repository history. Use fictional selections only. No filing or real payments.
+Public guidance, the integrated Guided IC/LC Inquiry staging workflow, blank Word drafts and a minimal server. Account-based plan access is implemented; shared case storage is deliberately absent. No confidential records, credentials, QA documents or private repository history. Use fictional selections only. No filing or real payments.
 
 Node 22+: npm run build, npm start. Free Render staging only.
 
@@ -11,3 +11,5 @@ Build verification includes software boundary tests. Additional checks: `node --
 Community: anonymous text-only questions and answers. Every post is pending until privately moderated. Backend configuration stays in server environment variables. No credentials, case data or moderation interface are published.
 
 Razorpay checkout is test-only and disabled until the owner supplies test credentials in Render. Live keys are refused. No paid-service activation, tax invoice or real purchase is generated. Institutional plans still require a proposal/quotation.
+
+Account and plan operations: see docs/account-access-operations.md. Only accounts and entitlements are stored. Never enable case-data collection. Licensed guide routes fail closed when account verification is unavailable. Customer provisioning is manual; automatic billing and public self-registration are not activated.
