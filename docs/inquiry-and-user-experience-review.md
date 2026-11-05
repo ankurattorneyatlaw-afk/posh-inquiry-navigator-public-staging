@@ -38,3 +38,12 @@ Individual support lifecycle: case-free enquiry → secure conflict check → wr
 Automated unit/security checks and desktop/mobile browser journeys cover oral intake, six conciliation statuses and respondent notice through report/implementation. Five new blank Word templates were rendered and visually inspected page by page. This is tested software, not a guarantee of lawful results in every factual or service-rule situation. No case information is stored by Navigator. Dates and session history are tab-local until explicitly exported; refresh/close loses unexported state. No background email escalation is sent.
 
 Sources: POSH Act sections 9–16 and Central Rules 6–7; official Rules: https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf. Detailed applicability remains for competent human review.
+
+
+## 5.4.0 follow-through — session and membership experience
+
+Implemented full-session recovery downloads, including validated workflow answers, review decisions, document phase and timeline history. Restore previews the file and requires explicit replacement; invalid imports leave current work untouched. Older timeline-only exports restart questions at P01 rather than presenting invented workflow recovery. Files are local readable JSON and do not include Word files or unrecorded form text. No web-storage or server case persistence was introduced.
+
+Added leave/restart/scenario-change warnings and full recovery download during access-verification holds. Added a collapsed first-session checklist, current-work-first layout, a visible account/renewal link and IST access-end details. Active plans ending within 30 or seven days have renewal guidance and a calendar reminder download. Missing access and knowledge-only access each have an appropriate next action. The owner operating procedure now covers provisioning, verified renewals, expiry, support and continuity.
+
+Still operational rather than automated: account provisioning, purchase verification, renewal acceptance and fee collection. Reminders require the user's calendar import; Navigator sends no scheduled renewal emails. Shared case collaboration, automatic case saving and planned higher-tier automation remain outside the released scope. Practitioner usability studies, independent security/accessibility certification and paid availability guarantees remain future validation work.
