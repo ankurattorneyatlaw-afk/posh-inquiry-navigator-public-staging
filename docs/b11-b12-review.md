@@ -1,0 +1,12 @@
+# B11 and B12 document integration
+
+Reviewed the two supplied blank Word templates. The original files and their metadata are not published. Adapted wording is integrated into the existing local Word generator, with IC/LC-neutral placeholders.
+
+- B11: outward witness appearance notice, separate receipt/availability acknowledgement, separate internal witness planning and service control. The ordinary request does not become a compulsory summons or impose a sanction by download. Witness non-attendance is not automatically governed by the complainant/respondent absence rule.
+- B12: outward production notice including its particularised Annexure A, separate recipient submission particulars, separate receipt acknowledgement, separate internal production/custody/disclosure control. A voluntary request and authorised statutory direction remain distinct choices. No fixed statutory production deadline, automatic adverse inference, privileged-material waiver, or blanket electronic-certificate prerequisite is invented.
+- Missing witnesses and missing documents retain owned follow-up and review routes. Where no witness is identified, a witness notice is not made the mandatory draft. A missing-document route prioritises B12; indexed records retain their ordinary evidence-record route.
+- An acknowledgement, return or internal control sheet cannot substitute for the primary outward notice in the download/continue sequence. Downloads never record actual notice issue, service, attendance, production or commencement.
+
+Seven separate editable drafts replace one short witness template and add six document choices, bringing the catalogue to 59. All 11 rendered pages were reviewed after paragraph/page-flow refinements. Original metadata, named parties and actual case information are excluded. The app continues to store accounts/entitlements only, with procedural processing and exports remaining local.
+
+Legal references checked: Section 11(3)(a)/(b), 11(4), 16 and 19(e)/(f) in the enacted Act annexed to the [Rajya Sabha Secretariat compendium](https://cms.rajyasabha.nic.in/UploadedFiles/ElectronicPublications/SEXUAL_HARASMENT.pdf) (enacted Act section 11 appears on PDF page 264); [Central Rules Gazette, Rule 7](https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf); and [Bharatiya Sakshya Adhiniyam sections 1 and 63](https://www.indiacode.nic.in/indiacode/bitstream/123456789/20063/1/aa202347.pdf). Applicable service/sector rules, binding directions and the facts still require competent review.

@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.0.0-private-session-account-access",
+  "version": "5.0.1-witness-production-account-access",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -15,13 +15,13 @@
     "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
     "checkout.js": "090fa082f547d6a3fa06b78e631dc952bce3cc89bde93d4aad7780ee5ee1ef6b",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "docx.js": "5a81cc42324d01836026e6a8a6a297c5ad354d7b20a624b2b5dc217ea2db451d",
+    "docx.js": "d707745f1ed5bdf0a753862bf87f454dc289f983655ec041e4fe5e1ed38acd2e",
     "engine.js": "6b0aaf5f41ec20f0b278875a0f70ea03f9c210c4e08b491de4a3de60931e3050",
     "faq.js": "627babe8e9a9527842d4dc0de092bce109abd506820b858dbcd3c9b22d74fae4",
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "guided-continuation.js": "179062560fdbc90617d563b08d7c544de1d08efd6fc681663a96d483f09b2265",
     "guided.html": "08ff6ed4295026dbeca2e8fdb12855f102de81690c6e3fe2edc17e5c8fa1f29b",
-    "guided.js": "b2ca2abdb5fff459a1ac11eb0ac69cfeaf16a34f9528d5bf148d72ce40b0cae9",
+    "guided.js": "ee52ce46b84cb927aec589bb510b6ceeaa1b0895da8a523d7efa2720f347d840",
     "index.html": "0ca0558210d5f3b5a1c4d040809f57ac07a8a348d50d04e224e867e3d10f19d6",
     "institutions.html": "aee3bbfcfa2d748d2a71935961fc66eb8dbde1f398b1f799b800bb83cdba2b1c",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
@@ -37,6 +37,6 @@
     "styles.css": "2ece523a43fd918c3dbc80cae9892c208fcf47545c062c250e98e1b7edf96c6b",
     "timeline-ui.js": "205db3cbb0d7b080c1d7edd759ec9d820d7de47c482217c4ec873c44c85e402b",
     "timeline.js": "565d6ce6f9936f9e08f44f8cc3f048500cb03c864fd2832cbbe0b5f18fefc475",
-    "workflow-documents.js": "862742f9b018802c748c55ac9770bd32ee0010b867b91a2095d3e89f81febaff"
+    "workflow-documents.js": "f4155607da8a61158a48b744ed453f1738623949ac1f9500b6260aaed402abdf"
   }
 }

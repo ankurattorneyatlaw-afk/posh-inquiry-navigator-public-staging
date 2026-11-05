@@ -68,6 +68,8 @@ const EXAMPLES=[
 ['complete_admission','Complete admission','P16',{P16:'full_admission'}],
 ['complete_denial','Complete denial','P16',{P16:'complete_denial'}],
 ['partial_admission','Partial admission','P16',{P16:'qualified_or_partial_admission'}],
+['witness_notice_demo','Witness appearance and fair participation','P24',{}],
+['document_production_demo','Missing documents and production request','P25',{}],
 ['first_hearing_demo','First hearing notices to both parties','P19',{}],
 ['complaint_followup_demo','Complainant clarification and procedural notice','P08',{}],
 ['respondent_notice_demo','Respondent complaint notice and enclosures','P13',{}],
