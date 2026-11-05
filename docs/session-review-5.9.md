@@ -1,0 +1,13 @@
+# Session review and handover release 5.9
+
+Adds a collapsed session-review panel within the existing recovery hub. The user can review current work, open all timeline/follow-up controls, or download a self-contained printable HTML sheet. No new case questions, database tables, legal deadlines or completion routes are introduced.
+
+The sheet uses the validated current workflow/timeline snapshot and existing deadline engine. It prioritises overdue, due-today and verification items, shows responsible roles and next actions, lists actual recorded milestones, and deduplicates template draft requests. It never substitutes a download for signature, issue or service, invents missing dates, marks a case complete or makes findings. Timeline readiness is explicitly separate from procedural questions and human approvals.
+
+The preview is invalidated when state, unsaved status or the India calendar date changes. Refresh is explicit and labelled. The printable sheet is a point-in-time readable summary, not a recovery backup, inquiry report, official audit log or proof of institutional approval. Local files require appropriate custody. The sheet does not include unfinished document/form narratives, account identity, evidence files or full audit actor/reason records; required next-action text and procedural record codes may still be present.
+
+Security: protected module requires the existing paid-access checks. All dynamic HTML text is escaped, including labels, actions, owners, dates and template titles. The exported sheet embeds no scripts, forms, frames or remote resources and carries a restrictive local CSP. Download generates no account/case request and changes no workflow or timeline state. Editing dates from the hub remains blocked while account verification holds the workspace inert; local review/export remains available for already-open work.
+
+Tests cover attention ordering, state immutability, absent milestones, unknown/duplicate draft codes, hostile HTML strings, incomplete payloads, desktop/mobile preview/download, stale preview invalidation, direct timeline action, offline opening and reflow. Existing recovery, paid lifecycle and accessibility checks remain release gates.
+
+Limitations: the sheet reflects user-recorded information and the current in-tab engine, not independent verification of case facts or dates. Standalone copies do not update or restore sessions. No server case storage, automated legal notifications, automatic renewals or uptime SLA is added. Practitioner review, assistive-technology acceptance and independent security testing remain external validation tasks.

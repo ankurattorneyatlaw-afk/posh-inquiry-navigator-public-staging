@@ -6,7 +6,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "build": "node scripts/verify.cjs && node --test scripts/software.test.cjs scripts/account-access.test.cjs",
+    "build": "node scripts/verify.cjs && node --test scripts/software.test.cjs scripts/account-access.test.cjs scripts/session-review.test.cjs",
     "start": "node scripts/serve.cjs"
   }
 }
