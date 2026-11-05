@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.0.1-role-workspaces-and-sandbox-purchases",
+  "version": "6.0.2-role-workspaces-and-sandbox-purchases",
   "environment": "staging",
   "search": {
     "indexable": false,
