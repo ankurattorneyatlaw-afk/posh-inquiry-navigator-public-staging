@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.9.0-session-review-and-handover",
+  "version": "5.10.0-simple-signin-and-free-resources",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -8,8 +8,8 @@
   },
   "assets": {
     "account-guard.js": "3c5f6311b02eb0bd557f464d42f33979dfcf5bc83c3d824519f250b2147e3d95",
-    "account.html": "37ddc7665d7209117405f547e0b6cd8d8163c68b272a30a2dd6fd0f9c182c7c0",
-    "account.js": "0c07880727c12bdfad9093e5676fcb85fda989c66b8374a61869236a405d7617",
+    "account.html": "f2505e2de4cc9ab82b5a1bb4e37204045fc9a15366d363b3161921fe5a8328db",
+    "account.js": "127f2e96a5231767d8022082088bf38c8048e105eaa5062dfbcc0f60efeb5181",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
