@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "5.0.1-witness-production-account-access",
+  "version": "5.1.0-email-code-sign-in",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -8,8 +8,8 @@
   },
   "assets": {
     "account-guard.js": "f30103992305dc67a16f12ec83a511dd396a40583b5299d213ebd8ed4ff98e6d",
-    "account.html": "7847b2b5a05c2f0378ddf097a5f9972fce2758af93abb3ea4c6eb0d1e0a4c9f0",
-    "account.js": "00c6d67d579a1fe420f0aa7cff0f36014bd186422391f83c12d35ac3c93e503f",
+    "account.html": "de3cdd50d707c1e322697198a69b4a8cba083a52ce61a342c5076112fe1cba78",
+    "account.js": "c5e49fd4259e02ef98c9cdd3d5230320629f9e1ecc59e59e74a617947a33a3ff",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checkout.html": "0e83ebcec528f821e8171ee505fa634ef81c43274aac00877800bb9bebea4164",
@@ -29,7 +29,7 @@
     "main.js": "f50e4c97a9313e374f638bc3509d6b84cd49ab5f7b88996dfa1d31b4f01dcdc5",
     "plans.js": "a9d6bdf97cbf2467e7d4904e4e5e19b8dc34ae4e5eef8752e0e29b681bf5f18d",
     "preview.html": "5b4642174ed5c935de17c2293a14b5de8df430d34eef66646c8af58783dc4147",
-    "privacy.html": "a87eabf282482bfad1263e0582d56681c3648c37c8c2f6ba6b7500dc74afc788",
+    "privacy.html": "f1b193a67d77cd2ae9070bcd65df8cb895b0d9b8ecff0f1d26ba7934f9aabb3f",
     "private-session-tools.js": "a85c9b3ce05aea588fd1ff5c6e4d51341f2f7c97c83f0092a0aca7a31f3be31d",
     "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "sitemap.xml": "68ab08991efaca902bcb8a6518106d8b29964c5651f39abbb7eb7c9713ca2770",
