@@ -472,3 +472,7 @@ body[data-page="institutional"] .analytics-consent{bottom:105px}@media(max-width
 
 
 .g-inline-step{border-bottom:1px solid #cbd5e0;padding:0 0 22px;margin:0 0 24px}.g-inline-step select,.g-inline-step input{display:block;width:100%;padding:10px;margin:8px 0 12px;border:1px solid #8fa1b2;border-radius:7px}.g-inline-step label{display:block}.g-inline-step details{margin:14px 0}.g-inline-edit{border:0;background:transparent;color:#174b78;text-decoration:underline;font:inherit;cursor:pointer}.g-inline-step h4{margin:12px 0 6px}
+
+/* Accessible paid-workspace controls: retain focus contrast and honour reduced motion. */
+:focus-visible{outline:3px solid #174f78;outline-offset:3px}button,summary{scroll-margin-block:24px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
