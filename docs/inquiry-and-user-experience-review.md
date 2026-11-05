@@ -47,3 +47,10 @@ Implemented full-session recovery downloads, including validated workflow answer
 Added leave/restart/scenario-change warnings and full recovery download during access-verification holds. Added a collapsed first-session checklist, current-work-first layout, a visible account/renewal link and IST access-end details. Active plans ending within 30 or seven days have renewal guidance and a calendar reminder download. Missing access and knowledge-only access each have an appropriate next action. The owner operating procedure now covers provisioning, verified renewals, expiry, support and continuity.
 
 Still operational rather than automated: account provisioning, purchase verification, renewal acceptance and fee collection. Reminders require the user's calendar import; Navigator sends no scheduled renewal emails. Shared case collaboration, automatic case saving and planned higher-tier automation remain outside the released scope. Practitioner usability studies, independent security/accessibility certification and paid availability guarantees remain future validation work.
+
+
+## 5.4.1 recovery hardening
+
+The prior release treated download initiation as a saved copy and cleared its warning too early. The default save now writes and reads back the user's selected file where the browser supports a Save dialog. The browser-download fallback keeps its link usable and requires a matching local-file check before claiming success. Cancelled/failed writes do not clear protection. Recovery schema 2 also preserves supported unfinished timeline and contextual document fields without submitting them. Restore rejects incomplete draft payloads and rolls back unexpected application failures; older exports remain compatible and do not inherit unrelated draft values.
+
+Browser tests cover completed disk files, source-browser closure, a fresh browser restore, complete inquiry closure recovery, unchanged statutory dates and simulated permission/write/read-back failures. This remains local recovery, not cloud backup or a tamper-proof institutional record.
