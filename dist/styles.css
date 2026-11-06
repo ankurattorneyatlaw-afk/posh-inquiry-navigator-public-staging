@@ -579,3 +579,10 @@ body[data-account-page="workspace"] h1{margin:8px 0 12px}.dashboard-intro{margin
 
 .navigator-document main>p>a:not(.btn){color:#185c60;text-decoration:underline;text-underline-offset:3px}.navigator-document .document-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;max-width:none}.document-actions>a:not(.btn){display:inline-flex;align-items:center;min-height:48px;padding:10px 14px;border:1px solid #cbd8e4;border-radius:7px;background:#fff}
 .navigator-document p.eyebrow{font-size:13px;color:#765423}.navigator-document .fineprint{color:#435c73;font-size:15px}
+
+/* Content-led rhythm: balanced columns, consistent gaps and natural section heights. */
+:root{--section-space:clamp(32px,4vw,56px);--column-space:clamp(24px,2.5vw,40px);--card-space:24px}
+@media(min-width:901px){.sales-hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--column-space)}.sales-split{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--column-space)}.founder-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:var(--column-space)}}
+.sales-section{padding:var(--section-space) 0}.sales-grid{gap:var(--card-space);margin-top:24px}.sales-grid article{padding:24px}.sales-onboarding{gap:24px}.founder-values-grid{gap:24px}.sales-panel{padding:24px}.sales-section h2{margin-bottom:18px}.sales-section p,.app-heading p,.navigator-document p{text-wrap:pretty}.sales-hero .sales-reassurance{max-width:100%}.sales-hero .sales-actions{margin-top:18px}.sales-actions{align-items:center}.organisation-plans{padding:16px 0 40px}.organisation-plans .paid-plan-grid{gap:24px}.workspace-overview{gap:24px}.draft-value{gap:24px;padding:24px}.resource-main .resource-intro{gap:28px}.navigator-document .document-header{margin-bottom:24px}.navigator-document h2{margin-bottom:16px}.resource-main .resource-grid{gap:24px}.resource-note .resource-links{gap:16px}
+@media(min-width:951px){.resource-main .resource-intro{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+@media(max-width:700px){.sales-grid article,.sales-panel,.draft-value{padding:22px}.sales-section{padding:32px 0}.founder-values-grid{gap:18px}.sales-onboarding{gap:18px}}
