@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.1.0-unified-branding-resources-and-guidance",
+  "version": "6.2.0-organisation-trust-and-journey",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -8,9 +8,9 @@
   },
   "assets": {
     "account-guard.js": "d95614ba1a3865032dffe1d659556e9b309abc6322e77c5f1a612b1481394ffe",
-    "account.html": "47647c8df9c120e3ca24e66fcbf1a532e3eb62849fb9a74fd1788d245c8e3e2d",
-    "account.js": "305d24431248fbe44970d120536edf5e518c5ea7cf3c5db5b87be1cea8998e12",
-    "admin.html": "cfd9387adaff1595a9feeea76f0eed27507f492f07efd888ffeba0cda4182f21",
+    "account.html": "27e299ad8633450d7d8c4a84832c3b326149a5e9e0a4bb39d5a7cdce70e34784",
+    "account.js": "7e4f4d9201c8d2482d239028f50c69711274711eda55c9b0aabb622436b9287e",
+    "admin.html": "0943f7696aed9a326755913c26f9e5151ddff28ba903a8b502e6ad8a84c2ee59",
     "analytics.js": "c0bedc3dc55f18295a78a67261b72f6e92712fd5e4655fbb5ee898b0874388f2",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checkout.html": "03fb0e3dfed4bc1735aaa9beee9bc34d489dadd1b6f205c94353ebaf990bdb42",
@@ -25,13 +25,13 @@
     "guided.html": "3d72469fa81463353541a5c75a6cc5790cd43eec136de37ee8e32f1b541c5312",
     "guided.js": "0a7eefd9e9f4a8a4fa4ea89e9fd29504d1cd84e4538f59acf2ed64e5d4cc2d62",
     "help.html": "76bd5f073e2f64547ba44b2a9bd85d03c66a40365a06f0f3c1a6ea919cadef36",
-    "index.html": "8f46fd95b0db8c83cbdf7916c54d4c90abfa812dcc650da2015baca12b9bb6a7",
+    "index.html": "599ed1990e2e208b668ffde47f442d0938956f6a4e89f53baa4177a8c53f2208",
     "individual-support.html": "94c1dc0042b585f8bd60415b4a8d1cf8f4e737e8192fabc0c31e9793da46a16e",
-    "institutions.html": "aee3bbfcfa2d748d2a71935961fc66eb8dbde1f398b1f799b800bb83cdba2b1c",
+    "institutions.html": "ab23f8a9fd6a2b500539138c3faad4ecc66869070d13131b48101ad1373b597f",
     "legal.js": "4881962b84c03ad8cd54019f4cd187e57990c4c912b400fb7d291f6c386cf1a6",
     "library.js": "597c56c93b5caae1095be80debab5c27ce42d1faffc94c6da38f2293490bab59",
-    "main.js": "e5f043d26f6796bcaae6047b80aa68606872882f207b4e6a736061523e34a7e7",
-    "plans.js": "31c8125e56f67ac4e98bfc2ef755e22899440e2bc06e0e5f3a9eac7b2c4634d4",
+    "main.js": "e6bdf8f7871652967b0d18ac98c9762549facac86964f46edb301ca73535f6dc",
+    "plans.js": "dcd6ff7830a3a9a5eaf00d4c7801c37ebd6214d89664dff9ba4949797343dba0",
     "preview.html": "5b4642174ed5c935de17c2293a14b5de8df430d34eef66646c8af58783dc4147",
     "privacy.html": "d59a12d613040a83d02333bb54c38e0f72705083e44748fb5730f52c8d51a8a9",
     "private-session-tools.js": "8941b253bfe7b887124ab9e75c529aef4218280b69484ad301aa8762d5602113",
@@ -41,10 +41,10 @@
     "session-review.js": "e1144a4b6d401730c466ba18a2b5e5d6dcc6a28b33c46c6e45e5fe97654079a3",
     "sitemap.xml": "68ab08991efaca902bcb8a6518106d8b29964c5651f39abbb7eb7c9713ca2770",
     "social-preview.png": "e5b16dcc53862b0c6fc627061f84d67da30358396b6606d4ecec99d89810db28",
-    "styles.css": "a47dc3f079e2fcc3d73e35253d9bb674781b1218363c1628a7b4b77d996ac752",
+    "styles.css": "6bc3fca338423db987883aa8cea46196b01ecabaaabbd2844c22c2d00a11cd7f",
     "timeline-ui.js": "0a43284b038a02d2790cc022f80244078c6b03e4ad4e368d766051d3e1394bcd",
     "timeline.js": "7b5dcb95ea0568932d4cea08cbc382c4ccb451067020276681eea8665829d076",
     "workflow-documents.js": "2ca3454caedaedd00c52580c64f8cd7c78ae6c2156faeaf14e14a988e7ae5560",
-    "workspace.html": "26ee6a17b82e24d83afaaef86cffa6da936dbc93e6993bceb8e2aae5841ce891"
+    "workspace.html": "c39b4d7f482a6dc3fd531a4190aa798c00c5301c30f4c293e5002e0f2bbbbdcb"
   }
 }

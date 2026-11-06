@@ -483,3 +483,56 @@ body[data-page="institutional"] .analytics-consent{bottom:105px}@media(max-width
 .sales-wrap{max-width:1320px;margin:auto;padding:0 clamp(20px,4vw,64px)}.sales-hero{background:#f4f6f5;padding:64px 0}.sales-hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:52px;align-items:center}.sales-kicker{font-size:calc(13px * var(--reading-scale,1));font-weight:750;letter-spacing:.1em;color:#805b24;margin-bottom:18px}.sales-hero h1{font:650 clamp(36px,4.3vw,62px)/1.12 'Segoe UI',Arial,sans-serif;letter-spacing:-.025em;color:#11243d;margin:0 0 26px}.sales-hero h1 span{color:#765423}.sales-lead{font-size:calc(20px * var(--reading-scale,1));line-height:1.75;color:#29485a;max-width:680px}.sales-actions{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.sales-small{font-size:calc(15px * var(--reading-scale,1));line-height:1.8;color:#435c73}.sales-process,.sales-panel{border:1px solid #d2dde5;border-radius:14px;background:white;padding:28px}.sales-process h2,.sales-panel h3{font-size:calc(25px * var(--reading-scale,1));line-height:1.4;color:#11243d}.sales-process ol{padding-left:24px}.sales-process li{margin:18px 0;padding-left:6px}.sales-process li strong,.sales-process li span{display:block}.sales-process li strong{font-size:calc(18px * var(--reading-scale,1));line-height:1.6}.sales-process li span{font-size:calc(17px * var(--reading-scale,1));line-height:1.75;color:#29485a;margin-top:4px}.sales-section{padding:64px 0;background:#fff}.sales-tint{background:#f3f6f8}.sales-section h2{font-size:clamp(28px,3vw,39px);line-height:1.3;max-width:850px;margin:0 0 22px;color:#11243d}.sales-section p,.sales-section li{font-size:calc(18px * var(--reading-scale,1));line-height:1.8;color:#29485a}.sales-intro{max-width:920px}.sales-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:32px}.sales-grid article{border:1px solid #d2dde5;border-radius:12px;padding:26px;background:white}.sales-grid h3{font-size:calc(23px * var(--reading-scale,1));line-height:1.4;margin:0 0 14px;color:#11243d}.sales-split{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}.sales-panel ul{padding-left:23px}.sales-onboarding{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;padding-left:24px}.sales-onboarding strong{font-size:calc(21px * var(--reading-scale,1));color:#11243d}.sales-faq{padding:20px 0;border-bottom:1px solid #cbd8e4}.sales-faq summary{font-size:calc(20px * var(--reading-scale,1));font-weight:650;cursor:pointer;min-height:44px;color:#11243d}.sales-close{padding-top:46px}.sales-section a,.sales-hero a{text-underline-offset:3px}@media(max-width:900px){.sales-hero-grid,.sales-split{grid-template-columns:1fr;gap:30px}.sales-grid,.sales-onboarding{grid-template-columns:1fr}.sales-hero,.sales-section{padding:40px 0}.sales-process,.sales-panel{padding:22px}.sales-actions .btn{white-space:normal}}
 
 #app .aside-card p,#app .aside-card .aside-row,#app .aside-card .aside-mini,#app .aside-card .info-link{font-size:calc(18px * var(--reading-scale,1));line-height:1.8;color:#29485a}#app .step-label{font-size:calc(13px * var(--reading-scale,1));color:#765423}#app .stage-desc,#app .question-hint,#app .privacy-line,#app .option small{color:#435c73}#app .privacy-line{font-size:calc(15px * var(--reading-scale,1));line-height:1.8}
+
+/* Organisation journey: generous screen use, readable text measures and restrained accents. */
+:root{--navy:#102c43;--teal:#185c60;--gold:#8b682e;--line:#d7e2e5;--paper:#f5f8f8}
+.sales-wrap,body[data-page="institutional"] .wrap{max-width:1760px;width:100%;padding-left:clamp(22px,4vw,80px);padding-right:clamp(22px,4vw,80px);box-sizing:border-box}
+.sales-hero{background:linear-gradient(115deg,#f1f7f7,#f8faf9);border-bottom:1px solid var(--line);padding:clamp(40px,5vw,80px) 0}
+.sales-hero-grid{grid-template-columns:minmax(0,1.3fr) minmax(360px,.9fr);gap:clamp(32px,4vw,72px);align-items:center}
+#app .sales-hero h1{font-size:clamp(36px,3.4vw,60px);line-height:1.16;letter-spacing:-.035em;max-width:none;text-wrap:balance}
+.sales-hero h1 .hero-line{display:block;color:var(--navy)}.sales-hero h1 .hero-accent{color:var(--teal);margin-top:.12em}
+#app .sales-kicker{font-size:calc(12px * var(--reading-scale,1));line-height:1.6;letter-spacing:.09em;color:#765423;text-wrap:balance}
+#app .sales-lead{font-size:calc(19px * var(--reading-scale,1));line-height:1.8;max-width:64ch}
+.sales-process{border:1px solid var(--line);border-top:3px solid var(--teal);box-shadow:0 16px 48px #102c4308;padding:clamp(24px,2.4vw,40px)}
+.sales-process h2{font-size:clamp(23px,1.8vw,28px);text-wrap:balance}.sales-process li{margin:16px 0}
+.sales-section h2,.plans-heading h1,.organisation-plans h2,.founder-story h3{text-wrap:balance;overflow-wrap:normal;word-break:normal}
+#app .sales-section p,#app .sales-section li{max-width:72ch}.sales-section .sales-kicker{max-width:none}
+.sales-section a.btn,.sales-hero a.btn,.organisation-plans .btn,.founder-identity .btn{white-space:normal;text-align:center;line-height:1.5;overflow-wrap:break-word}
+.sales-section .sales-grid article{border-top:3px solid #bed7d8;box-shadow:0 6px 22px #102c4304}.sales-tint{background:var(--paper)}
+.founder-profile{background:#eef5f5;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.founder-layout{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(32px,5vw,88px)}
+.founder-monogram{background:var(--navy);color:#fff;border:3px solid #c9b27d;font:600 30px 'Segoe UI',sans-serif}
+.founder-story h3{margin-top:0;color:var(--navy)}.founder-credentials span{border-color:#bed0d3;color:#234752}
+.founder-values article{border-color:#cadbdd}.founder-values h4{color:var(--teal)}
+.buyer-nav{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px}.buyer-nav a{color:var(--teal);text-underline-offset:4px;min-height:44px;display:inline-flex;align-items:center}
+.plans-heading{padding-bottom:24px}.plans-heading h1{font:650 clamp(32px,3vw,48px)/1.2 'Segoe UI',sans-serif;color:var(--navy);max-width:28ch}
+.organisation-plans{padding-top:16px}.current-scope{padding:clamp(22px,3vw,42px);border:1px solid #c6dadb;border-radius:18px;background:#f2f8f8}
+.proposed-scope{padding-top:56px}.organisation-plans h2{font:650 clamp(27px,2.3vw,38px)/1.3 'Segoe UI',sans-serif;max-width:34ch}
+#app .organisation-plans p{font-size:calc(17px * var(--reading-scale,1));line-height:1.8;max-width:78ch;color:#29485a}
+.organisation-plans .paid-plan-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.organisation-plans .price-card{min-width:0;background:#fff;border:1px solid var(--line);box-shadow:0 8px 28px #102c4306}
+.organisation-plans .price-card.featured{border:2px solid #6e989a;transform:none}.organisation-plans .price-tag{font-size:34px;color:var(--navy)}
+#app .organisation-plans .proposed-price-label{font-size:13px;font-weight:650;margin-bottom:0;color:#526879}.organisation-plans .price-category{color:#765423}
+.organisation-plans summary{cursor:pointer;min-height:44px;line-height:1.6}.buyer-checklist{margin-top:32px}.buyer-checklist ul{columns:2;column-gap:36px;padding-left:22px}.buyer-checklist li{break-inside:avoid;margin-bottom:12px}
+body[data-account-page="workspace"] main,body[data-account-page="admin"] main{max-width:1600px;margin:32px auto;width:calc(100% - 64px);padding:clamp(24px,3vw,48px);border-top-color:var(--teal)}
+body[data-account-page="workspace"] h1{max-width:28ch;font-size:clamp(30px,3vw,46px);line-height:1.2;text-wrap:balance}.dashboard-eyebrow{font-size:12px;letter-spacing:.08em;font-weight:750;color:#765423;margin-top:28px}.dashboard-intro{color:#435c73;max-width:70ch;line-height:1.8}
+body[data-account-page="workspace"] #account-profile{background:#f1f7f7;border-color:#c7dada;padding:clamp(20px,3vw,36px)}
+body[data-account-page="workspace"] #account-access-title{font-size:clamp(25px,2.2vw,32px);margin-top:0}
+.workspace-nav{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;gap:24px}.workspace-nav a{min-height:44px;display:inline-flex;align-items:center;color:var(--teal)}
+body[data-account-page="workspace"] #account-open{background:var(--navy);max-width:100%;white-space:normal;line-height:1.5}
+body[data-account-page="workspace"] .account-renewal{background:white}.materials-note{padding:20px 0;border-bottom:1px solid var(--line)}
+body[data-account-page="workspace"] #account-guest{display:block}
+@media(min-width:1600px){.sales-hero h1 .hero-line{white-space:nowrap}}
+@media(max-width:1100px){.sales-hero-grid{grid-template-columns:1fr;gap:30px}.sales-hero h1{max-width:26ch!important}.sales-process{max-width:none}.sales-grid{grid-template-columns:1fr}.sales-split{grid-template-columns:1fr}.sales-onboarding{grid-template-columns:1fr}}
+@media(max-width:700px){.sales-wrap,body[data-page="institutional"] .wrap{padding-left:22px;padding-right:22px}.sales-hero h1 .hero-line{white-space:normal}.founder-layout{grid-template-columns:1fr;gap:28px}.organisation-plans .paid-plan-grid{grid-template-columns:1fr}.buyer-checklist ul{columns:1}.sales-process,.sales-panel{padding:22px}.sales-section{padding:36px 0}.current-scope{padding:20px}.sales-onboarding{padding-left:22px}body[data-account-page="workspace"] main,body[data-account-page="admin"] main{margin:12px;width:calc(100% - 24px);padding:20px}.workspace-nav{gap:14px}.proposed-scope{padding-top:32px}}
+
+.draft-value{border-left:3px solid var(--teal);background:#f1f7f7;padding:24px 28px;margin:28px 0;border-radius:0 12px 12px 0}.draft-value h3{font-size:25px;color:var(--navy);margin:0 0 12px}.sales-small a{display:inline-block} @media(max-width:700px){.draft-value{padding:20px}}
+
+#app .sales-section .text-link,#app .organisation-plans .text-link{color:#185c60}
+#app .plans-heading .app-back{color:#29485a;font-size:15px}
+#app .organisation-plans .price-tag small{color:#435c73}
+#app .app-heading .eyebrow{color:#765423}
+.workspace-header{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid var(--line);padding-bottom:18px}.workspace-header .navigator-wordmark{border:0;margin:0;padding:0}.workspace-header .dashboard-home{margin:0;white-space:nowrap}
+body[data-account-page="workspace"] main{padding-top:28px}.workspace-statusbar{display:flex;align-items:center;justify-content:space-between;gap:20px}.workspace-statusbar #account-status{margin:0}.workspace-statusbar #account-refresh{margin:0;min-height:44px}
+body[data-account-page="workspace"] #account-profile{margin-top:18px}body[data-account-page="workspace"] .dashboard-eyebrow{margin-top:22px}body[data-account-page="workspace"] .workspace-nav{margin-bottom:18px;padding:4px 0}
+@media(max-width:700px){.workspace-header{align-items:start;gap:12px}.workspace-header .navigator-wordmark strong{font-size:20px}.workspace-statusbar{align-items:start;flex-direction:column;gap:12px}.workspace-header .dashboard-home{font-size:14px}}
+#app .enquiry-review .eyebrow{color:#765423}body .desktop-nav a:hover,body .desktop-nav a:focus-visible{color:#185c60}
