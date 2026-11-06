@@ -4,7 +4,7 @@ async function advanceDocumentSteps(page){
   const next=page.locator('#g-document-continue');
   if(await next.count()){await next.click();continue;}
   if(!await page.locator('[data-download-gate]').count())return;
-  const step=page.locator('.g-inline-step > div[id^="g-context-docs-"]').last(),select=step.locator('[data-document-select]'),first=await select.locator('option').first().getAttribute('value');await select.selectOption(first);await step.locator('[data-document-actor]').fill('Fictional reviewer');const pending=page.waitForEvent('download');await step.locator('[data-document-download]').click();const download=await pending;assert.equal(download.suggestedFilename(),'POSH_'+first+'_Editable_Draft.docx');await next.waitFor();
+  const step=page.locator('.g-inline-step > div[id^="g-context-docs-"]').last(),select=step.locator('[data-document-select]'),first=await select.locator('option').first().getAttribute('value');await select.selectOption(first);if(!await step.locator('[data-document-actor]').isVisible())await step.locator('.g-draft-options > summary').click();await step.locator('[data-document-actor]').fill('Fictional reviewer');const pending=page.waitForEvent('download');await step.locator('[data-document-download]').click();const download=await pending;assert.equal(download.suggestedFilename(),'POSH_'+first+'_Editable_Draft.docx');await next.waitFor();
  }
  throw Error('Document progression did not settle after sixteen steps.');
 }
