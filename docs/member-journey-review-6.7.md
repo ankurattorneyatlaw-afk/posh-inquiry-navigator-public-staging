@@ -1,0 +1,9 @@
+# Member journey and sign-in review 6.7
+
+An authenticated live synthetic IC journey was reviewed from oral complaint assistance and written acknowledgement through respondent notice, service correction, reply, hearings, witnesses, evidence, findings, report, implementation and completion. The completion gate correctly required verified timeline records; no real case was used. Six relevant completion documents remained reachable. Local synthetic IC/LC journeys also cover no-response review and full recovery.
+
+Visible internal P/C codes are replaced by meaningful stage labels in navigation, dates, review headings and follow-up prompts. Recovery keys and internal identifiers remain unchanged. Completed complaint-particular, preliminary-decision, conciliation-information, notice-dispatch and inquiry-issues answers offer optional drafts beside the next question, without forcing another download. Pending legacy recovery entries for those newly optional records are safely normalised. Preparation, correction and required document gates remain.
+
+The login uses a wider desktop layout with a value panel and a simple email-code form. The administrator layout no longer inherits a narrow 520-pixel login width. All account layouts share consistent heading sizes, spacing and responsive controls. Marketing copy describes procedural support without promising outcomes or replacing training or legal judgment.
+
+Validation: 77 build/core checks; 51 stages and 165 answer branches across three widths; targeted member usability at 320, 768, 1440 and 1920 pixels; customer/admin routing and access checks; full IC/LC completion and recovery; 58 automated accessibility states with no tagged findings. No independent legal, accessibility or security certification is claimed. No statutory calculations, authentication permissions, case-storage policy or payment mode changed.
