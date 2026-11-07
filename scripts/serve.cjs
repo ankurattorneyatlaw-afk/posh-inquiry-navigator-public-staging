@@ -3,7 +3,8 @@ const http = require('node:http');
 const accounts=require('./account-access.cjs').createAccountAccess();
 const community=require('./community-api.cjs').createCommunityHandler();
 const payments=require('./payment-api.cjs').createPaymentHandler({identify:accounts.purchaseIdentity});
-const shop=require('./shop-api.cjs').createShopHandler({identify:accounts.purchaseIdentity});
+const shop=require('./shop-api.cjs').createShopHandler({identify:accounts.purchaseIdentity,allowLegacyChecklist:false});
+const checklist=require('./checklist-checkout.cjs').fromEnvironment(accounts.checkoutIdentity);
 const analytics=require('./analytics-api.cjs').createAnalytics();
 const enquiryMailer=require('./enquiry-mail.cjs').createEnquiryMailer();
 const enquiries=require('./enquiry-api.cjs').createEnquiryHandler({onSaved:analytics.savedEnquiry,notify:enquiryMailer});
@@ -34,8 +35,9 @@ const server = http.createServer(async(req,res)=>{
   if(await enquiries(req,res,parsed))return;
   if(await community(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
+  if(await checklist(req,res,parsed))return;
   if(await shop(req,res,parsed))return;
-  if(parsed.pathname==='/checkout.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
+  if(parsed.pathname==='/checkout.html'||parsed.pathname==='/shop.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
   const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/account/':'account.html','/workspace':'workspace.html','/workspace/':'workspace.html','/admin':'admin.html','/admin/':'admin.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
   if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
   if(await accounts.protect(req,res,name))return;

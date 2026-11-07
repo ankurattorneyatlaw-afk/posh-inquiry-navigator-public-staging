@@ -1,7 +1,7 @@
 'use strict';
 const {randomUUID,createHmac,randomBytes}=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
 const catalogue=require('../dist/products.js'),{clientNetwork}=require('./request-guards.cjs');
-function createShopHandler({identify=async()=>null,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',now=Date.now,folder=path.join(__dirname,'../products'),assetKey=process.env.NAVIGATOR_PRODUCT_ASSET_KEY,readAsset=require('./product-assets.cjs').productReader({folder,key:assetKey})}={}){
+function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',now=Date.now,folder=path.join(__dirname,'../products'),assetKey=process.env.NAVIGATOR_PRODUCT_ASSET_KEY,readAsset=require('./product-assets.cjs').productReader({folder,key:assetKey})}={}){
  const orders=new Map(),access=new Map(),rates=new Map(),salt=randomBytes(32);let reset=now()+3600000;
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
  const product=id=>catalogue.products.find(p=>p.id===id);
@@ -10,6 +10,7 @@ function createShopHandler({identify=async()=>null,origin=process.env.RENDER_EXT
  const fulfilment=(o,p)=>({mode:'test',status:'test_fulfilled',charged:0,realPaymentsEnabled:false,serviceActivated:false,coreInquiryAccessGranted:false,orderId:o.id,product:p.id,name:p.name,catalogueAmount:p.amount,currency:'INR',termsVersion:o.termsVersion,delivery:destination(p),testAccessUntil:new Date(o.until).toISOString(),message:'Test order complete. No charge, tax invoice or real subscription was created. Test access is temporary and may reset after a service restart.'});
  return async function(req,res,url){if(!url.pathname.startsWith('/api/shop/'))return false;
   const p=product(url.searchParams.get('product'));
+  if(!allowLegacyChecklist&&p?.id==='checklist'){send(res,409,{error:'Use the checklist checkout page.'});return true;}
   try{
    if(req.method==='GET'&&url.pathname==='/api/shop/catalogue'){send(res,200,catalogue);return true;}
    if(!['/api/shop/session','/api/shop/content','/api/shop/download','/api/shop/order','/api/shop/confirm'].includes(url.pathname)){send(res,404,{error:'This shop action is unavailable.'});return true;}
@@ -29,6 +30,7 @@ function createShopHandler({identify=async()=>null,origin=process.env.RENDER_EXT
    for(const [id,o]of orders)if((o.expires<now()&&!o.until)||(o.until&&o.until<=now()))orders.delete(id);for(const [k,e]of access)if(e.until<now())access.delete(k);
    if(url.pathname==='/api/shop/order'){
     const chosen=product(data.product);if(!chosen||data.termsVersion!==catalogue.termsVersion){send(res,400,{error:'Review the current product scope and terms.'});return true;}if(orders.size>=1000||access.size>=1000){send(res,503,{error:'Test checkout capacity reached. No payment was taken.'});return true;}
+    if(!allowLegacyChecklist&&chosen.id==='checklist'){send(res,409,{error:'Use the checklist checkout page.'});return true;}
     readAsset(chosen.kind==='download'?'inquiry-checklist-v1.pdf':'individual-guides.json');const id='NAVTEST-'+randomUUID(),o={id,account:buyer.id,product:chosen.id,amount:chosen.amount,termsVersion:catalogue.termsVersion,expires:now()+900000};orders.set(id,o);send(res,201,{mode:'test',charged:0,orderId:id,product:chosen.id,name:chosen.name,catalogueAmount:chosen.amount,currency:'INR',termsVersion:o.termsVersion,expires:new Date(o.expires).toISOString()});return true;
    }
    const o=orders.get(data.orderId);if(!o||o.account!==buyer.id||(!o.until&&o.expires<now())){send(res,400,{error:'This test order is unavailable or expired. Start test checkout again.'});return true;}const chosen=product(o.product);if(o.until&&o.until<=now()){send(res,400,{error:'Test access expired. Start test checkout again.'});return true;}if(!o.until){o.until=now()+chosen.accessDays*86400000;access.set(buyer.id+'|'+o.product,{until:o.until,order:o.id});}send(res,200,fulfilment(o,chosen));return true;
