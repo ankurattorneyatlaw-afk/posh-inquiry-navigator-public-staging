@@ -2,7 +2,7 @@
 // Account and licence data only. This module has no case-data endpoint.
 const crypto=require('node:crypto'),{clientNetwork}=require('./request-guards.cjs');
 const PLANS=new Set(['essential','professional','advanced','institutional','enterprise','knowledge']);
-const PROTECTED=new Set(['guided.html','workspace.html','admin.html','guided.js','guided-continuation.js','workflow-documents.js','timeline.js','timeline-ui.js','session-experience.js','session-review.js']);
+const PROTECTED=new Set(['guided.html','workspace.html','admin.html','guided.js','guided-continuation.js','workflow-documents.js','timeline.js','timeline-ui.js','session-experience.js','session-review.js','evidence.js','evidence-ui.js']);
 function seal(value,key){const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key,iv);return Buffer.concat([iv,cipher.update(JSON.stringify(value)),cipher.final(),cipher.getAuthTag()]).toString('base64url');}
 function unseal(value,key){try{const b=Buffer.from(value,'base64url');if(b.length<29||b.length>4096)return null;const cipher=crypto.createDecipheriv('aes-256-gcm',key,b.subarray(0,12));cipher.setAuthTag(b.subarray(-16));return JSON.parse(Buffer.concat([cipher.update(b.subarray(12,-16)),cipher.final()]));}catch{return null}}
 function createAccountAccess({url=process.env.NAVIGATOR_AUTH_URL,key=process.env.NAVIGATOR_AUTH_PUBLISHABLE_KEY,cookieKey=process.env.NAVIGATOR_SESSION_KEY,enabled=process.env.NAVIGATOR_ACCOUNT_ACCESS_ENABLED==='true',origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',fetchImpl=fetch,now=Date.now}={}){
