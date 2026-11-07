@@ -1,1 +1,3 @@
 dist/** -text
+*.pdf binary
+*.enc binary
