@@ -1,5 +1,88 @@
 /* Fully local, dependency-free OOXML/DOCX exporter. ZIP method 0 (valid DOCX).
    Creates genuine, editable MS Word documents. No data leaves the browser. */
+(function(root,factory){const api=factory(); if(typeof module==='object'&&module.exports)module.exports=api;root.NavigatorPersonalDocx=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+  const te=new TextEncoder();
+  const enc=s=>te.encode(String(s));
+  const xml=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  const p=(text,style)=>`<w:p>${style?`<w:pPr><w:pStyle w:val="${style}"/></w:pPr>`:''}<w:r><w:t xml:space="preserve">${String(text??'').split(/\r?\n/).map(xml).join('</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`;
+  function table(rows,workflow=false,widths,personal=false){
+    if(!rows?.length)return '';
+    const cols=rows[0].length, grids=workflow&&cols===4?[2200,2382,2382,2382]:workflow&&cols===3?[2600,3373,3373]:cols===2?[3200,6146]:cols===3?(rows[0][0]==='REFERENCE'?[1650,3500,4196]:[1320,2450,5576]):cols===4?[1300,2400,2500,3146]:Array(cols).fill(Math.floor(9346/cols));
+    if(Array.isArray(widths)&&widths.length===cols&&widths.every(x=>Number.isInteger(x)&&x>0)&&widths.reduce((a,b)=>a+b,0)===9346)grids.splice(0,grids.length,...widths);
+    const gridXml=`<w:tblGrid>${grids.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`;
+    const markup=`<w:tbl><w:tblPr><w:tblW w:w="9346" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:top w:val="single" w:color="DDE4EB" w:sz="5"/><w:bottom w:val="single" w:color="DDE4EB" w:sz="5"/><w:insideH w:val="single" w:color="DFE5EB" w:sz="4"/><w:insideV w:val="single" w:color="DFE5EB" w:sz="4"/></w:tblBorders><w:tblCellMar><w:top w:w="105" w:type="dxa"/><w:bottom w:w="105" w:type="dxa"/><w:left w:w="125" w:type="dxa"/><w:right w:w="125" w:type="dxa"/></w:tblCellMar></w:tblPr>${gridXml}${rows.map((r,i)=>`<w:tr><w:trPr><w:cantSplit/>${i===0?'<w:tblHeader/>':''}</w:trPr>${r.map((c,j)=>`<w:tc><w:tcPr><w:tcW w:w="${grids[j]||grids[0]}" w:type="dxa"/>${i===0?'<w:shd w:val="clear" w:fill="'+(personal?'E8EEF2':'172C42')+'"/>':i%2===0?'<w:shd w:val="clear" w:fill="F5F7FA"/>':''}</w:tcPr>${p(c,i===0?'TableHeader':'TableBody')}</w:tc>`).join('')}</w:tr>`).join('')}</w:tbl>`;return personal?markup.replace(/DDE4EB|DFE5EB/g,'D9D9D9').replace('</w:tblBorders>','<w:left w:val="single" w:color="D9D9D9" w:sz="5"/><w:right w:val="single" w:color="D9D9D9" w:sz="5"/></w:tblBorders>'):markup;
+  }
+  function crc32(bytes){let c=-1;for(let i=0;i<bytes.length;i++){c^=bytes[i];for(let j=0;j<8;j++)c=(c>>>1)^((c&1)?0xEDB88320:0);}return (c^-1)>>>0;}
+  function u16(n){return [n&255,(n>>>8)&255]}function u32(n){return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]}
+  function zip(files){let parts=[],central=[],offset=0;for(const [name,body]of Object.entries(files)){
+    const n=enc(name),b=enc(body),crc=crc32(b),flags=0x0800;
+    const local=Uint8Array.from([0x50,0x4b,3,4,...u16(20),...u16(flags),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(b.length),...u32(b.length),...u16(n.length),...u16(0)]);
+    parts.push(local,n,b);
+    const cd=Uint8Array.from([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(flags),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(b.length),...u32(b.length),...u16(n.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)]);
+    central.push(cd,n);offset+=local.length+n.length+b.length;
+  }
+  const size=central.reduce((a,x)=>a+x.length,0),count=Object.keys(files).length;
+  const end=Uint8Array.from([0x50,0x4b,5,6,...u16(0),...u16(0),...u16(count),...u16(count),...u32(size),...u32(offset),...u16(0)]);
+  const all=[...parts,...central,end],len=all.reduce((a,x)=>a+x.length,0);let out=new Uint8Array(len),pos=0;for(const part of all){out.set(part,pos);pos+=part.length;}return out;
+  }
+  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos" w:eastAsia="Aptos"/><w:sz w:val="21"/><w:color w:val="273444"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="70" w:line="265" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
+  <w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
+  <w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:pPr><w:spacing w:before="100" w:after="170"/><w:keepNext/></w:pPr><w:rPr><w:b/><w:sz w:val="33"/><w:color w:val="162A42"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="Heading 1"/><w:pPr><w:spacing w:before="180" w:after="75"/><w:keepNext/><w:keepLines/></w:pPr><w:rPr><w:b/><w:sz w:val="24"/><w:color w:val="162A42"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Kicker"><w:name w:val="Kicker"/><w:pPr><w:spacing w:after="45"/><w:keepNext/></w:pPr><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="987945"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Meta"><w:name w:val="Metadata"/><w:pPr><w:spacing w:after="70"/></w:pPr><w:rPr><w:sz w:val="19"/><w:color w:val="556679"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="TableHeader"><w:name w:val="Table Header"/><w:pPr><w:spacing w:after="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="FFFFFF"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="TableBody"><w:name w:val="Table Body"/><w:pPr><w:spacing w:after="0"/><w:keepLines/></w:pPr><w:rPr><w:sz w:val="19"/><w:color w:val="26384C"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Notice"><w:name w:val="Draft notice"/><w:pPr><w:spacing w:before="50" w:after="170"/></w:pPr><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="875E2E"/></w:rPr></w:style></w:styles>`;
+  const contentTypes=`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`;
+  const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`;
+  const docRels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>`;
+  // Preserve wording and placeholders while separating address and closing blocks.
+  function formatItems(items){
+    const out=[];let recipient=false,closing=false;
+    for(const original of items){
+      if(original.type==='table'||original.type==='pageKicker'){out.push(original);recipient=false;closing=false;continue;}
+      for(const line of String(original.text??'').split(/\r?\n/)){
+        if(!line.trim()){recipient=false;closing=false;continue;}
+        let i={...original,text:line};
+        if(/^(?:Yours\b|For and on behalf)/i.test(line))closing=true;
+        if(closing&&['p','address','recipient'].includes(i.type))i.type='address';
+        if(['p','address','recipient'].includes(i.type)){
+          const inlineTo=line.match(/^To\s+(\[[^\]]+\]\.?)\s+(I\b.*)$/);
+          if(inlineTo){out.push({...i,type:'address',text:'To'},{...i,type:'recipient',text:inlineTo[1]},{...i,type:'p',text:inlineTo[2]});continue;}
+          const to=line.match(/^To(?:\s*:\s*(.*)|\s*)$/i);
+          if(to){out.push({...i,type:'address',text:'To'});if(to[1])out.push({...i,type:'recipient',text:to[1]});recipient=true;continue;}
+          if(recipient&&/^\s*\[/.test(line)&&!/^\s*\[(?:Subject|Date|Signature)/i.test(line))i.type='recipient';
+          else {recipient=false;if(/^(?:Dear\b|Yours\b|For and on behalf|Signature\s*:|Date\s*:|Name\s*:|Subject\s*:|Enclosures?\s*:|Received by\b)/i.test(line))i.type='address';}
+        }
+        if(/^(?:\[Optional\]|Optional(?:\s*:|\s+)|Recipient acknowledgement[^\n]*\boptional\b)/i.test(line.trim()))i.optional=true;
+        out.push(i);
+      }
+      if(!['p','address','recipient'].includes(original.type))recipient=false;
+    }
+    return out;
+  }
+  function buildDocx(title,items,options={}){
+    items=formatItems(items);
+    options={...options,personal:true};
+    const paragraph=i=>{let markup=p(i.text,i.type==='title'?'Title':i.type==='heading'?'Heading1':i.type==='kicker'?'Kicker':i.type==='meta'?'Meta':i.type==='address'?'Address':i.type==='recipient'?'Recipient':i.type==='notice'?'Notice':i.type==='th'?'TableHeader':'Normal');if(i.optional)markup=markup.replace('<w:r>','<w:r><w:rPr><w:i/></w:rPr>');return i.keepLines?markup.replace('</w:pPr>','<w:keepLines/></w:pPr>'):markup;};
+    const data=items.map(i=>i.type==='pageKicker'?'<w:p><w:pPr><w:pStyle w:val="Kicker"/><w:pageBreakBefore/></w:pPr><w:r><w:t xml:space="preserve">'+xml(i.text)+'</w:t></w:r></w:p>':i.type==='table'?table(i.rows,options.workflow,options.personal?i.widths:null,!!options.personal):paragraph(i)).join('');
+    const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${data}<w:sectPr><w:headerReference w:type="default" r:id="rId2"/><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="980" w:right="1280" w:bottom="980" w:left="1280" w:header="620" w:footer="650"/></w:sectPr></w:body></w:document>`;
+    const core=`<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xml(title)}</dc:title><dc:creator>The Cosmic Energizers — POSH Inquiry Navigator</dc:creator><cp:keywords>Confidential draft — editable template</cp:keywords></cp:coreProperties>`;
+    const header=`<?xml version="1.0" encoding="UTF-8"?><w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="8" w:color="C3A36E"/></w:pBdr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="172C42"/><w:sz w:val="16"/></w:rPr><w:t>THE COSMIC ENERGIZERS  |  POSH INQUIRY NAVIGATOR</w:t></w:r></w:p></w:hdr>`;
+    const footer=`<?xml version="1.0" encoding="UTF-8"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="4" w:color="D9DFE5"/></w:pBdr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="697889"/></w:rPr><w:t>CONFIDENTIAL  |  EDITABLE DRAFT — NOT SUBMITTED</w:t></w:r></w:p></w:ftr>`;
+    const personalStyles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/><w:color w:val="000000"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:jc w:val="both"/><w:spacing w:after="120" w:line="324" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:pPr><w:jc w:val="left"/><w:keepNext/><w:spacing w:before="220" w:after="220"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="000000"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="Heading 1"/><w:pPr><w:jc w:val="left"/><w:keepNext/><w:spacing w:before="180" w:after="100"/></w:pPr><w:rPr><w:b/><w:sz w:val="23"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Address"><w:name w:val="Address"/><w:pPr><w:jc w:val="left"/><w:keepNext/><w:spacing w:after="40" w:line="264" w:lineRule="auto"/></w:pPr></w:style><w:style w:type="paragraph" w:styleId="Recipient"><w:name w:val="Recipient"/><w:pPr><w:jc w:val="left"/><w:keepNext/><w:ind w:left="720"/><w:spacing w:after="40" w:line="288" w:lineRule="auto"/></w:pPr></w:style><w:style w:type="paragraph" w:styleId="Meta"><w:name w:val="Metadata"/><w:pPr><w:jc w:val="left"/></w:pPr><w:rPr><w:sz w:val="20"/><w:color w:val="475569"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="TableHeader"><w:name w:val="Table Header"/><w:pPr><w:jc w:val="left"/><w:spacing w:after="50" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="000000"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="TableBody"><w:name w:val="Table Body"/><w:pPr><w:jc w:val="left"/><w:spacing w:after="50" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:sz w:val="19"/></w:rPr></w:style></w:styles>`;
+    const emptyHeader='<?xml version="1.0" encoding="UTF-8"?><w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p/></w:hdr>';
+    const personalFooter='<?xml version="1.0" encoding="UTF-8"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:jc w:val="right"/></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr><w:t xml:space="preserve">Page </w:t></w:r><w:fldSimple w:instr="PAGE"/></w:p></w:ftr>';
+    return zip({'[Content_Types].xml':contentTypes,'_rels/.rels':rels,'word/document.xml':doc,'word/styles.xml':options.personal?personalStyles:options.workflow?styles.replace(/w:color w:val="(?:162A42|987945|556679|26384C|875E2E)"/g,'w:color w:val="000000"'):styles,'word/header1.xml':options.personal?emptyHeader:options.workflow?header.replace('172C42','000000'):header,'word/footer1.xml':options.personal?personalFooter:footer,'word/_rels/document.xml.rels':docRels,'docProps/core.xml':core});
+  }
+  return {buildDocx,formatItems};
+});
+
+/* END SHARED PROFESSIONAL FORMATTER */
+/* Fully local, dependency-free OOXML/DOCX exporter. ZIP method 0 (valid DOCX).
+   Creates genuine, editable MS Word documents. No data leaves the browser. */
 (function(root,factory){const api=factory(); if(typeof module==='object'&&module.exports)module.exports=api;root.NavigatorDocx=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   const te=new TextEncoder();
@@ -38,6 +121,11 @@
   const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`;
   const docRels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>`;
   function buildDocx(title,items,options={}){
+    const professional=typeof module==='object'&&module.exports?require('./personal-docx.js'):globalThis.NavigatorPersonalDocx;
+    if(!professional)throw Error('Document formatter unavailable. Reload Navigator and try again.');
+    return professional.buildDocx(title,items,options);
+  }
+  function legacyBuildDocx(title,items,options={}){
     const paragraph=i=>{const markup=p(i.text,i.type==='title'?'Title':i.type==='heading'?'Heading1':i.type==='kicker'?'Kicker':i.type==='meta'?'Meta':i.type==='notice'?'Notice':i.type==='th'?'TableHeader':'Normal');return i.keepLines?markup.replace('</w:pPr>','<w:keepLines/></w:pPr>'):markup;};
     const data=items.map(i=>i.type==='pageKicker'?'<w:p><w:pPr><w:pStyle w:val="Kicker"/><w:pageBreakBefore/></w:pPr><w:r><w:t xml:space="preserve">'+xml(i.text)+'</w:t></w:r></w:p>':i.type==='table'?table(i.rows,options.workflow):paragraph(i)).join('');
     const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${data}<w:sectPr><w:headerReference w:type="default" r:id="rId2"/><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="980" w:right="1280" w:bottom="980" w:left="1280" w:header="620" w:footer="650"/></w:sectPr></w:body></w:document>`;

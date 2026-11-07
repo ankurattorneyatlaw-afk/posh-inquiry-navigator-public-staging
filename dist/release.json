@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.10.0-evidence-annexures-and-report-review",
+  "version": "6.10.1-consistent-professional-documents",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -18,7 +18,7 @@
     "checkout.js": "f7ed7be1c94bc1a5e0894e46f513a7de9e5cd102c11eaa60707546596f29958b",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "digital.css": "35a1d12f398c7cc2a9df54f8cd3886eb0c5f9af4b500fd1238e170e824d8e8f1",
-    "docx.js": "d707745f1ed5bdf0a753862bf87f454dc289f983655ec041e4fe5e1ed38acd2e",
+    "docx.js": "2b9e0ab91f7c14c07ff346b0e4fb105a0c25f8c38dcc7bacf53e09bc2ae0aa7d",
     "engine.js": "6b0aaf5f41ec20f0b278875a0f70ea03f9c210c4e08b491de4a3de60931e3050",
     "evidence-ui.js": "4c0dd4cf035a637fe7c538c42406e49ea6cabe565803bb86f342f371837934b3",
     "evidence.js": "86c1fab32d62ebc669f1726d4736bee2e4595ab58ac5117b34592bd9424d9718",
@@ -37,7 +37,7 @@
     "legal.js": "c488b73fefc25f3f2d81af89b2e486bbac266439ab174934c2a49d3f880537d4",
     "library.js": "597c56c93b5caae1095be80debab5c27ce42d1faffc94c6da38f2293490bab59",
     "main.js": "d23a75d8143465716bab59d562b2aae13d5a5c76d6ab1a0d53fcbaee4a24c975",
-    "personal-docx.js": "4294356e23309675c50d169ef7f6c15a6090600d0bb9f6352455d55843c639a1",
+    "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plans.js": "baf344e63a9c4828a672159b22242b5eca02a2e84272c180c65bbaa17b99b0dd",
     "preview.html": "44cd62e09013ac03be07abfe716d1b94aa43fac3d352953f863ef42b420cd12b",
     "privacy.html": "5d4df8e4db98c7c5a45fa473298f08537ebdc632e2a3d77fc702f67d78780a52",
@@ -55,7 +55,7 @@
     "styles.css": "f56139828ecc0b98489840b7dea41d9675527c254992969e2708fec2d70d2645",
     "timeline-ui.js": "2f69d1b3d5d289258ce210534b12a2982d184ecb0b3f83df6c3f822bf78e345a",
     "timeline.js": "7b5dcb95ea0568932d4cea08cbc382c4ccb451067020276681eea8665829d076",
-    "workflow-documents.js": "febe76a2b36ac1e37ae2384e28e74733b575ae83f719995749618d2e6b32e7c8",
+    "workflow-documents.js": "6779a75784f31b12ebcf17e4c6882fe83b793ca63615e0405590e35f1da10848",
     "workspace.html": "0f9d086f519240255a106c078930d92beddbe98c65d08a798258342dce6e0c19"
   },
   "products": {
