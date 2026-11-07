@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.9.0-digital-checklist-and-self-service-guides",
+  "version": "6.9.1-professional-individual-templates",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -9,7 +9,7 @@
   "assets": {
     "account-guard.js": "d95614ba1a3865032dffe1d659556e9b309abc6322e77c5f1a612b1481394ffe",
     "account.html": "79117d57b7cd577c71aeb73df086ee7b2ef6f2c32afae74529129459c0c4c776",
-    "account.js": "ef3ba619ab2681e31af5a7201880a586f5cbf49843286ddb639d3b41dd7b7484",
+    "account.js": "3461f1e292e1c1f75240288e62f4d4475f1d42b66031bc088d2313c6e3d17b99",
     "admin.html": "3a782521088f2c2b382c922658b481ee9aae9770c5147cd4fabd0f4e6d0451b2",
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
@@ -17,7 +17,7 @@
     "checkout.html": "eb962b60179b7c541f6661f816501ccda963e123cbbfac11a6dd364890fb38f1",
     "checkout.js": "f7ed7be1c94bc1a5e0894e46f513a7de9e5cd102c11eaa60707546596f29958b",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "digital.css": "50d3577bc01be1a2bc545bf1ad844ce537d9d2f75ce85be1b88a4442c7063322",
+    "digital.css": "35a1d12f398c7cc2a9df54f8cd3886eb0c5f9af4b500fd1238e170e824d8e8f1",
     "docx.js": "d707745f1ed5bdf0a753862bf87f454dc289f983655ec041e4fe5e1ed38acd2e",
     "engine.js": "6b0aaf5f41ec20f0b278875a0f70ea03f9c210c4e08b491de4a3de60931e3050",
     "faq.js": "627babe8e9a9527842d4dc0de092bce109abd506820b858dbcd3c9b22d74fae4",
@@ -28,19 +28,20 @@
     "guided.js": "e7de54b5f22c750b465bb6ee5a5b805de7940c1fc075d7686e2fa1a1994ad52d",
     "help.html": "20fdca69a726d69047a34819fd1877ab057bb9f2713dabc1e8fdb89a69209fc9",
     "index.html": "439658cc50202ff2c02b874dbefaba403aa7954ac2a90df7aaafad0da392e830",
-    "individual-guide.html": "96c211317a2cd8a54151a8edc0de2429cd759499da3fab8a8a96d61f6c7714f9",
-    "individual-guide.js": "0220e92948a5ca1235d62dd3e3fb21cf1622c4cf16227acf0327ed6d2dc70bd3",
-    "individual-support.html": "9dd270f8c6106749157d6bbe786e5f39d1817673583433664a67869eea980c1d",
+    "individual-guide.html": "02ac5fdd4dd16392c43a73d19ad02d49715ed1d9749d417afbe0e5c5fa275f41",
+    "individual-guide.js": "5d4e235925b047fd98a04cb987fb3dff36b87abca5dacdefa0cbaa1a6d08ac96",
+    "individual-support.html": "145fa63d00d3485315c88154a106a5f6c8d555ca42402e378f4672ff810eda2c",
     "institutions.html": "8dc52d306a12eeb0e3ef8ea5eb49869f559f852139c32f93d6b2ae77cd07e5b3",
     "legal.js": "c488b73fefc25f3f2d81af89b2e486bbac266439ab174934c2a49d3f880537d4",
     "library.js": "597c56c93b5caae1095be80debab5c27ce42d1faffc94c6da38f2293490bab59",
     "main.js": "d23a75d8143465716bab59d562b2aae13d5a5c76d6ab1a0d53fcbaee4a24c975",
+    "personal-docx.js": "c290370b512461336b4b3423a47d696ddf34c64d848b03de5d83d256858f50e6",
     "plans.js": "baf344e63a9c4828a672159b22242b5eca02a2e84272c180c65bbaa17b99b0dd",
     "preview.html": "44cd62e09013ac03be07abfe716d1b94aa43fac3d352953f863ef42b420cd12b",
     "privacy.html": "5d4df8e4db98c7c5a45fa473298f08537ebdc632e2a3d77fc702f67d78780a52",
     "private-session-tools.js": "8941b253bfe7b887124ab9e75c529aef4218280b69484ad301aa8762d5602113",
     "product-terms.html": "cefe8494aafd1c8feba59e9f9bf79eaae586f7cb184d38f7e5940ebd686436f8",
-    "products.js": "6e59d4da913fd92c945c42f4ed5b76bd24a553aa8d7802a64756f044ecc58691",
+    "products.js": "fe7c4100f1b733b22bdf1371247a91a4c374333f3324c07027925b9cac83cbf0",
     "resources.html": "51087310c5de76e74601a0e51c71c71140b0b567ac5dfe392e2af16cdb75cc78",
     "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "session-experience.js": "175976a26bb1c19935828a36d35b54a0bebbdb5e44978c1d9d2059c471193a14",
@@ -56,7 +57,7 @@
     "workspace.html": "0f9d086f519240255a106c078930d92beddbe98c65d08a798258342dce6e0c19"
   },
   "products": {
-    "individual-guides.json.enc": "22f2404135a1eedd2f6d1991fbb87fd682da4749e61b3d7b72b8a21536dbb4a4",
+    "individual-guides.json.enc": "adad7f6d5c1e31397c3b422eeda48aaefbb064b8eac67fce5a6df9c8540f933a",
     "inquiry-checklist-v1.pdf.enc": "f38d64b74938f08c2aadb4d52a7f71e6da7223de466f7af6e95f28b8f21fc151"
   }
 }

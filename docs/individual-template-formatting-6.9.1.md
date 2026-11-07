@@ -1,0 +1,9 @@
+# Individual templates 6.9.1
+
+Individual correspondence now downloads as clean recipient-facing letters, rather than worksheets with software cautions mixed into the body. Date, IC/LC recipient, reference where relevant, descriptive subject heading, salutation, paragraphs, signature and safe-contact fields are separate. Placeholders use readable language. No provider banner, drafting instructions or automatic legal-approval claim appears in the letter. The separate usage guide contains preparation instructions, applicable-law checks and submission cautions.
+
+The two packages retain nine main editable templates each: ten correspondence templates and eight working sheets across the packages. Chronology, document/witness indices, hearing preparation and action planning use native editable Word tables and clear sections. Every template has a separate usage-guide download. Arial 11-point body, black headings, consistent paragraph spacing, light table borders, repeated header rows and page fields support subsequent customisation. A separate generic formatter contains no paid template wording. The existing public Committee exporter is unchanged; individual document wording remains in the encrypted product edition.
+
+Product-linked sign-in now explains the chosen checklist or individual guide. It returns only to an allowlisted product page; Committee and administrator roles remain separate.
+
+Validation includes 55 build tests plus 32 timeline/document tests, all 65 product browser/accessibility states, 36 actual Word downloads and local recovery checks, and product-aware sign-in across desktop and mobile. All 36 Word files were converted and rendered with the packaged document renderer for visual review. Plaintext paid wording remains outside the public repository; the protected edition is updated as authenticated ciphertext. Real payments remain disabled.
