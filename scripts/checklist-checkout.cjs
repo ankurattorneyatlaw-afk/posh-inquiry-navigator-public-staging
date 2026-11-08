@@ -14,7 +14,7 @@ function supabaseOrders({url,key,token,fetchImpl=fetch}) {
       method:'POST',headers:{apikey:key,Authorization:'Bearer '+buyer.accessToken,'Content-Type':'application/json'},
       body:JSON.stringify({p_token:token,p_action:action,p_gateway:gateway,...values}),signal:AbortSignal.timeout(8000)
     });
-    if (!response.ok) throw Error('Order store unavailable');
+    if (!response.ok) throw Object.assign(Error('Order store unavailable'),{checkoutSource:'order-store',status:response.status});
     return response.json();
   };
 }
@@ -26,7 +26,13 @@ function razorpayTest({keyId,secret,fetchImpl=fetch}) {
       method:body?'POST':'GET',headers:{Authorization:'Basic '+Buffer.from(keyId+':'+secret).toString('base64'),'Content-Type':'application/json'},
       body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(12000)
     });
-    if (!response.ok) throw Error('Test payment provider unavailable');
+    if (!response.ok) {
+      let description='';
+      try {description=String((await response.json()).error?.description||'');} catch {}
+      const reason=/authenticat|invalid.{0,12}key|incorrect.{0,12}key/i.test(description)?'credentials':
+        /activat|disabled|not enabled|not allowed|restricted|onboarding/i.test(description)?'account-restriction':'rejected';
+      throw Object.assign(Error('Test payment provider unavailable'),{checkoutSource:'razorpay',status:response.status,reason});
+    }
     return response.json();
   }
   return {
@@ -66,6 +72,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
     if (!['session','download','order','verify'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
     if (req.method!==(['session','download'].includes(action)?'GET':'POST')) return send(res,405,{error:'Method not allowed.'});
     if (req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))) return send(res,403,{error:'Use the Navigator checkout page.'});
+    let phase='session';
     try {
       const buyer=await identify(req,res);
       const available=!!(store&&gateway&&readTemplate);
@@ -100,9 +107,12 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
         if (count>8||(!orderLimits.has(buyer.id)&&orderLimits.size>=500)) return send(res,429,{error:'Test order limit reached. Try again later.'});
         orderLimits.set(buyer.id,count);
         // Verify the protected asset can be generated before starting checkout.
+        phase='prepare-template';
         generate(readTemplate(),organisation,'PREVIEW');
+        phase='create-gateway-order';
         const order=await gateway.create();
         if (!orderPattern.test(order?.id||'')||order.amount!==amount||order.currency!==currency) throw Error('Invalid gateway order');
+        phase='save-order';
         const saved=await store(buyer,'create',gateway.name,{p_id:order.id,p_organisation:organisation});
         if (saved?.id!==order.id) throw Error('Order not saved');
         return send(res,201,{...summary(saved),amount,currency,keyId:gateway.keyId,mode:gateway.name});
@@ -111,13 +121,24 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
       const order=await store(buyer,'get',gateway.name,{p_id:data.orderId});
       if (!order) return send(res,403,{error:'This order is unavailable for your account.'});
       if (order.captured) return send(res,200,summary(order));
+      phase='verify-gateway-payment';
       const payment=await gateway.verify(order.id,data);
       if (!payment||!paymentPattern.test(payment.id||'')||payment.live_mode===true||payment.order_id!==order.id||payment.amount!==amount||payment.currency!==currency) return send(res,400,{error:'Payment verification failed.'});
       if (payment.status!=='captured') return send(res,409,{error:'Test payment is awaiting capture. Retry verification.'});
+      phase='save-capture';
       const saved=await store(buyer,'capture',gateway.name,{p_id:order.id,p_payment:payment.id});
       if (!saved?.captured||saved.paymentId!==payment.id) throw Error('Capture not saved');
       return send(res,200,summary(saved));
-    } catch {return send(res,503,{error:'Checklist checkout is temporarily unavailable. Keep your order reference and retry.'});}
+    } catch(error) {
+      console.warn('Checklist checkout failed', {action,phase,mode:gateway?.name,
+        source:error.checkoutSource,status:error.status,reason:error.reason});
+      const errorMessage=error.checkoutSource==='razorpay'?
+        error.reason==='credentials'||error.status===401?'Razorpay rejected the staging test credentials. Check the test key pair in Render.':
+        error.reason==='account-restriction'||error.status===403?'Razorpay restricted this test request. Check the merchant account in Test Mode.':
+        'Razorpay did not accept the test request. No checklist was released.':
+        'Checklist checkout is temporarily unavailable. Keep your order reference and retry.';
+      return send(res,503,{error:errorMessage});
+    }
   };
 }
 
