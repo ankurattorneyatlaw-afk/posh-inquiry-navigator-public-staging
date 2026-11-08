@@ -3,3 +3,10 @@
 .save-panel{padding:18px 24px}.save-panel h2{font-size:1.15rem;margin:0 0 8px}.save-panel .small{margin:0 0 12px;max-width:100ch}.save-panel .actions{margin:0}.pending-list details summary{font-size:.9rem;padding:10px 0}.pending-list details p{font-size:.9rem}.save-panel #individual-status:empty{display:none}
 
 .template-actions{display:flex;flex-direction:column;align-items:stretch;gap:6px;min-width:0;max-width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:white}.template-notes{background:#f3f7f8;font-size:.86rem!important}.template-actions button{text-align:left}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+#tools-panels{display:grid;gap:22px;max-width:1120px}
+#tools-panels input[type=checkbox]{width:18px;height:18px;margin:0 6px 0 0;vertical-align:middle}
+#tools-panels button{margin-top:14px}
+#tools-panels select,#tools-panels input{max-width:100%}
+#tools-panels details{margin-top:8px}
+#tools-panels details summary{padding:8px 0}

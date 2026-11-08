@@ -1,10 +1,13 @@
 // Serves allowlisted public assets and validated community/test-payment API requests.
 const http = require('node:http');
-const accounts=require('./account-access.cjs').createAccountAccess();
+const {createAccountAccess,PROTECTED}=require('./account-access.cjs');
+const accounts=createAccountAccess();
+const testInquiryAssets=new Set([...PROTECTED].filter(name=>!['workspace.html','admin.html'].includes(name)));
 const community=require('./community-api.cjs').createCommunityHandler();
 const payments=require('./payment-api.cjs').createPaymentHandler({identify:accounts.purchaseIdentity});
 const shop=require('./shop-api.cjs').createShopHandler({identify:accounts.purchaseIdentity,allowLegacyChecklist:false});
 const checklist=require('./checklist-checkout.cjs').fromEnvironment(accounts.checkoutIdentity);
+const {getPlanTools}=require('./plan-tools.cjs');
 const analytics=require('./analytics-api.cjs').createAnalytics();
 const enquiryMailer=require('./enquiry-mail.cjs').createEnquiryMailer();
 const enquiries=require('./enquiry-api.cjs').createEnquiryHandler({onSaved:analytics.savedEnquiry,notify:enquiryMailer});
@@ -30,6 +33,19 @@ const server = http.createServer(async(req,res)=>{
     res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'});res.end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok',product:release.product,version:release.version}));return;
   }
   if(parsed.pathname==='/institutions.html'||parsed.pathname==='/institutions/'){res.writeHead(301,{Location:'/institutions'});res.end();return;}
+  if(parsed.pathname==='/api/plan-tools'){
+    res.setHeader('Content-Type','application/json; charset=utf-8');
+    res.setHeader('Vary','Cookie');
+    if(req.method!=='GET'){res.writeHead(405,{'Allow':'GET'});res.end(JSON.stringify({error:'Use the plan tools page.'}));return;}
+    try{
+      const test=parsed.searchParams.has('testOrder');
+      const plan=test?await payments.toolsPlan(req,res,parsed.searchParams.get('testOrder')):await accounts.activeToolsPlan(req,res);
+      const tools=getPlanTools(plan);
+      res.writeHead(tools?200:403);
+      res.end(JSON.stringify(tools?{...tools,test}:{error:'Verified plan access is required. Open your workspace or return to your captured staging order.'}));
+    }catch{res.writeHead(503);res.end(JSON.stringify({error:'Plan access is temporarily unavailable.'}));}
+    return;
+  }
   if(await accounts.handle(req,res,parsed))return;
   if(await analytics.handle(req,res,parsed))return;
   if(await enquiries(req,res,parsed))return;
@@ -40,7 +56,15 @@ const server = http.createServer(async(req,res)=>{
   if(parsed.pathname==='/checkout.html'||parsed.pathname==='/shop.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
   const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/account/':'account.html','/workspace':'workspace.html','/workspace/':'workspace.html','/admin':'admin.html','/admin/':'admin.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
   if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
-  if(await accounts.protect(req,res,name))return;
+  const testOrder=parsed.searchParams.get('testOrder');
+  const testAsset=testOrder!==null&&testInquiryAssets.has(name);
+  if(testAsset){
+    let verified;
+    try{verified=await payments.toolsPlan(req,res,testOrder);}catch{
+      res.writeHead(503);res.end('Staging access check unavailable.');return;
+    }
+    if(!verified){res.writeHead(403);res.end('Verified staging order required.');return;}
+  }else if(await accounts.protect(req,res,name))return;
   if (!allowed.has(name)) {
     const page=(req.headers.accept||'').includes('text/html')||!path.extname(name)||name.endsWith('.html');
     res.writeHead(404,{'Content-Type':page?'text/html; charset=utf-8':'text/plain; charset=utf-8'});
@@ -52,6 +76,13 @@ const server = http.createServer(async(req,res)=>{
   // Surface the integrated workflow in the existing site without modifying the signed static release assets.
   let payload=fs.readFileSync(path.join(root,name));
   if(name==='guided.html'&&accounts.enabled){payload=Buffer.from(payload.toString('utf8').replace('<body>','<body data-account-required>').replace('CURRENT RENDER STAGING','ACCOUNT ACCESS').replace('FICTIONAL DEMONSTRATION · DO NOT ENTER ACTUAL CASE INFORMATION','PRIVATE BROWSER SESSION · USE CODES ONLY · NO CASE DATA IS STORED').replace('Structured IC/LC workflow · Staging','Structured IC/LC procedural guide').replace('Follow the fictional inquiry','Follow the procedural inquiry').replace('Complaint intake to completion · Procedural preview','Complaint intake to completion · Committee decisions remain human').replace('No real cases or identities.','Keep identities and source records in your institution’s own secure records.').replace('Existing POSH Inquiry Navigator staging · Not approved for confidential or operational use · Human decisions always required','POSH Inquiry Navigator · No case data is transmitted or stored · Human decisions always required').replace('Fictional test scenario','Learning scenario (synthetic examples only)'),'utf8');}
+  if(testOrder!==null&&/^order_[A-Za-z0-9]+$/.test(testOrder)&&(name==='guided.html'||name==='plan-tools.html')){
+    const query='?testOrder='+encodeURIComponent(testOrder);
+    const body=payload.toString('utf8').replace(/src="\/([^"]+)"/g,(match,asset)=>
+      testInquiryAssets.has(asset)?'src="/'+asset+query+'"':match
+    ).replace(/<body(?: data-account-required)?>/,name==='guided.html'?'<body data-account-required data-test-inquiry>':'<body>');
+    payload=Buffer.from(body,'utf8');
+  }
   res.writeHead(200);res.end(req.method==='HEAD'?undefined:payload);
 });
 server.requestTimeout=15000;

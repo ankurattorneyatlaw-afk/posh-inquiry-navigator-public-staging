@@ -1,6 +1,7 @@
 'use strict';
 // Account and licence data only. This module has no case-data endpoint.
 const crypto=require('node:crypto'),{clientNetwork}=require('./request-guards.cjs');
+const {tiers}=require('./plan-tools.cjs');
 const PLANS=new Set(['essential','professional','advanced','institutional','enterprise','knowledge']);
 const PROTECTED=new Set(['guided.html','workspace.html','admin.html','guided.js','guided-continuation.js','workflow-documents.js','timeline.js','timeline-ui.js','session-experience.js','session-review.js','evidence.js','evidence-ui.js']);
 function seal(value,key){const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key,iv);return Buffer.concat([iv,cipher.update(JSON.stringify(value)),cipher.final(),cipher.getAuthTag()]).toString('base64url');}
@@ -61,10 +62,18 @@ function createAccountAccess({url=process.env.NAVIGATOR_AUTH_URL,key=process.env
  if(parsed.pathname==='/api/account/mfa/verify'){if(!/^[a-f0-9-]{36}$/i.test(data.factorId||'')||!/^\d{6}$/.test(data.code||'')){send(res,400,{error:'Enter the six-digit authenticator code.'});return true}const challenge=await remote('/auth/v1/factors/'+data.factorId+'/challenge',{method:'POST',token:current.s.access,body:{}}),r=await remote('/auth/v1/factors/'+data.factorId+'/verify',{method:'POST',token:current.s.access,body:{challenge_id:challenge.id,code:data.code}});write(res,{...current.s,access:r.access_token,refresh:r.refresh_token,expires:now()+r.expires_in*1000});send(res,200,{verified:true});return true}
  send(res,404,{error:'Account action unavailable.'});return true;
  }catch(error){send(res,[400,413].includes(error.status)?error.status:503,{error:error.status===413?'Account request is too large.':error.status===400?'Invalid account request.':'The account service could not complete this action. No case information is accepted here.'});return true}}
+ async function activeToolsPlan(req,res){
+   const current=await session(req,res);
+   if(!current)return null;
+   const operator=await remote('/rest/v1/rpc/navigator_is_operator',{method:'POST',token:current.s.access,body:{}});
+   if(operator===true)return 'advanced';
+   const plans=(await rights(current.s)).filter(row=>Object.hasOwn(tiers,row.plan));
+   return plans.sort((a,b)=>tiers[b.plan]-tiers[a.plan])[0]?.plan||null;
+ }
  async function purchaseIdentity(req,res){const current=await session(req,res);return current?{id:current.user.id}:null;}
  async function checkoutIdentity(req,res){const current=await session(req,res);return current?{id:current.user.id,accessToken:current.s.access}:null;}
  async function protect(req,res,asset){if(!enabled||!PROTECTED.has(asset))return false;if(!configured){send(res,503,{error:'Licensed access is temporarily unavailable.'});return true}const page=['guided.html','workspace.html','admin.html'].includes(asset),redirect=where=>{res.writeHead(303,{Location:where,'Cache-Control':'no-store'});res.end();};try{const current=await session(req,res);if(!current){if(page)redirect('/account');else send(res,401,{error:'Sign in required'});return true}if(asset==='workspace.html')return false;const operator=await remote('/rest/v1/rpc/navigator_is_operator',{method:'POST',token:current.s.access,body:{}});if(asset==='admin.html'){if(operator===true)return false;redirect('/workspace');return true;}if(operator===true)return false;const access=await rights(current.s);if(!access.some(x=>x.guided)){if(page)redirect('/workspace');else send(res,403,{error:'An active inquiry plan and verified sign-in are required'});return true}return false}catch{if(page){res.writeHead(503,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Access check unavailable | Navigator</title><main><h1>Access check temporarily unavailable</h1><p>Your access could not be verified. Keep any existing inquiry tab open and save its recovery file before refreshing.</p><p><a href="/account">Try sign-in again</a> · <a href="/">Public website and free guidance</a></p></main></html>');}else send(res,503,{error:'Plan access could not be verified. Please try again later.'});return true}}
 
- return{handle,protect,purchaseIdentity,checkoutIdentity,enabled,configured};
+ return{handle,protect,purchaseIdentity,checkoutIdentity,activeToolsPlan,enabled,configured};
 }
 module.exports={createAccountAccess,seal,unseal,PROTECTED};
