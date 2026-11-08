@@ -1,13 +1,13 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.18.0-expired-preview-clearing-staging",
+  "version": "6.19.0-faster-invited-seat-checks-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
     "origin": "https://posh-inquiry-navigator-staging.onrender.com"
   },
   "assets": {
-    "account-guard.js": "3d04b71e8df6d92381076c28efaca09fa5e5de32e10484a89f0c1c68106e82b4",
+    "account-guard.js": "2e1c9f5587031ff7b630de33285dbb85d4f2f3896bdb998bd8b38fa247d50d76",
     "account.html": "d69fcdf51dc3210d56c4349b6d707549cb714036b074fb4b4ecd84591faff937",
     "account.js": "282f1ac7fa90147d8ceb704d1c877a8c946740f1130b502169c5c0fcba6f9daf",
     "admin.html": "c756e66bd321a38362d429b950d15129a2f61c89357ce02859ef1aa0370c240a",
