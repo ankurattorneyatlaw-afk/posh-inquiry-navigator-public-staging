@@ -4,7 +4,11 @@ const {createAccountAccess,PROTECTED}=require('./account-access.cjs');
 const accounts=createAccountAccess();
 const testInquiryAssets=new Set([...PROTECTED].filter(name=>!['workspace.html','admin.html'].includes(name)));
 const community=require('./community-api.cjs').createCommunityHandler();
-const payments=require('./payment-api.cjs').createPaymentHandler({identify:accounts.purchaseIdentity});
+const {stagingOrigin,planStoreFromEnvironment}=require('./plan-store.cjs');
+const payments=require('./payment-api.cjs').createPaymentHandler({
+  identify:accounts.checkoutIdentity,store:planStoreFromEnvironment(),
+  requireDurable:process.env.RENDER_EXTERNAL_URL===stagingOrigin
+});
 const shop=require('./shop-api.cjs').createShopHandler({identify:accounts.purchaseIdentity,allowLegacyChecklist:false});
 const checklist=require('./checklist-checkout.cjs').fromEnvironment(accounts.checkoutIdentity);
 const {getPlanTools}=require('./plan-tools.cjs');
@@ -39,10 +43,16 @@ const server = http.createServer(async(req,res)=>{
     if(req.method!=='GET'){res.writeHead(405,{'Allow':'GET'});res.end(JSON.stringify({error:'Use the plan tools page.'}));return;}
     try{
       const test=parsed.searchParams.has('testOrder');
-      const plan=test?await payments.toolsPlan(req,res,parsed.searchParams.get('testOrder')):await accounts.activeToolsPlan(req,res);
+      const entitlement=test?await payments.entitlement(req,res,parsed.searchParams.get('testOrder')):null;
+      if(entitlement?.state==='read-only'){
+        res.writeHead(200);
+        res.end(JSON.stringify({test:true,label:getPlanTools(entitlement.plan).label,entitlement}));
+        return;
+      }
+      const plan=test?(entitlement?.state==='active'?entitlement.plan:null):await accounts.activeToolsPlan(req,res);
       const tools=getPlanTools(plan);
       res.writeHead(tools?200:403);
-      res.end(JSON.stringify(tools?{...tools,test}:{error:'Verified plan access is required. Open your workspace or return to your captured staging order.'}));
+      res.end(JSON.stringify(tools?{...tools,test,entitlement}:{error:'Verified plan access is required. Open your workspace or return to your captured staging order.'}));
     }catch{res.writeHead(503);res.end(JSON.stringify({error:'Plan access is temporarily unavailable.'}));}
     return;
   }

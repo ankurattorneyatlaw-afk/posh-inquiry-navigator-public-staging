@@ -1,15 +1,15 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.13.0-plan-tools-staging",
+  "version": "6.14.0-durable-plan-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
     "origin": "https://posh-inquiry-navigator-staging.onrender.com"
   },
   "assets": {
-    "account-guard.js": "977adcba6572d567bf1e9a9c4f73a2a803e0602e971a282e5bb5f48e1a20d1a1",
+    "account-guard.js": "3d04b71e8df6d92381076c28efaca09fa5e5de32e10484a89f0c1c68106e82b4",
     "account.html": "79117d57b7cd577c71aeb73df086ee7b2ef6f2c32afae74529129459c0c4c776",
-    "account.js": "18c88d811d0ba14471f02f53ab97d086b70099844528319dbdcf5dca06af68dc",
+    "account.js": "30d3a3417d5c5aebb11f1e247540a323c3375efa4bf97cf5aa37ee8a9047c12c",
     "admin.html": "3a782521088f2c2b382c922658b481ee9aae9770c5147cd4fabd0f4e6d0451b2",
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
@@ -17,7 +17,7 @@
     "checkout.html": "eb962b60179b7c541f6661f816501ccda963e123cbbfac11a6dd364890fb38f1",
     "checkout.js": "e205ade257c9e908816312847167753eeb65705d3c16867e97f842b2994b1a20",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
-    "digital.css": "3c93e7a306cb8656316b974ab1c0a004ecd8165bb111dcea08cad6168bb8e91d",
+    "digital.css": "d90a5a563f4373a4d43f000dc5dd75f75c183bf8ecaae4fe54cb769d5743f62d",
     "docx.js": "2b9e0ab91f7c14c07ff346b0e4fb105a0c25f8c38dcc7bacf53e09bc2ae0aa7d",
     "engine.js": "6b0aaf5f41ec20f0b278875a0f70ea03f9c210c4e08b491de4a3de60931e3050",
     "evidence-ui.js": "4c0dd4cf035a637fe7c538c42406e49ea6cabe565803bb86f342f371837934b3",
@@ -56,9 +56,9 @@
     "timeline-ui.js": "5147b2836242a1a4ab8bbd27f352d75c764bccdfba64eeaba7ebe90ae532e3d5",
     "timeline.js": "2e26ac867da676ec82ae1da17197d4f863622fbe06167701afa78e25b1a82cd2",
     "workflow-documents.js": "6779a75784f31b12ebcf17e4c6882fe83b793ca63615e0405590e35f1da10848",
-    "workspace.html": "19a94961844986579d2c71acdf3d767b9b8c8c9b0b3019e0a5be399cfbe6abcf",
+    "workspace.html": "f2f5b25107cbc05c27903bda40cae83480c79b64d2ef948ac000073906316c63",
     "plan-tools.html": "d0935755d60974d3bfd8ca6b269d8593bd5e7e67c4f2f6a2c83ed48043664338",
-    "plan-tools.js": "f007bfca63d538fab73bde5c03010434bfa77e2244d1a46346a30e2b48627f0b"
+    "plan-tools.js": "4f822f5b8cf65b37f961c1c7fca70178af2a9a932e0a9aa6ee6b5d5ba61761bc"
   },
   "products": {
     "individual-guides.json.enc": "09aa66b356d12794a22a297178f8cbc5afb6ba556029475614a2bd2117f8d824",

@@ -58,7 +58,7 @@ function exportButton(parent,label,name,expected,items){
     button.disabled=true;
     try{
       const current=await access();
-      if(current.plan!==expected)throw Error('Plan access changed. Open the tools again to load your current plan.');
+      if(current.plan!==expected||(current.test&&current.entitlement?.state!=='active'))throw Error('Plan access changed. Open the tools again to load your current plan.');
       const title=name.replaceAll('-',' ');
       const doc=window.NavigatorPersonalDocx.buildDocx(title,documentItems(title,items()),{workflow:true});
       window.NavigatorDocx.download(name+'.docx',doc);
@@ -244,11 +244,117 @@ function advancedTools(data){
     ];
   });
 }
+function showSeats(data){
+  if(!data.entitlement?.owner)return;
+  const panel=section('Plan seats');
+  const url=new URL('/api/payments/seats',location.origin);
+  url.searchParams.set('order',testOrder);
+  const count=el('p','Loading seats…',panel);
+  count.setAttribute('role','status');
+  const list=el('ul','',panel);
+  const email=field(panel,'Existing Navigator account email',254);
+  email.type='email';
+  const add=el('button','Assign seat',panel);
+  add.type='button';
+  const active=data.entitlement.state==='active';
+  email.closest('label').hidden=!active;
+  add.hidden=!active;
+  let busy=false;
+  async function update(change){
+    if(busy)return;
+    busy=true;
+    add.disabled=true;
+    for(const button of list.querySelectorAll('button'))button.disabled=true;
+    try{
+      const response=await fetch(url,{credentials:'same-origin',cache:'no-store',
+        ...(change?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(change)}:{})});
+      const result=await response.json();
+      if(!response.ok)throw Error(result.error||'Seat access could not be verified.');
+      count.textContent=(result.members.length+1)+' of '+result.seatLimit+' seats used, including your seat.';
+      list.replaceChildren();
+      if(change?.action==='add')email.value='';
+      for(const member of result.members){
+        const item=el('li',member.email+' ',list);
+        if(result.state!=='active')continue;
+        const remove=el('button','Remove',item);
+        remove.type='button';
+        remove.setAttribute('aria-label','Remove '+member.email);
+        remove.onclick=()=>update({action:'remove',member:member.id});
+      }
+    }catch(error){count.textContent=error.message;}
+    finally{
+      busy=false;
+      add.disabled=false;
+      for(const button of list.querySelectorAll('button'))button.disabled=false;
+    }
+  }
+  add.onclick=()=>{if(email.reportValidity()&&email.value)update({action:'add',email:email.value});};
+  el('p','Seat holders sign in to their own confirmed account to open this plan. Inquiry files stay on their devices.',panel);
+  update();
+}
+function showReadOnly(){
+  const panel=section('Review a saved inquiry');
+  el('p','Open a local Navigator recovery file to review it here. The file stays on this device and is never changed. Previously downloaded documents remain available on your device.',panel);
+  const input=el('input','',el('label','Navigator recovery JSON',panel));
+  input.type='file';
+  input.accept='.json,application/json';
+  const result=el('div','',panel);
+  result.setAttribute('aria-live','polite');
+  input.onchange=async()=>{
+    result.replaceChildren();
+    try{
+      const current=await access();
+      if(current.entitlement?.state!=='read-only')throw Error('Read-only access could not be verified.');
+      const file=input.files[0];
+      if(!file||file.size>2_000_000)throw Error('Choose a Navigator recovery file up to 2 MB.');
+      const data=JSON.parse(await file.text());
+      if(data?.format!=='posh-navigator-session'||![1,2,3,4].includes(data.schemaVersion)||
+        !data.workflow||!data.timeline)throw Error('Choose a saved Navigator inquiry recovery file.');
+      for(const [label,value] of [['Inquiry workflow',data.workflow],['Timeline and history',data.timeline],['Evidence references',data.evidence],['Unsubmitted notes and references',data.drafts]]){
+        if(!value)continue;
+        const group=el('details','',result);
+        el('summary',label,group);
+        const pre=el('pre',JSON.stringify(value,null,2),group);
+        pre.className='readonly-record';
+      }
+    }catch(error){el('p',error.message,result);}
+  };
+}
 access().then(data=>{
   $('tools-heading').textContent=data.label;
   $('tools-mode').textContent=data.test?'Staging test access · no real payment':'Verified plan access';
-  status.textContent=data.test?'Test only. Access can reset if the staging server restarts.':'Your plan tools are ready.';
+  const expiry=data.entitlement?.readOnlyUntil;
+  const date=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'long',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST';
+  status.textContent=data.test&&expiry?
+    'Staging plan. Editing ends '+date(data.entitlement.ends_at)+'. Read-only access ends '+date(expiry)+'.':
+    'Your plan tools are ready.';
   $('tools-content').hidden=false;
+  if(data.test&&expiry){
+    const state=data.entitlement.state;
+    const boundary=Date.parse(state==='active'?data.entitlement.ends_at:expiry);
+    const recheck=async()=>{
+      const content=$('tools-content');
+      if(Date.now()>=boundary)content.inert=true;
+      try{
+        const current=await access();
+        if(current.entitlement?.state!==state)throw Error('Plan access changed. Reload to open the current access period.');
+        content.inert=false;
+      }catch(error){
+        content.inert=true;
+        status.textContent=error.message+' Reload to check your current access.';
+      }
+    };
+    if(boundary-Date.now()<2147483647)setTimeout(recheck,Math.max(0,boundary-Date.now()));
+    setInterval(recheck,60000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)recheck();});
+  }
+  if(data.entitlement?.state==='read-only'){
+    status.textContent='Read-only access until '+date(expiry)+'. Editing and new draft creation have ended.';
+    showReadOnly();
+    showSeats(data);
+    return;
+  }
+  showSeats(data);
   standardTools(data.plan);
   const toolkit=section('POSH Readiness Toolkit');
   const toolkitItems=reviewList(toolkit,data.toolkit,true);

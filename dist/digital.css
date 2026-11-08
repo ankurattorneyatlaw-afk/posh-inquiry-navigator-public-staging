@@ -10,3 +10,4 @@
 #tools-panels select,#tools-panels input{max-width:100%}
 #tools-panels details{margin-top:8px}
 #tools-panels details summary{padding:8px 0}
+.readonly-record{white-space:pre-wrap;overflow-wrap:anywhere;max-height:32rem;overflow:auto;background:#f2f6f7;padding:12px}
