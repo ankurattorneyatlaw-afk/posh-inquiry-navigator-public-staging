@@ -308,14 +308,24 @@ function showReadOnly(){
   input.accept='.json,application/json';
   const result=el('div','',panel);
   result.setAttribute('aria-live','polite');
+  let previewRequest=0;
+  const clearPreview=()=>{
+    previewRequest++;
+    input.value='';
+    result.replaceChildren();
+  };
   input.onchange=async()=>{
+    const request=++previewRequest;
     result.replaceChildren();
     try{
       const current=await access();
+      if(request!==previewRequest)return;
       if(current.entitlement?.state!=='read-only')throw Error('Read-only access could not be verified.');
       const file=input.files[0];
       if(!file||file.size>2_000_000)throw Error('Choose a Navigator recovery file up to 2 MB.');
-      const data=JSON.parse(await file.text());
+      const text=await file.text();
+      if(request!==previewRequest)return;
+      const data=JSON.parse(text);
       if(data?.format!=='posh-navigator-session'||![1,2,3,4].includes(data.schemaVersion)||
         !data.workflow||!data.timeline)throw Error('Choose a saved Navigator inquiry recovery file.');
       el('h3','Saved inquiry at a glance',result);
@@ -339,8 +349,9 @@ function showReadOnly(){
         const pre=el('pre',JSON.stringify(value,null,2),group);
         pre.className='readonly-record';
       }
-    }catch(error){el('p',error.message,result);}
+    }catch(error){if(request===previewRequest)el('p',error.message,result);}
   };
+  return clearPreview;
 }
 access().then(data=>{
   $('tools-heading').textContent=data.label;
@@ -350,19 +361,29 @@ access().then(data=>{
   status.textContent=data.test&&expiry?
     'Staging plan. Editing ends '+date(data.entitlement.ends_at)+'. Read-only access ends '+date(expiry)+'.':
     'Your plan tools are ready.';
-  $('tools-content').hidden=false;
+  const content=$('tools-content');
+  content.hidden=false;
+  let clearPreview;
   if(data.test&&expiry){
     const state=data.entitlement.state;
     const boundary=Date.parse(state==='active'?data.entitlement.ends_at:expiry);
+    let checkRequest=0;
+    const lock=()=>{
+      content.inert=true;
+      clearPreview?.();
+    };
     const recheck=async()=>{
-      const content=$('tools-content');
-      if(Date.now()>=boundary)content.inert=true;
+      const request=++checkRequest;
+      if(Date.now()>=boundary)lock();
       try{
         const current=await access();
-        if(current.entitlement?.state!==state)throw Error('Plan access changed. Reload to open the current access period.');
+        if(request!==checkRequest)return;
+        if(current.entitlement?.state!==state)throw Error('Plan access changed.');
+        if(state==='read-only'&&Date.now()>=boundary)throw Error('The read-only period has ended.');
         content.inert=false;
       }catch(error){
-        content.inert=true;
+        if(request!==checkRequest)return;
+        lock();
         status.textContent=error.message+' Reload to check your current access.';
       }
     };
@@ -373,7 +394,7 @@ access().then(data=>{
   if(data.entitlement?.state==='read-only'){
     $('tools-editing-intro').hidden=true;
     status.textContent='Read-only access until '+date(expiry)+'. Editing and new draft creation have ended.';
-    showReadOnly();
+    clearPreview=showReadOnly();
     showSeats(data);
     return;
   }
@@ -399,4 +420,3 @@ access().then(data=>{
   link($('tools-sources'),'Central POSH Rules',data.sources.rules);
 }).catch(error=>{status.textContent=error.message;});
 })();
-

@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.17.0-durable-individual-guide-access-staging",
+  "version": "6.18.0-expired-preview-clearing-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -58,7 +58,7 @@
     "workflow-documents.js": "6779a75784f31b12ebcf17e4c6882fe83b793ca63615e0405590e35f1da10848",
     "workspace.html": "c80017af1882fa319c1cbb22a6b0695315d8490d7c6f0e810bd3e3bf88b0b0e7",
     "plan-tools.html": "44dd78f36137cfd45e453408405831ef48b6e416fc4f9ac332914128665b63df",
-    "plan-tools.js": "5b23ecdced01a6301c2857a908bbce35730cbaab0adc9f1f126050c72bcb492a",
+    "plan-tools.js": "fba508e0067096cb390f920856707cb48dc7d1ab9abf5fd0e17deed52ea6724d",
     "about.html": "3a89012724e96e2b452bc3e57fc9980fe05794169dd47ffc7dd193d482a32f8f",
     "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
     "digital-delivery.html": "a27e327262252ad28cd98b680788b5a557423bf409ef0d24378651c89f84c141",
