@@ -292,6 +292,16 @@ function showSeats(data){
   el('p','Seat holders sign in to their own confirmed account to open this plan. Inquiry files stay on their devices.',panel);
   update();
 }
+const reviewDates={
+  receipt:'Written complaint received',commenced:'Verified inquiry commencement',
+  firstMeeting:'First Committee meeting',completed:'Inquiry completed',
+  reportSubmitted:'Report provided to employer or District Officer',
+  partiesSupplied:'Report made available to parties',
+  recommendationsReceived:'Recommendations received',implemented:'Action or implementation',
+  conciliationRequested:'Conciliation requested',settled:'Settlement recorded',
+  settlementForwarded:'Settlement forwarded',settlementCopies:'Settlement copies provided',
+  breachReported:'Settlement breach reported'
+};
 function showReadOnly(){
   const panel=section('Review a saved inquiry');
   el('p','Open a local Navigator recovery file to review it here. The file stays on this device and is never changed. Previously downloaded documents remain available on your device.',panel);
@@ -310,6 +320,20 @@ function showReadOnly(){
       const data=JSON.parse(await file.text());
       if(data?.format!=='posh-navigator-session'||![1,2,3,4].includes(data.schemaVersion)||
         !data.workflow||!data.timeline)throw Error('Choose a saved Navigator inquiry recovery file.');
+      el('h3','Saved inquiry at a glance',result);
+      const route=data.timeline.route;
+      if(route==='conciliation'||route==='inquiry')el('p',route==='conciliation'?'Recorded route · Conciliation':'Recorded route · Inquiry',result);
+      const recorded=Object.entries(reviewDates).filter(([key])=>/^\d{4}-\d{2}-\d{2}$/.test(data.timeline.dates?.[key]||''));
+      el('h4','Recorded milestone dates',result);
+      if(recorded.length){
+        const list=el('dl','',result);
+        for(const [key,label] of recorded){
+          el('dt',label,list);
+          el('dd',data.timeline.dates[key],list);
+        }
+      }else el('p','No milestone dates are recorded in this file.',result);
+      el('p','These dates come from your saved file. Confirm them against your Committee’s records.',result);
+      el('h4','Detailed recovery record',result);
       for(const [label,value] of [['Inquiry workflow',data.workflow],['Timeline and history',data.timeline],['Evidence references',data.evidence],['Unsubmitted notes and references',data.drafts]]){
         if(!value)continue;
         const group=el('details','',result);
@@ -349,6 +373,7 @@ access().then(data=>{
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)recheck();});
   }
   if(data.entitlement?.state==='read-only'){
+    $('tools-editing-intro').hidden=true;
     status.textContent='Read-only access until '+date(expiry)+'. Editing and new draft creation have ended.';
     showReadOnly();
     showSeats(data);
