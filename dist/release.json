@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.15.0-merchant-review-staging",
+  "version": "6.15.1-merchant-review-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -63,8 +63,8 @@
     "contact.html": "91ef53bdd79959adfb10b6bc0f62922028373d5af50bb648d6a5f85b14cb154c",
     "digital-delivery.html": "bd5d78ff2b78ee3716d9c804fb66334f2662023d398270afee1baca59ca79d8a",
     "pricing.html": "c32771ece218a2a3ca375956625a12dccc4c8199ab5b5bf653225be94cbfbae3",
-    "purchase-terms.html": "8dd6fb207adb30c4c3a2dc01d2c601e6cff577c64dfea83e35b4c764a07481db",
-    "refund-policy.html": "ffa756912a4a9e9e37878a536340a6130dd5113a9a36767f3c1bd85633865cf7"
+    "purchase-terms.html": "9191817c030d82ed0ffc606d0335df98abfd2a492c3c3dd87d93e966efb1b28a",
+    "refund-policy.html": "e703f3709bee4b09ffc78a085c854e52ac4e7372bf44d907469fcd52d5b88699"
   },
   "products": {
     "individual-guides.json.enc": "09aa66b356d12794a22a297178f8cbc5afb6ba556029475614a2bd2117f8d824",
