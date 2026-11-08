@@ -1,13 +1,17 @@
 'use strict';
 const {randomUUID,createHmac,randomBytes}=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
 const catalogue=require('../dist/products.js'),{clientNetwork}=require('./request-guards.cjs');
-function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',now=Date.now,folder=path.join(__dirname,'../products'),assetKey=process.env.NAVIGATOR_PRODUCT_ASSET_KEY,readAsset=require('./product-assets.cjs').productReader({folder,key:assetKey})}={}){
+function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',now=Date.now,folder=path.join(__dirname,'../products'),assetKey=process.env.NAVIGATOR_PRODUCT_ASSET_KEY,readAsset=require('./product-assets.cjs').productReader({folder,key:assetKey}),store=null,requireDurable=false}={}){
  const orders=new Map(),access=new Map(),rates=new Map(),salt=randomBytes(32);let reset=now()+3600000;
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
  const product=id=>catalogue.products.find(p=>p.id===id);
- const entry=(id,p)=>{const e=access.get(id+'|'+p);return e&&e.until>now()?e:null;};
+ async function entry(buyer,p){
+  if(store)return store(buyer,'access',{p_product:p});
+  const e=access.get(buyer.id+'|'+p);
+  return e&&e.until>now()?e:null;
+ }
  const destination=p=>p.kind==='download'?'/api/shop/download?product=checklist':'/individual-guide.html?product='+p.id;
- const fulfilment=(o,p)=>({mode:'test',status:'test_fulfilled',charged:0,realPaymentsEnabled:false,serviceActivated:false,coreInquiryAccessGranted:false,orderId:o.id,product:p.id,name:p.name,catalogueAmount:p.amount,currency:'INR',termsVersion:o.termsVersion,delivery:destination(p),testAccessUntil:new Date(o.until).toISOString(),message:'Test order complete. No charge, tax invoice or real subscription was created. Test access is temporary and may reset after a service restart.'});
+ const fulfilment=(o,p)=>({mode:'test',status:'test_fulfilled',charged:0,realPaymentsEnabled:false,serviceActivated:false,coreInquiryAccessGranted:false,orderId:o.id,product:p.id,name:p.name,catalogueAmount:p.amount,currency:'INR',termsVersion:o.termsVersion,delivery:destination(p),testAccessUntil:new Date(o.until).toISOString(),message:'Test order complete. No charge, tax invoice or real subscription was created.'});
  return async function(req,res,url){if(!url.pathname.startsWith('/api/shop/'))return false;
   const p=product(url.searchParams.get('product'));
   if(!allowLegacyChecklist&&p?.id==='checklist'){send(res,409,{error:'Use the checklist checkout page.'});return true;}
@@ -17,10 +21,11 @@ function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,ori
    if((['/api/shop/order','/api/shop/confirm'].includes(url.pathname)&&req.method!=='POST')||(!['/api/shop/order','/api/shop/confirm'].includes(url.pathname)&&req.method!=='GET')){send(res,405,{error:'Method not allowed.'});return true;}
    if(req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))){send(res,403,{error:'Use Navigator test checkout.'});return true;}
    const buyer=await identify(req,res);
-   if(url.pathname==='/api/shop/session'){if(!p){send(res,400,{error:'Choose a listed product.'});return true;}const active=buyer&&entry(buyer.id,p.id);send(res,200,{signedIn:!!buyer,hasTestAccess:!!active,mode:'test',realPaymentsEnabled:false,delivery:active?destination(p):null,until:active?new Date(active.until).toISOString():null});return true;}
+   if(buyer&&requireDurable&&!store)throw Error('Guide access store unavailable');
+   if(url.pathname==='/api/shop/session'){if(!p){send(res,400,{error:'Choose a listed product.'});return true;}const active=buyer&&await entry(buyer,p.id);send(res,200,{signedIn:!!buyer,hasTestAccess:!!active,mode:'test',realPaymentsEnabled:false,delivery:active?destination(p):null,until:active?new Date(active.until).toISOString():null});return true;}
    if(!buyer){send(res,401,{error:'Sign in to continue. No payment has been taken.'});return true;}
    if(['/api/shop/content','/api/shop/download'].includes(url.pathname)){
-    if(!p||!entry(buyer.id,p.id)){send(res,403,{error:'Complete test checkout for this product to open it. Your recovery file stays on your device.'});return true;}
+    if(!p||!await entry(buyer,p.id)){send(res,403,{error:'Complete test checkout for this product to open it. Your recovery file stays on your device.'});return true;}
     if(url.pathname==='/api/shop/content'){if(p.kind!=='guide'){send(res,400,{error:'This product is a PDF download.'});return true;}const content=JSON.parse(readAsset('individual-guides.json').toString('utf8'))[p.id];send(res,200,{product:p.id,edition:p.edition,...content});return true;}
     if(p.id!=='checklist'){send(res,400,{error:'Choose the checklist for PDF delivery.'});return true;}const pdf=readAsset('inquiry-checklist-v1.pdf');res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="POSH-Inquiry-Checklist-v1.pdf"','Cache-Control':'private, no-store'});res.end(pdf);return true;
    }
@@ -31,7 +36,20 @@ function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,ori
    if(url.pathname==='/api/shop/order'){
     const chosen=product(data.product);if(!chosen||data.termsVersion!==catalogue.termsVersion){send(res,400,{error:'Review the current product scope and terms.'});return true;}if(orders.size>=1000||access.size>=1000){send(res,503,{error:'Test checkout capacity reached. No payment was taken.'});return true;}
     if(!allowLegacyChecklist&&chosen.id==='checklist'){send(res,409,{error:'Use the checklist checkout page.'});return true;}
-    readAsset(chosen.kind==='download'?'inquiry-checklist-v1.pdf':'individual-guides.json');const id='NAVTEST-'+randomUUID(),o={id,account:buyer.id,product:chosen.id,amount:chosen.amount,termsVersion:catalogue.termsVersion,expires:now()+900000};orders.set(id,o);send(res,201,{mode:'test',charged:0,orderId:id,product:chosen.id,name:chosen.name,catalogueAmount:chosen.amount,currency:'INR',termsVersion:o.termsVersion,expires:new Date(o.expires).toISOString()});return true;
+    readAsset(chosen.kind==='download'?'inquiry-checklist-v1.pdf':'individual-guides.json');
+    const id='NAVTEST-'+randomUUID();
+    const o=store?await store(buyer,'create',{p_id:id,p_product:chosen.id,p_terms_version:catalogue.termsVersion}):
+      {id,account:buyer.id,product:chosen.id,termsVersion:catalogue.termsVersion,expires:now()+900000};
+    if(o?.id!==id)throw Error('Guide order was not saved');
+    if(!store)orders.set(id,o);
+    send(res,201,{mode:'test',charged:0,orderId:id,product:chosen.id,name:chosen.name,catalogueAmount:chosen.amount,currency:'INR',termsVersion:o.termsVersion,expires:new Date(o.expires).toISOString()});return true;
+   }
+   if(store){
+    if(typeof data.orderId!=='string'||!/^NAVTEST-[0-9a-f-]{36}$/.test(data.orderId)){send(res,400,{error:'This test order is unavailable or expired. Start test checkout again.'});return true;}
+    const saved=await store(buyer,'confirm',{p_id:data.orderId});
+    const chosen=product(saved?.product);
+    if(!chosen||!saved.until){send(res,400,{error:'This test order is unavailable or expired. Start test checkout again.'});return true;}
+    send(res,200,fulfilment(saved,chosen));return true;
    }
    const o=orders.get(data.orderId);if(!o||o.account!==buyer.id||(!o.until&&o.expires<now())){send(res,400,{error:'This test order is unavailable or expired. Start test checkout again.'});return true;}const chosen=product(o.product);if(o.until&&o.until<=now()){send(res,400,{error:'Test access expired. Start test checkout again.'});return true;}if(!o.until){o.until=now()+chosen.accessDays*86400000;access.set(buyer.id+'|'+o.product,{until:o.until,order:o.id});}send(res,200,fulfilment(o,chosen));return true;
   }catch{send(res,503,{error:'Access or checkout could not be verified. Keep any guide tab open; save its local recovery file. No real payment is taken.'});return true;}

@@ -4,12 +4,15 @@ const {createAccountAccess,PROTECTED}=require('./account-access.cjs');
 const accounts=createAccountAccess();
 const testInquiryAssets=new Set([...PROTECTED].filter(name=>!['workspace.html','admin.html'].includes(name)));
 const community=require('./community-api.cjs').createCommunityHandler();
-const {stagingOrigin,planStoreFromEnvironment}=require('./plan-store.cjs');
+const {stagingOrigin,planStoreFromEnvironment,guideStoreFromEnvironment}=require('./plan-store.cjs');
 const payments=require('./payment-api.cjs').createPaymentHandler({
   identify:accounts.checkoutIdentity,store:planStoreFromEnvironment(),
   requireDurable:process.env.RENDER_EXTERNAL_URL===stagingOrigin
 });
-const shop=require('./shop-api.cjs').createShopHandler({identify:accounts.purchaseIdentity,allowLegacyChecklist:false});
+const shop=require('./shop-api.cjs').createShopHandler({
+  identify:accounts.checkoutIdentity,allowLegacyChecklist:false,store:guideStoreFromEnvironment(),
+  requireDurable:process.env.RENDER_EXTERNAL_URL===stagingOrigin
+});
 const checklist=require('./checklist-checkout.cjs').fromEnvironment(accounts.checkoutIdentity);
 const {getPlanTools}=require('./plan-tools.cjs');
 const analytics=require('./analytics-api.cjs').createAnalytics();
