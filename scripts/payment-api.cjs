@@ -79,7 +79,7 @@ function createPaymentHandler({keyId=process.env.RAZORPAY_KEY_ID,secret=process.
    const accepted=url.pathname==='/api/payments/order'?['plan','testConsent']:['context','paymentId','orderId','signature'];if(Object.keys(data).some(k=>!accepted.includes(k))){send(res,400,{error:'Only checkout identifiers are accepted. Never send case information.'});return true;}
    if(url.pathname==='/api/payments/order'){
     const plan=Object.hasOwn(plans,data.plan)?plans[data.plan]:null;if(!plan||data.testConsent!==true){send(res,400,{error:'Choose an eligible plan and confirm test mode.'});return true;}
-    const order=await gateway('orders',{amount:plan.amount,currency:'INR',receipt:'nav_test_'+randomBytes(10).toString('hex'),notes:{environment:'staging_test',plan:data.plan,no_service_activation:'true',account_id:buyer.id}});
+    const order=await gateway('orders',{amount:plan.amount,currency:'INR',receipt:'nav_test_'+randomBytes(10).toString('hex'),notes:{environment:'staging_test',plan:data.plan,no_service_activation:'true'}});
     if(!validOrder(order.id)||order.amount!==plan.amount||order.currency!=='INR')throw Error('gateway');
     if(store){
       const pending=await store(buyer,'create',{p_id:order.id,p_plan:data.plan});
@@ -95,7 +95,7 @@ function createPaymentHandler({keyId=process.env.RAZORPAY_KEY_ID,secret=process.
     if(!ctx||ctx.account!==buyer.id||!Object.hasOwn(plans,ctx.plan)||!Number.isFinite(ctx.expires)||ctx.expires<now()||ctx.amount!==plans[ctx.plan].amount||!/^pay_[A-Za-z0-9]+$/.test(data.paymentId||'')||data.orderId!==ctx.order||!equal(sign(ctx.order+'|'+data.paymentId),data.signature)){send(res,400,{error:'Payment verification failed.'});return true;}
     const previous=store?null:sandbox.get(ctx.order);if(previous){if(previous.accountId!==buyer.id||previous.paymentId!==data.paymentId){send(res,400,{error:'This test order was already used.'});return true;}send(res,200,{mode:'test',status:'test_success',serviceActivated:false,sandboxRoleAssigned:true,plan:previous.plan,tools:toolsLink(ctx.order),message:'This test purchase is already verified. Its sandbox role is unchanged; no real paid access was activated.'});return true;}
     const payment=await gateway('payments/'+data.paymentId);
-    if(payment.live_mode===true||payment.order_id!==ctx.order||payment.amount!==ctx.amount||payment.currency!=='INR'||!['authorized','captured'].includes(payment.status)){send(res,400,{error:'The test payment could not be confirmed.'});return true;}
+    if(payment.id!==data.paymentId||payment.live_mode===true||payment.order_id!==ctx.order||payment.amount!==ctx.amount||payment.currency!=='INR'||!['authorized','captured'].includes(payment.status)){send(res,400,{error:'The test payment could not be confirmed.'});return true;}
     if(payment.status!=='captured'){send(res,200,{mode:'test',status:'test_authorized',serviceActivated:false,sandboxRoleAssigned:false,message:'Test payment authorised; capture is pending. No sandbox role or real access assigned.'});return true;}
     if(store){
       const saved=await store(buyer,'capture',{p_id:ctx.order,p_plan:ctx.plan,p_payment:data.paymentId});

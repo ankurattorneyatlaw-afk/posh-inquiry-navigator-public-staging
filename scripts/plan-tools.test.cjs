@@ -21,7 +21,7 @@ test('each captured staging payment grants only its own tier to the paying accou
         payment={order_id:'order_Test'+(++counter),amount,currency};
         return {ok:true,json:async()=>({id:payment.order_id,amount,currency})};
       }
-      return {ok:true,json:async()=>({...payment,status})};
+      return {ok:true,json:async()=>({...payment,id:url.split('/').at(-1),status})};
     }
   });
   async function call(route,data){
