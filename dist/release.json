@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.16.4-plan-and-guidance-review-staging",
+  "version": "6.16.5-approved-policy-pages-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -40,9 +40,9 @@
     "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plans.js": "544ee108c6c5db29f88b5cca76a30af85545d3f87155eef6d88ebd3530733a9c",
     "preview.html": "6063aa7e1b800c956333f050f0f2650fa83cb4e3f7cd81b982e1a48493f44b19",
-    "privacy.html": "b6d157ba539ea015f3103dba87661048f7353e2cb24569283a277178fadd7b86",
+    "privacy.html": "1f42a8e754dc39625591a02f3ff5575ae5e29bb9930ffaf334f3bdf8279b1296",
     "private-session-tools.js": "8941b253bfe7b887124ab9e75c529aef4218280b69484ad301aa8762d5602113",
-    "product-terms.html": "46b35181a85e00e99004a6eb89cf8c27f162b80fe37dbb422000c542c0932f27",
+    "product-terms.html": "f67020e0c84e720827aa7b107944288e0116ea7352d39b349a2f919f98c07bdc",
     "products.js": "a686a6e5ba8027b658737c20923ebd32b07b41a65faaba04ef00bc0aa881222d",
     "resources.html": "6295a65792dfe3d9b6d6f1141336e73b24fb69704b8b342846a22651199d0aa8",
     "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
@@ -60,11 +60,12 @@
     "plan-tools.html": "4a79525486010767c2af98dda21d331ac90eae2859c1af4ef0e9c64c13c274c5",
     "plan-tools.js": "b3bd481351eb96c2fa1f7399d6af8035a7fdb1ff2c592874d5b998121bd8ffc8",
     "about.html": "3a89012724e96e2b452bc3e57fc9980fe05794169dd47ffc7dd193d482a32f8f",
-    "contact.html": "36edaf985f14f1655e28cd1f8c32a271ae367f86b28f1d1964d99e125c42a6e7",
-    "digital-delivery.html": "bd5d78ff2b78ee3716d9c804fb66334f2662023d398270afee1baca59ca79d8a",
-    "pricing.html": "3b6569916da0f990ea74257f6f7ce7ddb93e916c5aa9b53524feb0924b212db7",
-    "purchase-terms.html": "9191817c030d82ed0ffc606d0335df98abfd2a492c3c3dd87d93e966efb1b28a",
-    "refund-policy.html": "e703f3709bee4b09ffc78a085c854e52ac4e7372bf44d907469fcd52d5b88699"
+    "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
+    "digital-delivery.html": "a27e327262252ad28cd98b680788b5a557423bf409ef0d24378651c89f84c141",
+    "pricing.html": "e0a062f094558a82a3fd725d80a3d5ff43b95659ecd212ca98ad982c3ba530ed",
+    "purchase-terms.html": "979a0b0daa882d407908802b40043c4103ef2b891475b0741f6161dc5d33351a",
+    "refund-policy.html": "773038da898fe5d8310d4535580ece57b458110af4d812bd6c6de0dd40341f43",
+    "essential-sample-invoice.pdf": "d55b97769ebbbbd80cd56fd94d25d6d54232f1032e1ffdd88f02f6d39b2e9b4b"
   },
   "products": {
     "individual-guides.json.enc": "09aa66b356d12794a22a297178f8cbc5afb6ba556029475614a2bd2117f8d824",
