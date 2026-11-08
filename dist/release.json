@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.14.0-durable-plan-staging",
+  "version": "6.15.0-merchant-review-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -14,7 +14,7 @@
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checklist-sample.pdf": "6899902b7c021d3632faf3d1f63c28af19c5669c45b4ea4cb469badde9e30d75",
-    "checkout.html": "eb962b60179b7c541f6661f816501ccda963e123cbbfac11a6dd364890fb38f1",
+    "checkout.html": "24175efe7d98e6cf291e277526e11ac5911925148246bfe88e25faf332dab990",
     "checkout.js": "e205ade257c9e908816312847167753eeb65705d3c16867e97f842b2994b1a20",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "digital.css": "d90a5a563f4373a4d43f000dc5dd75f75c183bf8ecaae4fe54cb769d5743f62d",
@@ -29,7 +29,7 @@
     "guided.html": "60f0d8c3bdc73ec8dafd86473907b81c6c7f8543379c5733c119493432c64ac6",
     "guided.js": "f1bbe42993c717de9f24e0c316d027d87cdcd9451b04fb1b942f09eb5de4262c",
     "help.html": "20fdca69a726d69047a34819fd1877ab057bb9f2713dabc1e8fdb89a69209fc9",
-    "index.html": "439658cc50202ff2c02b874dbefaba403aa7954ac2a90df7aaafad0da392e830",
+    "index.html": "081380812b284702228c1fa3f8c12d5f2c749387cf7116ac2f5a8bc26c7b82b9",
     "individual-guide.html": "02ac5fdd4dd16392c43a73d19ad02d49715ed1d9749d417afbe0e5c5fa275f41",
     "individual-guide.js": "5d4e235925b047fd98a04cb987fb3dff36b87abca5dacdefa0cbaa1a6d08ac96",
     "individual-support.html": "145fa63d00d3485315c88154a106a5f6c8d555ca42402e378f4672ff810eda2c",
@@ -40,7 +40,7 @@
     "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plans.js": "baf344e63a9c4828a672159b22242b5eca02a2e84272c180c65bbaa17b99b0dd",
     "preview.html": "44cd62e09013ac03be07abfe716d1b94aa43fac3d352953f863ef42b420cd12b",
-    "privacy.html": "5d4df8e4db98c7c5a45fa473298f08537ebdc632e2a3d77fc702f67d78780a52",
+    "privacy.html": "d84fcb872a1454d6d5a4f0f50c5a2acf7214fef0f32d56f2dc67227ec61b9c3f",
     "private-session-tools.js": "8941b253bfe7b887124ab9e75c529aef4218280b69484ad301aa8762d5602113",
     "product-terms.html": "8339a7520fcd5cdf4fb2127d044024b3ba80b297542c13f2d305a87ab014d3fc",
     "products.js": "8900515e07f18963d151eaa9ce9da4d61569ed5d7882df12a3b6493b93faea03",
@@ -58,7 +58,13 @@
     "workflow-documents.js": "6779a75784f31b12ebcf17e4c6882fe83b793ca63615e0405590e35f1da10848",
     "workspace.html": "f2f5b25107cbc05c27903bda40cae83480c79b64d2ef948ac000073906316c63",
     "plan-tools.html": "d0935755d60974d3bfd8ca6b269d8593bd5e7e67c4f2f6a2c83ed48043664338",
-    "plan-tools.js": "4f822f5b8cf65b37f961c1c7fca70178af2a9a932e0a9aa6ee6b5d5ba61761bc"
+    "plan-tools.js": "4f822f5b8cf65b37f961c1c7fca70178af2a9a932e0a9aa6ee6b5d5ba61761bc",
+    "about.html": "3a89012724e96e2b452bc3e57fc9980fe05794169dd47ffc7dd193d482a32f8f",
+    "contact.html": "91ef53bdd79959adfb10b6bc0f62922028373d5af50bb648d6a5f85b14cb154c",
+    "digital-delivery.html": "bd5d78ff2b78ee3716d9c804fb66334f2662023d398270afee1baca59ca79d8a",
+    "pricing.html": "c32771ece218a2a3ca375956625a12dccc4c8199ab5b5bf653225be94cbfbae3",
+    "purchase-terms.html": "8dd6fb207adb30c4c3a2dc01d2c601e6cff577c64dfea83e35b4c764a07481db",
+    "refund-policy.html": "ffa756912a4a9e9e37878a536340a6130dd5113a9a36767f3c1bd85633865cf7"
   },
   "products": {
     "individual-guides.json.enc": "09aa66b356d12794a22a297178f8cbc5afb6ba556029475614a2bd2117f8d824",
