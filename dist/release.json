@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.23.0-owner-email-invitations-staging",
+  "version": "6.24.0-guided-preview-line-wrap-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -26,7 +26,7 @@
     "finder.js": "1c3c1e23483c8a7a2c0985c3e9b9f303b1d239fe17ff127dad57708da533aeb7",
     "guidance-context.js": "5b3fa9f587ce7c8d0ef6b5655adaa247f761223f53313bc0705e6ca23ba8e587",
     "guided-continuation.js": "b16343b50aa02d80ebee75afd4759f177a43878263b7c79cabe9c8266f57901d",
-    "guided.html": "6c27ffee5e4420e7a2fc654ee9d0d2b0b6a7bca724a0b47453c0cfadb0d4813a",
+    "guided.html": "a53b1d609b131e14df9dd4665e3572f6dd191738ace9ae8d74d45879e59cdef0",
     "guided.js": "f1bbe42993c717de9f24e0c316d027d87cdcd9451b04fb1b942f09eb5de4262c",
     "help.html": "775082d809e4cefec423e75851e933f962294b3a89e8448e573bba1d9f2a0108",
     "index.html": "5268dde240dddfa3ef2bcb47859cabd858d0f1fc73d3b47dc756bd3ca94be53f",
