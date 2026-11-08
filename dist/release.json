@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.22.0-shared-plan-layout-staging",
+  "version": "6.23.0-owner-email-invitations-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -9,7 +9,7 @@
   "assets": {
     "account-guard.js": "2e1c9f5587031ff7b630de33285dbb85d4f2f3896bdb998bd8b38fa247d50d76",
     "account.html": "3278ccfda59a8582d9aa4e28fc60933261a955e8d471e633d3d05eaab8a0b525",
-    "account.js": "351a5c663b4a3715161f7107a2f47073282ecf60161de6a90f8025f06f9f7e58",
+    "account.js": "67b3be4f5af1445d3a427227f4394285d93b757d9d4d89f8ae2bbe3109e6b1bf",
     "admin.html": "c756e66bd321a38362d429b950d15129a2f61c89357ce02859ef1aa0370c240a",
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
@@ -58,7 +58,7 @@
     "workflow-documents.js": "6779a75784f31b12ebcf17e4c6882fe83b793ca63615e0405590e35f1da10848",
     "workspace.html": "c80017af1882fa319c1cbb22a6b0695315d8490d7c6f0e810bd3e3bf88b0b0e7",
     "plan-tools.html": "284fe7188a4d9b48126faf17a4e0482bbe91f91d9a2c655cccbeaecf20727b4d",
-    "plan-tools.js": "c481bc737d6410f8b0d799a1a0c4bb0f5b1831644083cb78ca635af65f0ef2b8",
+    "plan-tools.js": "9c7ae2e52e41e38daaff593e7c2fc538a4ad70b2fe52951066d6b2a68fd331ef",
     "about.html": "3a89012724e96e2b452bc3e57fc9980fe05794169dd47ffc7dd193d482a32f8f",
     "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
     "digital-delivery.html": "a27e327262252ad28cd98b680788b5a557423bf409ef0d24378651c89f84c141",

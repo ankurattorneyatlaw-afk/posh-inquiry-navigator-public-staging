@@ -42,11 +42,15 @@ function createPaymentHandler({keyId=process.env.RAZORPAY_KEY_ID,secret=process.
      try{data=JSON.parse(raw);}catch{send(res,400,{error:'Invalid seat request.'});return true;}
      if(data?.action==='add'&&Object.keys(data).length===2&&typeof data.email==='string'&&data.email.length<=254&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){
        action='add';params.p_email=data.email;
-     }else if(data?.action==='remove'&&Object.keys(data).length===2&&typeof data.member==='string'&&/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(data.member)){
-       action='remove';params.p_member=data.member;
-     }else{send(res,400,{error:'Use a confirmed account email or an assigned member.'});return true;}
+     }else if(['remove','invite_cancel'].includes(data?.action)&&Object.keys(data).length===2&&typeof data.member==='string'&&/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(data.member)){
+       action=data.action;params.p_member=data.member;
+     }else{send(res,400,{error:'Enter a member email or select an existing seat or invitation.'});return true;}
    }
-   const result=await store(buyer,action,params);
+   let result=await store(buyer,action,params);
+   if(action==='add'&&result?.inviteRequired){
+     if(!store.invite){send(res,503,{error:'Email invitations are temporarily unavailable.'});return true;}
+     result=await store.invite(buyer,id,params.p_email.trim().toLowerCase());
+   }
    send(res,result?.error?409:result?200:403,result||{error:'Only the order owner can manage seats.'});
    return true;
  }

@@ -252,10 +252,12 @@ function showSeats(data){
   url.searchParams.set('order',testOrder);
   const count=el('p','Loading seats…',panel);
   count.setAttribute('role','status');
+  const message=el('p','',panel);
+  message.setAttribute('role','status');
   const list=el('ul','',panel);
-  const email=field(panel,'Existing Navigator account email',254);
+  const email=field(panel,'Member email address',254);
   email.type='email';
-  const add=el('button','Assign seat',panel);
+  const add=el('button','Assign or invite member',panel);
   add.type='button';
   const active=data.entitlement.state==='active';
   email.closest('label').hidden=!active;
@@ -269,11 +271,21 @@ function showSeats(data){
     try{
       const response=await fetch(url,{credentials:'same-origin',cache:'no-store',
         ...(change?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(change)}:{})});
-      const result=await response.json();
-      if(!response.ok)throw Error(result.error||'Seat access could not be verified.');
-      count.textContent=(result.members.length+1)+' of '+result.seatLimit+' seats used, including your seat.';
+      let result=await response.json();
+      let error='';
+      if(!response.ok){
+        error=result.error||'Seat access could not be verified.';
+        if(!change)throw Error(error);
+        const refresh=await fetch(url,{credentials:'same-origin',cache:'no-store'});
+        if(!refresh.ok)throw Error(error);
+        result=await refresh.json();
+      }
+      const pending=result.invitations||[];
+      count.textContent=(result.members.length+1+pending.length)+' of '+result.seatLimit+' seats used, including your seat.'
+        +(pending.length?' Pending invitations: '+pending.length+'.':'');
+      message.textContent=error||result.notice||(change?.action==='add'?'Seat assigned. The member can sign in and open this plan.':'');
       list.replaceChildren();
-      if(change?.action==='add')email.value='';
+      if(!error&&change?.action==='add')email.value='';
       for(const member of result.members){
         const item=el('li',member.email+' ',list);
         if(result.state!=='active')continue;
@@ -282,7 +294,15 @@ function showSeats(data){
         remove.setAttribute('aria-label','Remove '+member.email);
         remove.onclick=()=>update({action:'remove',member:member.id});
       }
-    }catch(error){count.textContent=error.message;}
+      for(const invitation of pending){
+        const item=el('li',invitation.email+' · '+(invitation.sent?'Invitation pending':'Delivery unconfirmed')+' ',list);
+        if(result.state!=='active')continue;
+        const cancel=el('button','Cancel invitation',item);
+        cancel.type='button';
+        cancel.setAttribute('aria-label','Cancel invitation for '+invitation.email);
+        cancel.onclick=()=>update({action:'invite_cancel',member:invitation.id});
+      }
+    }catch(error){message.textContent=error.message;}
     finally{
       busy=false;
       add.disabled=false;
@@ -290,7 +310,7 @@ function showSeats(data){
     }
   }
   add.onclick=()=>{if(email.reportValidity()&&email.value)update({action:'add',email:email.value});};
-  el('p','Seat holders sign in to their own confirmed account to open this plan. Inquiry files stay on their devices.',panel);
+  el('p','People with a confirmed account can sign in straight away. New members receive an email invitation. A pending invitation reserves a seat for up to ten minutes. Inquiry files stay on each person’s device.',panel);
   update();
 }
 const reviewDates={
