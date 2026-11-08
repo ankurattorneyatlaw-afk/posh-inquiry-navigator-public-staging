@@ -588,3 +588,13 @@ body[data-account-page="workspace"] h1{margin:8px 0 12px}.dashboard-intro{margin
 @media(max-width:700px){.sales-grid article,.sales-panel,.draft-value{padding:22px}.sales-section{padding:32px 0}.founder-values-grid{gap:18px}.sales-onboarding{gap:18px}}
 
 .individual-offers{grid-template-columns:repeat(2,minmax(0,1fr))}.individual-offers article{display:flex;flex-direction:column}.individual-offers .btn{margin-top:auto;align-self:start}@media(min-width:951px){.resource-main .resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.individual-offers{grid-template-columns:1fr}}
+
+.start-paths{background:#f1f6f6;border-block:1px solid #dce7e7}
+.start-path-grid{margin-top:24px}
+.start-path-grid article{display:flex;flex-direction:column;align-items:flex-start}
+.start-path-grid article .sales-kicker{margin-top:0}
+.start-path-grid article .text-link{margin-top:auto;padding-block:8px}
+.help-topics{margin:20px 0;padding:16px;background:#edf5f5;border-radius:10px}
+.help-topics a{display:inline-flex;align-items:center;min-height:44px}
+.help-checklist{margin-top:32px;padding:20px;border:1px solid #cbd8e4;border-radius:10px;background:#f4f8fa}
+.help-checklist h2{margin-top:0}

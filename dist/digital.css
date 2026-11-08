@@ -13,3 +13,8 @@
 .readonly-record{white-space:pre-wrap;overflow-wrap:anywhere;max-height:32rem;overflow:auto;background:#f2f6f7;padding:12px}
 
 .checklist-preview{margin:20px 0;padding:16px 18px;border-left:4px solid var(--teal);border-radius:0 8px 8px 0;background:#edf5f5}.checklist-preview h3{margin-top:0}
+
+.public-pricing .digital-main{max-width:1120px}
+.public-pricing .pricing-status{width:fit-content;padding:8px 14px;border-radius:8px;background:#e9f2f2;border:1px solid var(--line)}
+.public-pricing .pricing-notes{margin-top:20px}
+.public-pricing .plan-table-scroll{overflow-x:auto}
