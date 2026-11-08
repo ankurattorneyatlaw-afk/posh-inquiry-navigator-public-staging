@@ -11,3 +11,5 @@
 #tools-panels details{margin-top:8px}
 #tools-panels details summary{padding:8px 0}
 .readonly-record{white-space:pre-wrap;overflow-wrap:anywhere;max-height:32rem;overflow:auto;background:#f2f6f7;padding:12px}
+
+.checklist-preview{margin:20px 0;padding:16px 18px;border-left:4px solid var(--teal);border-radius:0 8px 8px 0;background:#edf5f5}.checklist-preview h3{margin-top:0}

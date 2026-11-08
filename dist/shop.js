@@ -46,5 +46,41 @@ $('shop-order').onsubmit=e=>{e.preventDefault();run(async()=>{if(!$('shop-consen
 $('order-confirm').onclick=()=>run(async()=>{if(!order)throw Error('Start test checkout again.');if(selected.id==='checklist'){await launchChecklist();return;}complete(await api('confirm',{orderId:order.orderId,testConsent:true}));});
 $('order-cancel').onclick=()=>{order=null;$('order-review').hidden=true;$('shop-order').hidden=false;status('Test order cancelled in this screen. No money was taken.');};
 $('save-test-receipt').onclick=()=>{if(!receipt)return;const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(receipt,null,2)],{type:'application/json'}));a.href=url;a.download='Navigator-Test-Order-'+selected.id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),15000);};
-(async()=>{try{catalogue=await api('catalogue');const id=new URLSearchParams(location.search).get('product')||'checklist';$('product-tabs').innerHTML=catalogue.products.map(p=>'<a href="/shop.html?product='+esc(p.id)+'" '+(p.id===id?'aria-current="page"':'')+'>'+esc(p.name)+'</a>').join('');selected=catalogue.products.find(p=>p.id===id);if(!selected)throw Error('This product is unavailable. Choose one of the listed products above.');$('organisation-row').hidden=selected.id!=='checklist';$('buyer-organisation').required=selected.id==='checklist';$('product-detail').innerHTML='<p class="kicker">'+(selected.kind==='download'?'Personalised Word download':'Advanced self-service guide')+'</p><h2>'+esc(selected.name)+'</h2><p class="price">'+money(selected.amount)+'</p><p class="small">Catalogue price · '+(selected.kind==='guide'?'90-day single-account access':'one organisation, this edition')+' · ₹0 charged in this test</p><p>'+esc(selected.scope)+'</p><h3>What you receive</h3><ul>'+selected.includes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul><details><summary>What is outside this product</summary><ul>'+selected.excludes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></details><p class="small">Edition '+esc(selected.edition)+'</p>'+(selected.sample?'<a class="button" href="'+esc(selected.sample)+'" target="_blank" rel="noopener">Preview the sample PDF</a>':selected.kind==='download'?'':'<a href="'+(selected.id==='aggrieved'?'/#woman':'/#respondent')+'">Use the free guidance first</a>');$('product-licence').textContent=selected.licence;$('shop-content').hidden=false;const session=id==='checklist'?await checklist('session'):await api('session?product='+id);if(id==='checklist'&&session.signedIn){if(!session.available){status('Checklist test checkout is currently unavailable.');return;}if(session.latest?.captured){complete(session.latest);return;}if(session.latest){reviewChecklist({...session.latest,keyId:session.keyId,mode:session.mode});return;}}if(session.hasTestAccess)complete(session);else if(session.signedIn){$('shop-order').hidden=false;status('Review the scope, then start test checkout.');}else{$('shop-signin').hidden=false;$('shop-signin-link').href='/account?product='+id;status('Choose your product, then sign in for test checkout.');}}catch(e){status(e.message,true);}})();
+function productDetails(product){
+  const checklist=product.id==='checklist';
+  const offer=checklist?'Catalogue price · one organisation, this edition':'Catalogue price · 90-day single-account access · ₹0 charged in this test';
+  const features=product.includes.map(item=>'<li>'+esc(item)+'</li>').join('');
+  const limits=product.excludes.map(item=>'<li>'+esc(item)+'</li>').join('');
+  const preview=checklist?`
+    <div class="checklist-preview">
+      <h3>See six checks before signing in</h3>
+      <p>Read one example from each stage, including check 43 on annual reporting. The full Word edition contains all 43 checks.</p>
+      <a class="button" href="${esc(product.sample)}" target="_blank" rel="noopener">Preview the sample PDF</a>
+    </div>`:'';
+  const contents=checklist?`
+    <h3>What you get for ${money(product.amount)}</h3>
+    <ul>
+      <li><strong>All 43 checks in a two-page Word file.</strong> Tick the applicable boxes and save your progress in desktop Word.</li>
+      <li><strong>Personalised to your organisation.</strong> Your organisation name and order reference appear on both pages. The wording is protected and the tick boxes can be edited.</li>
+      <li><strong>Linked legal sources and an internal-use licence.</strong> Use and print this edition within one organisation.</li>
+    </ul>
+    <h3>Six stages covered</h3>
+    <ol>${features}</ol>
+    <p class="small">The guided inquiry workspace, advice and case review are separate. <a href="/#plan-tested">Compare the inquiry plans</a>.</p>`:`
+    <h3>What you receive</h3>
+    <ul>${features}</ul>
+    <details><summary>What is outside this product</summary><ul>${limits}</ul></details>`;
+  const freeGuide=checklist?'':'<a href="'+(product.id==='aggrieved'?'/#woman':'/#respondent')+'">Use the free guidance first</a>';
+  return `
+    <p class="kicker">${checklist?'Personalised Word download':'Advanced self-service guide'}</p>
+    <h2>${esc(product.name)}</h2>
+    <p class="price">${money(product.amount)}</p>
+    <p class="small">${offer}</p>
+    <p>${esc(product.scope)}</p>
+    ${preview}
+    ${contents}
+    <p class="small">Edition ${esc(product.edition)}</p>
+    ${freeGuide}`;
+}
+(async()=>{try{catalogue=await api('catalogue');const id=new URLSearchParams(location.search).get('product')||'checklist';$('product-tabs').innerHTML=catalogue.products.map(p=>'<a href="/shop.html?product='+esc(p.id)+'" '+(p.id===id?'aria-current="page"':'')+'>'+esc(p.name)+'</a>').join('');selected=catalogue.products.find(p=>p.id===id);if(!selected)throw Error('This product is unavailable. Choose one of the listed products above.');$('organisation-row').hidden=selected.id!=='checklist';$('buyer-organisation').required=selected.id==='checklist';$('product-detail').innerHTML=productDetails(selected);$('product-licence').textContent=selected.licence;$('shop-content').hidden=false;const session=id==='checklist'?await checklist('session'):await api('session?product='+id);if(id==='checklist'&&session.signedIn){if(!session.available){status('Checklist test checkout is currently unavailable.');return;}if(session.latest?.captured){complete(session.latest);return;}if(session.latest){reviewChecklist({...session.latest,keyId:session.keyId,mode:session.mode});return;}}if(session.hasTestAccess)complete(session);else if(session.signedIn){$('shop-order').hidden=false;status('Review the scope, then start test checkout.');}else{$('shop-signin').hidden=false;$('shop-signin-link').href='/account?product='+id;status('Choose your product, then sign in for test checkout.');}}catch(e){status(e.message,true);}})();
 })();
