@@ -598,3 +598,10 @@ body[data-account-page="workspace"] h1{margin:8px 0 12px}.dashboard-intro{margin
 .help-topics a{display:inline-flex;align-items:center;min-height:44px}
 .help-checklist{margin-top:32px;padding:20px;border:1px solid #cbd8e4;border-radius:10px;background:#f4f8fa}
 .help-checklist h2{margin-top:0}
+
+.workspace-plan-grid{display:grid;gap:12px}
+.workspace-plan-card{border:1px solid #cbd8e4;border-radius:10px;padding:14px;background:white;min-width:0}
+.workspace-plan-card h3{font-size:1.05rem;margin:0 0 6px}
+.workspace-plan-card p{margin:8px 0 12px}
+.workspace-plan-card .btn{white-space:normal}
+.workspace-plan-status{display:inline-block;padding:3px 9px;border-radius:6px;background:#e6f1f1;color:#214f55;font-size:.85rem;font-weight:650}

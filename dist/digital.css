@@ -18,3 +18,11 @@
 .public-pricing .pricing-status{width:fit-content;padding:8px 14px;border-radius:8px;background:#e9f2f2;border:1px solid var(--line)}
 .public-pricing .pricing-notes{margin-top:20px}
 .public-pricing .plan-table-scroll{overflow-x:auto}
+
+.tools-start{max-width:1120px;margin:0 0 22px;background:#edf5f5;border-left:4px solid var(--teal)}
+.tools-index{max-width:1120px;margin:0 0 24px}
+.tools-index h2{font-size:1.18rem;margin:0 0 6px}
+.tools-index ul{display:flex;flex-wrap:wrap;gap:4px 16px;list-style:none;padding:0;margin:0}
+.tools-index li{margin:0}
+.tools-index a{display:inline-flex;align-items:center;min-height:44px}
+@media print{.tools-start,.tools-index{display:none!important}}

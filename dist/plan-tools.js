@@ -5,6 +5,7 @@ const status=$('tools-status');
 const endpoint=new URL('/api/plan-tools',location.origin);
 const testOrder=new URLSearchParams(location.search).get('testOrder');
 if(testOrder!==null)endpoint.searchParams.set('testOrder',testOrder);
+const guidedHref=testOrder?'/guided?testOrder='+encodeURIComponent(testOrder):'/guided';
 function el(tag,text,parent){
   const node=document.createElement(tag);
   if(text)node.textContent=text;
@@ -119,9 +120,6 @@ function standardTools(plan){
   const pdf=el('button','Print or save the tools as PDF',basic);
   pdf.type='button';
   pdf.onclick=()=>window.print();
-  const guide=section('Guided IC/LC inquiry');
-  el('p','The guided workflow contains the shared notices, deadlines, hearing records and evidence register.',guide);
-  link(guide,'Open the guided workflow',testOrder?'/guided?testOrder='+encodeURIComponent(testOrder):'/guided');
 }
 function professionalTools(data){
   const panel=section('Allegation-wise evidence and question planning');
@@ -379,13 +377,23 @@ access().then(data=>{
     showSeats(data);
     return;
   }
-  showSeats(data);
+  $('tools-open-guided').href=guidedHref;
+  $('tools-start').hidden=false;
   standardTools(data.plan);
   const toolkit=section('POSH Readiness Toolkit');
   const toolkitItems=reviewList(toolkit,data.toolkit,true);
   exportButton(toolkit,'Download the readiness toolkit','POSH-Readiness-Toolkit',data.plan,toolkitItems);
   if(data.reportSections)professionalTools(data);
   if(data.advanced)advancedTools(data);
+  showSeats(data);
+  const index=$('tools-index');
+  el('h2','Tools in this plan',index);
+  const list=el('ul','',index);
+  for(const [i,panel] of Array.from($('tools-panels').children).entries()){
+    panel.id='plan-tool-'+(i+1);
+    link(el('li','',list),panel.querySelector('h2').textContent,'#'+panel.id);
+  }
+  index.hidden=false;
   link($('tools-sources'),'POSH Act on India Code',data.sources.act);
   $('tools-sources').append(' · ');
   link($('tools-sources'),'Central POSH Rules',data.sources.rules);
