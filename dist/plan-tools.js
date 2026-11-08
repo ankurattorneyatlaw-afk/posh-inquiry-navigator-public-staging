@@ -12,8 +12,8 @@ function el(tag,text,parent){
   if(parent)parent.append(node);
   return node;
 }
-function section(title){
-  const panel=el('section','',$('tools-panels'));
+function section(title,parent=$('tools-panels')){
+  const panel=el('section','',parent);
   panel.className='panel';
   el('h2',title,panel);
   return panel;
@@ -244,7 +244,10 @@ function advancedTools(data){
 }
 function showSeats(data){
   if(!data.entitlement?.owner)return;
-  const panel=section('Plan seats');
+  const seatOptions=$('tools-seat-options');
+  seatOptions.querySelector('summary').textContent=data.entitlement.state==='active'?'Manage plan seats':'View plan seats';
+  seatOptions.hidden=false;
+  const panel=section('Plan seats',$('tools-seat-panel'));
   const url=new URL('/api/payments/seats',location.origin);
   url.searchParams.set('order',testOrder);
   const count=el('p','Loading seats…',panel);
@@ -301,7 +304,7 @@ const reviewDates={
   breachReported:'Settlement breach reported'
 };
 function showReadOnly(){
-  const panel=section('Review a saved inquiry');
+  const panel=section('Review a saved inquiry',$('tools-review-panels'));
   el('p','Open a local Navigator recovery file to review it here. The file stays on this device and is never changed. Previously downloaded documents remain available on your device.',panel);
   const input=el('input','',el('label','Navigator recovery JSON',panel));
   input.type='file';
@@ -401,6 +404,7 @@ access().then(data=>{
   $('tools-open-guided').href=guidedHref;
   $('tools-resume-guided').href=guidedHref+'#resume-inquiry';
   $('tools-start').hidden=false;
+  $('tools-optional').hidden=false;
   standardTools(data.plan);
   const toolkit=section('POSH Readiness Toolkit');
   const toolkitItems=reviewList(toolkit,data.toolkit,true);
