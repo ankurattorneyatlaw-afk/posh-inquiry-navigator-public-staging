@@ -399,6 +399,7 @@ access().then(data=>{
     return;
   }
   $('tools-open-guided').href=guidedHref;
+  $('tools-resume-guided').href=guidedHref+'#resume-inquiry';
   $('tools-start').hidden=false;
   standardTools(data.plan);
   const toolkit=section('POSH Readiness Toolkit');

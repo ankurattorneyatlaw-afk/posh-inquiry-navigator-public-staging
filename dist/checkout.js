@@ -4,6 +4,8 @@ const button=document.getElementById('test-pay');
 const status=document.getElementById('checkout-status');
 const content=document.getElementById('checkout-plan');
 const consent=document.getElementById('test-consent');
+const signIn=document.getElementById('checkout-signin');
+const payment=document.getElementById('checkout-payment');
 const planId=new URLSearchParams(location.search).get('plan');
 let proof=null,verifying=false,completed=false,modalOpen=false;
 
@@ -19,7 +21,7 @@ async function api(path,body){
 }
 function updateButton(){
   button.disabled=completed||verifying||modalOpen||(!proof&&!consent.checked);
-  button.textContent=proof&&!completed?'Retry verification for this order':'Open Razorpay test checkout';
+  button.textContent=proof&&!completed?'Check this test payment again':'Continue to Razorpay test checkout';
 }
 async function verify(){
   if(!proof||verifying||completed)return;
@@ -33,12 +35,14 @@ async function verify(){
       return;
     }
     completed=true;
-    status.textContent=result.message;
+    payment.hidden=true;
+    status.textContent='Test checkout complete. Open your plan to start or resume an inquiry. You can also find the plan in My workspace.';
     const link=document.createElement('a');
     link.href=result.tools||'/workspace';
     link.className='btn btn-dark';
-    link.textContent=result.tools?'Open the activated test plan':'Open workspace and test access';
+    link.textContent=result.tools?'Open my plan':'Open my workspace';
     status.after(link);
+    link.focus();
   }catch(error){
     status.textContent=error.message+' Check My workspace or retry verification for order '+proof.orderId+'.';
   }finally{
@@ -67,11 +71,23 @@ try{
     item.textContent=feature;
     list.append(item);
   }
-  content.append(heading,details,scope,list);
+  const features=document.createElement('details');
+  const featuresLabel=document.createElement('summary');
+  featuresLabel.textContent='See what this plan includes';
+  features.append(featuresLabel,scope,list);
+  content.append(heading,details,features);
   if(!config.configured){
     status.textContent='Test checkout is unavailable. No payment can be taken.';
     return;
   }
+  const accountResponse=await fetch('/api/account/session',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+  if(!accountResponse.ok)throw Error('We could not check your sign-in. Reload this page to try again.');
+  const account=await accountResponse.json();
+  if(!account.signedIn||account.mfaRequired){
+    signIn.hidden=false;
+    return;
+  }
+  payment.hidden=false;
   updateButton();
   consent.addEventListener('change',updateButton);
   button.addEventListener('click',async()=>{

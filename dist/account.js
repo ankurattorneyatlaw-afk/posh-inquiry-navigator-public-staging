@@ -147,7 +147,7 @@ async function loadSandbox(operator,stagingOnly,entering){
     }
     if(stagingOnly&&page==='workspace'&&access.some(item=>['active','read-only'].includes(item.state||'active'))){
       $('account-access-title').textContent='Your staging workspace';
-      $('account-plans').textContent='Choose a plan below to start a test inquiry or review a saved file.';
+      $('account-plans').textContent='Open your plan below to start an inquiry, continue from a saved file, or use the tools included in your plan.';
       $('account-pending-help').hidden=true;
       $('account-guest').hidden=true;
     }
@@ -174,7 +174,7 @@ async function loadSandbox(operator,stagingOnly,entering){
         const a=document.createElement('a');
         a.className='btn btn-dark';
         a.href=item.tools;
-        a.textContent=state==='read-only'?'Review saved inquiry':'Open '+(planNames[item.plan]||item.plan).replace('Inquiry ','');
+        a.textContent=state==='read-only'?'Review saved inquiry':'Open '+(planNames[item.plan]||item.plan).replace('Inquiry ','')+' plan';
         card.append(a);
       }
       list.append(card);
