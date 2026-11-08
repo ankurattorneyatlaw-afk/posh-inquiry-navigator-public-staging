@@ -14,19 +14,24 @@ const template={
 };
 function fixture(gateway) {
   const records=new Map();
+  let now=Date.parse('2026-11-08T00:00:00Z');
   const store=async (buyer,action,mode,data)=>{
     if(action==='create') {
       const row={id:data.p_id,organisation:data.p_organisation,owner:buyer.id,mode,captured:false};
       records.set(row.id,row);return row;
     }
     const owner=row=>row?.owner===buyer.id&&row.mode===mode;
-    if(action==='latest')return [...records.values()].reverse().find(owner);
+    if(action==='latest')return [...records.values()].reverse().find(row=>owner(row)&&!row.cancelled);
     const row=records.get(data.p_id);
     if(!owner(row))return null;
+    if(action==='cancel'&&!row.captured)row.cancelled=true;
     if(action==='capture') {
+      if(row.cancelled)return null;
       if(row.paymentId&&row.paymentId!==data.p_payment)throw Error('duplicate');
       row.paymentId=data.p_payment;row.captured=true;
+      row.downloadUntil??=new Date(now+90*86400000).toISOString();
     }
+    row.downloadAvailable=row.captured&&now<Date.parse(row.downloadUntil);
     return row;
   };
   const create=()=>createChecklistCheckout({origin,gateway,store,readTemplate:()=>template,identify:async req=>req.account?{id:req.account}:null});
@@ -38,7 +43,7 @@ function fixture(gateway) {
     const res={writeHead(status,headers){result.status=status;result.headers=headers;},end(value){result.body=Buffer.isBuffer(value)||value instanceof Uint8Array?Buffer.from(value):JSON.parse(value);}};
     await handler(req,res,new URL('/api/checklist/'+route,origin));return result;
   };
-  return {call,restart(){handler=create();},records};
+  return {call,restart(){handler=create();},advance(ms){now+=ms;},records};
 }
 
 test('simulated checkout stores captured order before delivery and survives handler restart',async()=>{
@@ -86,4 +91,38 @@ test('Razorpay test adapter requires a valid signature and captured matching INR
   assert.equal((await call('verify',{orderId,paymentId,signature})).status,400);
   payment={...payment,live_mode:false};
   assert.equal((await call('verify',{orderId,paymentId,signature})).status,200);
+});
+
+test('cancellation persists, is owner-only, and leaves the earlier captured order available',async()=>{
+  const {call,restart,records}=fixture(simulatedGateway());
+  const first=(await call('order',{organisation:'Original buyer',testConsent:true})).body.orderId;
+  await call('verify',{orderId:first});
+  const pending=(await call('order',{organisation:'Next order',testConsent:true})).body.orderId;
+  assert.equal((await call('cancel',{orderId:pending},'buyer-b')).status,403);
+  assert.equal((await call('cancel',{orderId:first})).status,409);
+  assert.equal((await call('cancel',{orderId:pending})).body.latest.orderId,first);
+  restart();
+  assert.equal((await call('session')).body.latest.orderId,first);
+  assert.equal((await call('cancel',{orderId:pending})).body.cancelled,true);
+  assert.equal((await call('verify',{orderId:pending})).status,409);
+  assert.equal((await call('download?order='+pending)).status,403);
+  assert.equal(records.get(pending).captured,false);
+  assert.equal((await call('download?order='+first)).status,200);
+});
+
+test('redownload ends exactly 90 days from capture, with no extension after re-verification',async()=>{
+  const {call,advance,restart}=fixture(simulatedGateway());
+  const orderId=(await call('order',{organisation:'Example',testConsent:true})).body.orderId;
+  advance(86400000);
+  const captured=(await call('verify',{orderId})).body;
+  assert.equal(captured.downloadUntil,'2027-02-07T00:00:00.000Z');
+  advance(90*86400000-1);
+  assert.equal((await call('download?order='+orderId)).status,200);
+  advance(1);
+  restart();
+  assert.equal((await call('download?order='+orderId)).status,410);
+  assert.equal((await call('download?order='+orderId,undefined,'buyer-b')).status,403);
+  const expired=(await call('verify',{orderId})).body;
+  assert.equal(expired.downloadUntil,captured.downloadUntil);
+  assert.equal(expired.delivery,null);
 });

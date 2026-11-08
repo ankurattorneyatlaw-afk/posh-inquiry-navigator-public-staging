@@ -65,11 +65,15 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
     return true;
   };
   const delivery=id=>'/api/checklist/download?order='+encodeURIComponent(id);
-  const summary=order=>order?{orderId:order.id,organisation:order.organisation,captured:order.captured,delivery:order.captured?delivery(order.id):null}:null;
+  const summary=order=>order?{
+    orderId:order.id,organisation:order.organisation,captured:order.captured,
+    downloadUntil:order.downloadUntil??null,
+    delivery:order.captured&&order.downloadAvailable===true?delivery(order.id):null
+  }:null;
   return async (req,res,url)=>{
     if (!url.pathname.startsWith('/api/checklist/')) return false;
     const action=url.pathname.slice('/api/checklist/'.length);
-    if (!['session','download','order','verify'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
+    if (!['session','download','order','verify','cancel'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
     if (req.method!==(['session','download'].includes(action)?'GET':'POST')) return send(res,405,{error:'Method not allowed.'});
     if (req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))) return send(res,403,{error:'Use the Navigator checkout page.'});
     let phase='session';
@@ -87,6 +91,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
         if (!orderPattern.test(id||'')) return send(res,400,{error:'Check the order reference.'});
         const order=await store(buyer,'get',gateway.name,{p_id:id});
         if (!order?.captured) return send(res,403,{error:'This captured order is unavailable for your account.'});
+        if (order.downloadAvailable!==true) return send(res,410,{error:'The 90-day redownload period has ended.'});
         const file=generate(readTemplate(),order.organisation,order.id);
         res.writeHead(200,{'Content-Type':'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           'Content-Disposition':`attachment; filename="POSH-Checklist-${order.id}.docx"`,'Cache-Control':'private, no-store','Vary':'Cookie'});
@@ -96,7 +101,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
       for await (const chunk of req) {size+=chunk.length;if(size>2048)return send(res,413,{error:'Request is too large.'});chunks.push(chunk);}
       let data;
       try {data=JSON.parse(Buffer.concat(chunks).toString('utf8'));} catch {return send(res,400,{error:'Invalid checkout request.'});}
-      const keys=action==='order'?['organisation','testConsent']:['orderId','paymentId','signature'];
+      const keys=action==='order'?['organisation','testConsent']:action==='cancel'?['orderId']:['orderId','paymentId','signature'];
       if (!data||typeof data!=='object'||Array.isArray(data)||Object.keys(data).some(key=>!keys.includes(key))) return send(res,400,{error:'Only checkout details are accepted.'});
       if (action==='order') {
         if (data.testConsent!==true) return send(res,400,{error:'Confirm that this is a test checkout.'});
@@ -118,8 +123,18 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
         return send(res,201,{...summary(saved),amount,currency,keyId:gateway.keyId,mode:gateway.name});
       }
       if (!orderPattern.test(data.orderId||'')) return send(res,400,{error:'Check the order reference.'});
+      if (action==='cancel') {
+        phase='cancel-order';
+        const result=await store(buyer,'cancel',gateway.name,{p_id:data.orderId});
+        if (!result) return send(res,403,{error:'This order is unavailable for your account.'});
+        if (result.captured) return send(res,409,{error:'This order was already captured. Reload to view its download.'});
+        if (!result.cancelled) throw Error('Cancellation not saved');
+        const latest=await store(buyer,'latest',gateway.name);
+        return send(res,200,{cancelled:true,latest:summary(latest),mode:gateway.name,keyId:gateway.keyId});
+      }
       const order=await store(buyer,'get',gateway.name,{p_id:data.orderId});
       if (!order) return send(res,403,{error:'This order is unavailable for your account.'});
+      if (order.cancelled) return send(res,409,{error:'This test order was cancelled. Start a new test order.'});
       if (order.captured) return send(res,200,summary(order));
       phase='verify-gateway-payment';
       const payment=await gateway.verify(order.id,data);
@@ -127,6 +142,10 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
       if (payment.status!=='captured') return send(res,409,{error:'Test payment is awaiting capture. Retry verification.'});
       phase='save-capture';
       const saved=await store(buyer,'capture',gateway.name,{p_id:order.id,p_payment:payment.id});
+      if (!saved) {
+        const current=await store(buyer,'get',gateway.name,{p_id:order.id});
+        if (current?.cancelled) return send(res,409,{error:'This test order was cancelled before delivery.'});
+      }
       if (!saved?.captured||saved.paymentId!==payment.id) throw Error('Capture not saved');
       return send(res,200,summary(saved));
     } catch(error) {
