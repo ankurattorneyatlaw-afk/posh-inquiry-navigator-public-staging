@@ -2,6 +2,20 @@
 // Account and licence data only. This module has no case-data endpoint.
 const crypto=require('node:crypto'),{clientNetwork}=require('./request-guards.cjs');
 const {tiers}=require('./plan-tools.cjs');
+const {checkoutPlans}=require('../dist/plans.js');
+const dateInIndia=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kolkata'});
+const midnightIndia='T00:00:00+05:30';
+
+function planExpiry(startDate,months){
+ const date=new Date(startDate+'T00:00:00Z');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(startDate)||!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==startDate)return null;
+ const day=date.getUTCDate();
+ date.setUTCDate(1);
+ date.setUTCMonth(date.getUTCMonth()+months);
+ const lastDay=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,0)).getUTCDate();
+ date.setUTCDate(Math.min(day,lastDay));
+ return date.toISOString().slice(0,10);
+}
 const PLANS=new Set(['essential','professional','advanced','institutional','enterprise','knowledge']);
 const PROTECTED=new Set(['guided.html','workspace.html','admin.html','guided.js','guided-continuation.js','workflow-documents.js','timeline.js','timeline-ui.js','session-experience.js','session-review.js','evidence.js','evidence-ui.js']);
 function seal(value,key){const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key,iv);return Buffer.concat([iv,cipher.update(JSON.stringify(value)),cipher.final(),cipher.getAuthTag()]).toString('base64url');}
@@ -53,9 +67,31 @@ function createAccountAccess({url=process.env.NAVIGATOR_AUTH_URL,key=process.env
  if(parsed.pathname==='/api/account/logout'){const local=read(req);cookie(res,'',0);cookie(res,'',0,name+'-otp');if(local){try{await remote('/auth/v1/logout?scope=local',{method:'POST',token:local.access})}catch{send(res,503,{error:'Browser signed out; server revocation could not be confirmed. Use account support to revoke all sessions.'});return true}}send(res,200,{signedIn:false});return true}
  const current=await session(req,res);if(!current){send(res,401,{error:'Sign in again. Session inputs have not been uploaded.'});return true}
  if(parsed.pathname.startsWith('/api/account/admin/')){const uid=v=>/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(v||'');if(!await remote('/rest/v1/rpc/navigator_is_operator',{method:'POST',token:current.s.access,body:{}})){send(res,403,{error:'Plan administrator access is required.'});return true}let result;
- if(parsed.pathname==='/api/account/admin/lookup'){if(typeof data.email!=='string'||data.email.length>254)throw Error('Invalid account');result=await remote('/rest/v1/rpc/navigator_admin_account',{method:'POST',token:current.s.access,body:{p_email:data.email}})}
+ if(parsed.pathname==='/api/account/admin/lookup'){
+  const email=typeof data.email==='string'?data.email.trim():'';
+  if(!emailValid(email)){send(res,400,{error:'Enter the customer’s account email.'});return true;}
+  result=await remote('/rest/v1/rpc/navigator_admin_account',{method:'POST',token:current.s.access,body:{p_email:email}});
+  const startsOn=dateInIndia.format(new Date(now()));
+  const planDates=Object.fromEntries(Object.entries(checkoutPlans).map(([plan,{months}])=>[plan,{startsOn,endsOn:planExpiry(startsOn,months),months}]));
+  send(res,200,{result,planDates});return true;
+ }
  else if(parsed.pathname==='/api/account/admin/access'){if(!uid(data.accountId))throw Error('Invalid account');result=await remote('/rest/v1/rpc/navigator_admin_access',{method:'POST',token:current.s.access,body:{p_user:data.accountId}})}
- else if(parsed.pathname==='/api/account/admin/grant'){if(!uid(data.accountId)||!uid(data.verificationReference)||!PLANS.has(data.plan)||!Number.isFinite(Date.parse(data.startsAt))||!Number.isFinite(Date.parse(data.endsAt)))throw Error('Invalid plan details');result=await remote('/rest/v1/rpc/navigator_admin_grant',{method:'POST',token:current.s.access,body:{p_user:data.accountId,p_plan:data.plan,p_starts:data.startsAt,p_ends:data.endsAt,p_reference:data.verificationReference}})}
+ else if(parsed.pathname==='/api/account/admin/grant'){
+  if(!uid(data.accountId)||!uid(data.verificationReference)||!PLANS.has(data.plan)){
+   send(res,400,{error:'Find a confirmed account and select a valid plan.'});return true;
+  }
+  const standard=Object.hasOwn(checkoutPlans,data.plan)?checkoutPlans[data.plan]:null;
+  let endsAt=data.endsAt;
+  if(standard){
+   const startDate=typeof data.startsAt==='string'&&data.startsAt.endsWith(midnightIndia)?data.startsAt.slice(0,10):'';
+   const endsOn=data.startsAt===startDate+midnightIndia&&planExpiry(startDate,standard.months);
+   endsAt=endsOn?endsOn+midnightIndia:null;
+  }
+  if(!Number.isFinite(Date.parse(data.startsAt))||!Number.isFinite(Date.parse(endsAt))||Date.parse(endsAt)<=Date.parse(data.startsAt)){
+   send(res,400,{error:'Check the plan dates. Access must end after it starts.'});return true;
+  }
+  result=await remote('/rest/v1/rpc/navigator_admin_grant',{method:'POST',token:current.s.access,body:{p_user:data.accountId,p_plan:data.plan,p_starts:data.startsAt,p_ends:endsAt,p_reference:data.verificationReference}});
+ }
  else if(parsed.pathname==='/api/account/admin/revoke'){if(!uid(data.accessId))throw Error('Invalid access');result=await remote('/rest/v1/rpc/navigator_admin_revoke',{method:'POST',token:current.s.access,body:{p_access:data.accessId}})}else{send(res,404,{error:'Unknown administration action'});return true}send(res,200,{result});return true}
 
  if(parsed.pathname==='/api/account/mfa/enrol'){const r=await remote('/auth/v1/factors',{method:'POST',token:current.s.access,body:{factor_type:'totp',friendly_name:'Navigator authenticator'}});send(res,200,{factorId:r.id,secret:r.totp?.secret,uri:r.totp?.uri});return true}

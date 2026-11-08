@@ -16,8 +16,84 @@ $('account-refresh').onclick=()=>run(configure);$('account-logout').onclick=()=>
 $('account-enrol').onclick=()=>run(async()=>{const r=await api('mfa/enrol',{});factorId=r.factorId;$('account-secret').textContent=r.secret;$('account-secret-wrap').hidden=false;status.textContent='Add the setup key in your authenticator app, then enter its code.'});
 $('account-mfa').onsubmit=e=>{e.preventDefault();run(async()=>{if(!factorId)throw Error('Set up an authenticator first.');await api('mfa/verify',{factorId,code:e.target.elements.code.value});e.target.reset();$('account-secret').textContent='';$('account-secret-wrap').hidden=true;await load();status.textContent='Authenticator verified. Your active plan, if assigned, is shown above.'})};
 async function adminList(){const id=$('admin-grant').elements.accountId.value;if(!id)return;const r=await api('admin/access',{accountId:id}),list=$('admin-access-list');list.replaceChildren();for(const item of r.result){const row=document.createElement('p'),text=document.createElement('span');text.textContent=item.plan+' · '+item.status+' · ends '+item.ends_at+' ';row.append(text);if(item.status==='active'){const button=document.createElement('button');button.type='button';button.className='btn btn-light';button.textContent='Revoke this access';button.onclick=()=>{if(!confirm('Revoke this customer’s '+item.plan+' access?'))return;run(async()=>{await api('admin/revoke',{accessId:item.access_id});await adminList();$('admin-result').textContent='Access revoked. Already downloaded documents remain on the customer’s device.'})};row.append(button)}list.append(row)}}
-$('admin-lookup').onsubmit=e=>{e.preventDefault();run(async()=>{$('admin-grant').elements.accountId.value='';$('admin-access-list').replaceChildren();const r=await api('admin/lookup',{email:e.target.elements.email.value});if(!r.result.length)throw Error('No confirmed account found. Provision and confirm the customer account first.');const f=$('admin-grant').elements;f.accountId.value=r.result[0].account_id;f.verificationReference.value=crypto.randomUUID();f.startsAt.value=new Date().toISOString().slice(0,10);f.verified.checked=false;await adminList();$('admin-result').textContent='Confirmed account found. Verify purchase before assigning access.'})};
-$('admin-grant').onsubmit=e=>{e.preventDefault();run(async()=>{const f=e.target.elements;if(!f.verified.checked)throw Error('Verify the purchase first.');await api('admin/grant',{accountId:f.accountId.value,plan:f.plan.value,startsAt:f.startsAt.value+'T00:00:00+05:30',endsAt:f.endsAt.value+'T00:00:00+05:30',verificationReference:f.verificationReference.value});f.verified.checked=false;f.verificationReference.value=crypto.randomUUID();await adminList();$('admin-result').textContent='Access assigned. Ask the customer to sign in with an email code and refresh access.'})};
+const lookupForm=$('admin-lookup'),grantForm=$('admin-grant');
+const lookupResult=$('admin-lookup-result')||$('admin-result'),accountHelp=$('admin-account-help');
+let planDates={};
+function showPlanDates(){
+  const f=grantForm.elements,dates=Object.hasOwn(planDates,f.plan.value)?planDates[f.plan.value]:null;
+  f.startsAt.readOnly=f.endsAt.readOnly=!!dates;
+  f.startsAt.value=dates?.startsOn||planDates.essential?.startsOn||new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kolkata'}).format(new Date());
+  f.endsAt.value=dates?.endsOn||'';
+  const term=$('admin-plan-term');
+  if(term)term.textContent=dates?dates.months+' calendar months. The dates are set automatically.':'Enter the start and end dates agreed for this role.';
+}
+grantForm.elements.plan.addEventListener('change',showPlanDates);
+function clearAdminSelection(){
+  const f=grantForm.elements;
+  planDates={};
+  f.accountId.value='';
+  f.verificationReference.value='';
+  f.verified.checked=false;
+  if(page==='admin')grantForm.hidden=true;
+  if(accountHelp)accountHelp.hidden=true;
+  $('admin-access-list').replaceChildren();
+  $('admin-result').textContent='';
+  lookupResult.textContent='';
+}
+lookupForm.elements.email.addEventListener('input',clearAdminSelection);
+lookupForm.onsubmit=e=>{
+  e.preventDefault();
+  run(async()=>{
+    clearAdminSelection();
+    const email=lookupForm.elements.email.value.trim();
+    lookupResult.textContent='Checking the Navigator account…';
+    try{
+      const r=await api('admin/lookup',{email});
+      if(email!==lookupForm.elements.email.value.trim())return;
+      if(!r.result.length){
+        lookupResult.textContent='No confirmed Navigator account was found for this email.';
+        if(accountHelp)accountHelp.hidden=false;
+        return;
+      }
+      const f=grantForm.elements;
+      f.accountId.value=r.result[0].account_id;
+      f.verificationReference.value=crypto.randomUUID();
+      planDates=r.planDates||{};
+      showPlanDates();
+      grantForm.hidden=false;
+      lookupResult.textContent='Confirmed account found. Select the agreed plan below.';
+      await adminList();
+    }catch(error){
+      if(email===lookupForm.elements.email.value.trim())lookupResult.textContent=error.message;
+    }
+  });
+};
+grantForm.onsubmit=e=>{
+  e.preventDefault();
+  run(async()=>{
+    const f=grantForm.elements,result=$('admin-result');
+    if(!f.accountId.value||!f.verified.checked)return;
+    if(f.endsAt.value<=f.startsAt.value){
+      result.textContent='Choose an access end date after the start date. Access ends at midnight IST at the start of the end date.';
+      f.endsAt.focus();
+      return;
+    }
+    result.textContent='Assigning plan access…';
+    lookupForm.elements.email.disabled=true;
+    try{
+      await api('admin/grant',{accountId:f.accountId.value,plan:f.plan.value,startsAt:f.startsAt.value+'T00:00:00+05:30',...(!f.endsAt.readOnly?{endsAt:f.endsAt.value+'T00:00:00+05:30'}:{}),verificationReference:f.verificationReference.value});
+    }catch(error){
+      result.textContent=error.message;
+      return;
+    }finally{
+      lookupForm.elements.email.disabled=false;
+    }
+    f.verified.checked=false;
+    f.verificationReference.value=crypto.randomUUID();
+    result.textContent='Access assigned. The customer can sign in with an email code and open My workspace.';
+    try{await adminList();}catch{result.textContent+=' Use Find confirmed account to refresh the access list.';}
+  });
+};
 async function loadSandbox(operator,stagingOnly,entering){
   const section=$('account-sandbox');
   if(!section)return;

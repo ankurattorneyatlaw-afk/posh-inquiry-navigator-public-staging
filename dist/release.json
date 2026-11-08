@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.16.8-guided-session-entry-staging",
+  "version": "6.16.9-manual-access-dates-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -9,8 +9,8 @@
   "assets": {
     "account-guard.js": "3d04b71e8df6d92381076c28efaca09fa5e5de32e10484a89f0c1c68106e82b4",
     "account.html": "d69fcdf51dc3210d56c4349b6d707549cb714036b074fb4b4ecd84591faff937",
-    "account.js": "c37d2977e716e7d035739b2afd0e43271af7e7dda4091b08bd22013b2bbd1484",
-    "admin.html": "3a782521088f2c2b382c922658b481ee9aae9770c5147cd4fabd0f4e6d0451b2",
+    "account.js": "282f1ac7fa90147d8ceb704d1c877a8c946740f1130b502169c5c0fcba6f9daf",
+    "admin.html": "c756e66bd321a38362d429b950d15129a2f61c89357ce02859ef1aa0370c240a",
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
     "checklist-sample.pdf": "dfcee8895af46fa4af976aafbbd320d69080b096ac7faa19970bf486f5f4854d",

@@ -58,3 +58,38 @@ test('administrator has full inquiry access without a customer subscription',asy
 test('customer workspace is authenticated and administrator area rejects customers',async()=>{const {api}=mock({access:false,operator:false});assert.equal((await request(api,'/',{asset:'workspace.html',cookie:sessionCookie()})).handled,false);const admin=await request(api,'/',{asset:'admin.html',cookie:sessionCookie()});assert.equal(admin.status,303);assert.equal(admin.headers.Location,'/workspace');const guided=await request(api,'/',{asset:'guided.html',cookie:sessionCookie()});assert.equal(guided.status,303);assert.equal(guided.headers.Location,'/workspace');});
 
 test('verified administrator and email-code customer do not get a subscription-dependent MFA detour',async()=>{const factors=[{status:'verified',factor_type:'totp',id:'synthetic-factor'}];const owner=await request(mock({operator:true,access:false,factors}).api,'/api/account/session',{cookie:sessionCookie()});assert.equal(owner.body.mfaRequired,false);const payload=Buffer.from(JSON.stringify({aal:'aal1',amr:[{method:'otp'}]})).toString('base64url');const customer=await request(mock({access:false,factors}).api,'/api/account/session',{cookie:sessionCookie({access:'header.'+payload+'.signature'})});assert.equal(customer.body.mfaRequired,false);const password=await request(mock({access:false,factors}).api,'/api/account/session',{cookie:sessionCookie()});assert.equal(password.body.mfaRequired,true);});
+
+test('admin lookup previews plan dates in India time and clamps month-end expiry',async()=>{
+ const now=Date.parse('2027-08-30T19:00:00Z');
+ const {api}=mock({operator:true,clock:()=>now});
+ const cookie=sessionCookie({started:now-1000,seen:now-1000,expires:now+3600000});
+ const r=await request(api,'/api/account/admin/lookup',{method:'POST',cookie,data:{email:'member@example.invalid'}});
+ assert.equal(r.status,200);
+ assert.deepEqual(r.body.planDates,{
+  essential:{startsOn:'2027-08-31',endsOn:'2028-02-29',months:6},
+  professional:{startsOn:'2027-08-31',endsOn:'2028-05-31',months:9},
+  advanced:{startsOn:'2027-08-31',endsOn:'2028-08-31',months:12}
+ });
+});
+
+test('admin grant derives standard expiry and accepts agreed dates for custom roles',async()=>{
+ const {api,calls}=mock({operator:true});
+ const accountId='10000000-0000-4000-8000-000000000001';
+ const verificationReference='20000000-0000-4000-8000-000000000002';
+ const data={accountId,verificationReference,startsAt:'2027-08-31T00:00:00+05:30'};
+ const grant=(plan,dates)=>request(api,'/api/account/admin/grant',{
+  method:'POST',cookie:sessionCookie(),data:{...data,plan,...dates}
+ });
+ for(const [plan,endsOn] of [['essential','2028-02-29'],['professional','2028-05-31'],['advanced','2028-08-31']]){
+  const r=await grant(plan,{endsAt:'2029-01-01T00:00:00+05:30'});
+  assert.equal(r.status,200);
+  assert.equal(JSON.parse(calls.at(-1).opts.body).p_ends,endsOn+'T00:00:00+05:30');
+ }
+ const r=await grant('enterprise',{endsAt:'2029-01-01T00:00:00+05:30'});
+ assert.equal(r.status,200);
+ assert.equal(JSON.parse(calls.at(-1).opts.body).p_ends,'2029-01-01T00:00:00+05:30');
+ const count=calls.filter(call=>call.url.endsWith('/navigator_admin_grant')).length;
+ assert.equal((await grant('essential',{startsAt:'2027-02-30T00:00:00+05:30'})).status,400);
+ assert.equal((await grant('enterprise',{endsAt:data.startsAt})).status,400);
+ assert.equal(calls.filter(call=>call.url.endsWith('/navigator_admin_grant')).length,count);
+});
