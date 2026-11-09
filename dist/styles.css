@@ -613,3 +613,10 @@ body{overflow-wrap:anywhere}
 @media(max-width:400px){
   .inquiry-workspace .timeline-basic li{display:grid;grid-template-columns:minmax(0,1fr)}
 }
+
+.home-walkthrough-form{display:grid;gap:12px;max-width:100%;min-width:0}
+.home-walkthrough-form label:not(.enquiry-trap){display:grid;gap:4px;min-width:0;font-weight:650}
+.home-walkthrough-form input:not([type=checkbox]),.home-walkthrough-form select{min-width:0;max-width:100%;width:100%;padding:9px;border:1px solid #a8b9c9;border-radius:6px;background:white;font:inherit}
+.home-walkthrough-form label.enquiry-consent{grid-template-columns:auto minmax(0,1fr);align-items:start;gap:8px;font-weight:400}
+.home-walkthrough-form input[type=checkbox]{margin-top:4px}
+.home-walkthrough-form button{justify-self:start}

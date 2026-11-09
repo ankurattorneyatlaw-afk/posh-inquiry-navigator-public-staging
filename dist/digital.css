@@ -33,3 +33,6 @@
 .tools-index li{margin:0}
 .tools-index a{display:inline-flex;align-items:center;min-height:44px}
 @media print{.tools-start,.tools-index{display:none!important}}
+
+#checkout-recovery{margin:16px 0;background:#edf5f5}
+#checkout-recovery-status:empty{display:none}

@@ -2,6 +2,7 @@
 const http = require('node:http');
 const {createAccountAccess,PROTECTED}=require('./account-access.cjs');
 const accounts=createAccountAccess();
+const recovery=require('./checkout-recovery.cjs').createRecovery({identify:accounts.checkoutIdentity});
 const testInquiryAssets=new Set([...PROTECTED].filter(name=>!['workspace.html','admin.html'].includes(name)));
 const community=require('./community-api.cjs').createCommunityHandler();
 const {stagingOrigin,planStoreFromEnvironment,guideStoreFromEnvironment}=require('./plan-store.cjs');
@@ -65,6 +66,7 @@ const server = http.createServer(async(req,res)=>{
   if(await analytics.handle(req,res,parsed))return;
   if(await enquiries(req,res,parsed))return;
   if(await community(req,res,parsed))return;
+  if(await recovery(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
   if(await checklist(req,res,parsed)||await complianceChecklist(req,res,parsed))return;
   if(await shop(req,res,parsed))return;

@@ -7,6 +7,7 @@ const consent=document.getElementById('test-consent');
 const signIn=document.getElementById('checkout-signin');
 const payment=document.getElementById('checkout-payment');
 const planId=new URLSearchParams(location.search).get('plan');
+const recovery=window.NavigatorCheckoutRecovery?.checkout(planId);
 let proof=null,verifying=false,completed=false,modalOpen=false;
 
 async function api(path,body){
@@ -35,6 +36,7 @@ async function verify(){
       return;
     }
     completed=true;
+    recovery?.hide();
     payment.hidden=true;
     status.textContent='Test checkout complete. Open your plan to start or resume an inquiry. You can also find the plan in My workspace.';
     const link=document.createElement('a');
@@ -88,6 +90,7 @@ try{
     return;
   }
   payment.hidden=false;
+  await recovery?.show();
   updateButton();
   consent.addEventListener('change',updateButton);
   button.addEventListener('click',async()=>{
@@ -97,6 +100,7 @@ try{
     updateButton();
     status.textContent='Creating a test order…';
     try{
+      await recovery?.begin();
       const order=await api('order',{plan:planId,testConsent:true});
       if(!window.Razorpay)await new Promise((resolve,reject)=>{
         const script=document.createElement('script');
@@ -121,11 +125,13 @@ try{
         }}
       });
       checkout.on('payment.failed',()=>{
+        void recovery?.failed();
         status.textContent='The test payment failed. Retry within Razorpay or close checkout to return.';
       });
       status.textContent='Complete the simulated payment in Razorpay Test Mode.';
       checkout.open();
     }catch(error){
+      await recovery?.failed();
       modalOpen=false;
       status.textContent=error.message;
       updateButton();
