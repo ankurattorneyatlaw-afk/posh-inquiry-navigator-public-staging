@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.19-verified-school-inquiry-judgment-staging",
+  "version": "6.35.20-curated-court-library-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -13,7 +13,7 @@
     "account.js": "ce7d9cc32d9c58a07c4b4d075240267818232b896c1e63b777b6607664ba3b62",
     "admin.html": "c756e66bd321a38362d429b950d15129a2f61c89357ce02859ef1aa0370c240a",
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
-    "cases.js": "d492a0fc268398c88f107dd0fd5ed45a20dd97f6a7c2ef37ed0e8b7bb22c7ea4",
+    "cases.js": "8826c7c382426296972d07879619d4224dc23e8390b249519271e08e21e54d74",
     "checklist-sample.pdf": "5acd229ced21cf6e99f71f5c215592c782026cc172ef257befc9a354a78c50de",
     "checkout-recovery.js": "b2222cb85c746b239ad6103eeaad8b41aa0c144aa6b337cf778ba5bc805b2112",
     "checkout-reminders.html": "e0f752665c730d9692b2295788fc31ce302d07abd9a7d82cf61148acec17f3c2",
@@ -46,7 +46,7 @@
     "inquiry-checklist.js": "0e3ae9ef91a9744b23f78a36b632072f0be4471593fd609452824fce287747f1",
     "institutions.html": "d292b90f5b0843e3783b2c7003075086700382ce2b5b5bd8b5414948961da6d9",
     "legal.js": "51c4bf6ab42d32bf7940c806acf61eeb700a88a15726eeb66f303fab08094bcf",
-    "library.js": "1b2c651ff39e780849d0a2cecd1f88dcd9787488a51cf85b8b804b7bb57b31ec",
+    "library.js": "c3475c5ce09b97812659a94193b4fb6bb29bdb94310fe290a0aceefdf51024de",
     "main.js": "fa5a3ae568f9c59b26b8ef2c6b2137ba77f629b0d2e39ea1fedb5c3e04a6f325",
     "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plan-tools.html": "284fe7188a4d9b48126faf17a4e0482bbe91f91d9a2c655cccbeaecf20727b4d",

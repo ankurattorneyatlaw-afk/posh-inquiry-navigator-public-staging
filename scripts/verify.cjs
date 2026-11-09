@@ -32,7 +32,7 @@ console.log('Integrated guided inquiry staging safeguards verified.');
 require('./test-guided.cjs');
 
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,78);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,36);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,444);
@@ -44,31 +44,30 @@ for (const [source,target] of [[69,404],[404,69],[211,214],[214,438],[438,211],[
   assert(finder.relatedTo(record).some(faq=>Number(faq.number)===target));
 }
 const caseDirectory=require('../dist/cases.js');
-assert.equal(caseDirectory.data.length,78);
-assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,78);
-assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,78);
-assert.equal(new Set(caseDirectory.data.filter(c=>c.publicationRank).map(c=>c.masterId)).size,62);
-assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,76);
-const retainedCourtRecords=caseDirectory.data.filter(c=>!c.publicationRank);
-assert.equal(retainedCourtRecords.length,16);
-assert(retainedCourtRecords.every(c=>caseDirectory.checked(c)&&c.checkedAt==='2026-11-09'));
-assert.deepEqual(retainedCourtRecords.filter(c=>c.sourceHost==='publisher').map(c=>c.id),['C20','C21']);
+assert.equal(caseDirectory.data.length,36);
+assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,36);
+assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,36);
+assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,35);
+assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),['SC026']);
+assert.deepEqual(caseDirectory.data.filter(c=>c.sourceHost==='publisher').map(c=>c.id),['C20','C21']);
 assert(caseDirectory.filter('Judgment 011')[0].linkedOrders.some(o=>o.date==='2025-09-15'&&o.url));
 assert(caseDirectory.filter('2025 INSC 1106')[0].linkedOrders.some(o=>o.date==='2025-11-17'&&o.url));
 assert.equal(caseDirectory.filter('Judgment 007')[0].id,'C08');
 assert.equal(caseDirectory.filter('Ajit Seth')[0].id,'SC056');
-assert(caseDirectory.filter('Sunita Thawani')[0].linkedOrders.some(o=>o.docket.includes('28851/2019')&&o.url.startsWith('https://api.sci.gov.in/')));
 assert.equal(caseDirectory.filter('Air France')[0].id,'SC027');
 assert(caseDirectory.filter('Lucy Sequeira').some(c=>c.id==='SC078'&&caseDirectory.checked(c)));
-assert(caseDirectory.filter('11889/2025')[0].related.includes('HC077'));
-assert(caseDirectory.filter('2026:GAU-AS:3698-DB').some(c=>c.id==='HC077'&&c.url.endsWith('.pdf/stream')));
-assert(caseDirectory.filter('Seema Joshi')[0].linkedOrders.some(o=>o.docket.includes('34428/2025')));
-assert(!caseDirectory.data.some(c=>c.masterId==='POSH-0502'));
-const sahityaExpedition=caseDirectory.data.find(c=>c.id==='SC041');
-assert(caseDirectory.checked(sahityaExpedition));
-assert(!sahityaExpedition.url&&!sahityaExpedition.sourceArchive&&!sahityaExpedition.caseNumber);
-assert.equal(sahityaExpedition.citation,'Supreme Court order dated 30 January 2024');
-assert(caseDirectory.filter('','All topics','All forums','Procedural orders').length===17);
+assert(caseDirectory.filter('2026:GAU-AS:3698-DB').some(c=>c.id==='HC077'&&c.linkedOrders.length===2));
+assert.equal(caseDirectory.filter('Judgment 064').length,0);
+assert.equal(caseDirectory.filter('Judgment 075').length,0);
+assert.equal(caseDirectory.filter('Judgment 076').length,0);
+const publishedCaseIds=new Set(library.cases.map(c=>c.id));
+for(const faq of finder.records){
+  assert(faq.members.every(m=>(m.cases||[]).every(id=>publishedCaseIds.has(id))),faq.id);
+  for(const link of faq.links||[]){
+    const caseId=link.url.match(/^\/?#faq\/case-([a-z0-9]+)/i)?.[1];
+    if(caseId)assert(publishedCaseIds.has(caseId.toUpperCase()),faq.id);
+  }
+}
 for(const number of [69,211,214,248,292,404,438,444]){
   const record=finder.search('FAQ '+number)[0];
   assert(record.cases.length);
