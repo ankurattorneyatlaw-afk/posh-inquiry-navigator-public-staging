@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.21-fresh-committee-reference-staging",
+  "version": "6.35.22-checklist-routing-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -21,8 +21,8 @@
     "checkout.js": "32eb7088245c0229226a39f5fa85ca8723ca2c03c9695b8e3ff83fe6b0e74c67",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "compliance-assessment.css": "87cde7713532f6d227230ceb75864bf42f7221c1992053a45c898ce33f1ae66c",
-    "compliance-assessment.html": "c4b256c9c0ad395497468603b7aea080104b3a7aa64464b3b683d5da87c7365e",
-    "compliance-assessment.js": "ed8cedc961d5d5305c6b8a31f68b248abdfb6cb074c6d34c6ee124ecdb6ff094",
+    "compliance-assessment.html": "6397b338056c40a2efb0b93c580b882b4236d07f9b2b216fd974da4733bcb01d",
+    "compliance-assessment.js": "46644e2821e6f400176fbe20faf9d9b418a83e4034690bcbab21801f564d4f7e",
     "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
     "digital-delivery.html": "209acd651d0f622627a0d63333870a758c3f4ee952ee8390317454cd9f0878cb",
     "digital.css": "53b8e3f1d63736e85d6b8f6d45f52617b6443dd400132bdc396b8686547c2d26",

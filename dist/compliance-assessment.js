@@ -30,9 +30,13 @@
     for(const node of document.querySelectorAll('[data-company]'))node.hidden=!company;
     fields.mca.required=fields.listed.required=company;
     fields.sebi.required=company&&fields.listed.value==='Yes';$('sebi').hidden=!fields.sebi.required;
-    $('route-preview').textContent=fields.workers.value===''?'':Number(fields.workers.value)>=10?
+    const office=hasSiteCount?fields.siteWorkers:fields.workers;
+    const ready=fields.workers.value!==''&&office.value!==''&&Number(office.value)<=Number(fields.workers.value);
+    $('route-preview').textContent=!ready?'':Number(office.value)>=10?
       'IC route. A complaint against the employer uses the district LC route.':
-      'LC route. IC-only checks are excluded.';
+      Number(fields.workers.value)>=10?
+        'This office has fewer than 10 workers. The first question will confirm whether this office uses the IC or LC route.':
+        'LC route. IC-only checks are excluded.';
   }
   form.addEventListener('input',refreshScope);
   form.onsubmit=e=>{
@@ -55,6 +59,8 @@
     const parent=q.parentId&&current.review.applicable.find(item=>item.id===q.parentId);
     return parent?parent.title+' · '+q.title:q.title;
   }
+  const routeSetup=q=>Array.isArray(q.availableAnswers);
+  const answerLabel=(q,value)=>routeSetup(q)?(value==='Yes'?'Confirmed IC route':'Confirmed LC route'):value;
   // Fictional examples. Each entry pairs a record with a check-specific evidence gap.
   const evidenceSamples={
     1:['Signed IC constitution order IC-01, current version.','a signed current IC constitution order'],
@@ -191,13 +197,16 @@
       const next=el('p',q.next);next.className='next';card.append(next);
       if(current.final) {
         const a=q.answer;
-        card.append(el('p',a.value+(a.evidence?' · '+a.evidence:'')));
+        card.append(el('p',answerLabel(q,a.value)+(a.evidence?' · '+a.evidence:'')));
         if(a.owner||a.due)card.append(el('p','Owner: '+(a.owner||'Unassigned')+' · Target: '+(a.due||'Unset')));
+      }else if(q.blocked){
+        card.append(el('p','Blocked. Update the prerequisite answer to reopen this check.'));
       }else{
         const entry=el('form'),grid=el('div');grid.className='assessment-grid';
         const label=el('label','Answer'), answer=el('select');answer.required=true;
         answer.append(new Option('Choose',''));
-        for(const option of ['Yes','Partly','No','Not sure',...(q.conditional?['Not triggered']:[])])answer.append(new Option(option,option));
+        const options=q.availableAnswers||['Yes','Partly','No','Not sure',...(q.conditional?['Not triggered']:[])];
+        for(const option of options)answer.append(new Option(answerLabel(q,option),option));
         answer.value=q.answer?.value||'';label.append(answer);
         const proof=input('Record reference or reason','textarea',q.answer?.evidence,300);
         const example=el('small');example.id='evidence-example-'+q.id;
@@ -206,12 +215,12 @@
         const owner=input('Action owner or role','text',q.answer?.owner,80), due=input('Target date','date',q.answer?.due);
         grid.append(label,proof.wrap,reviewer.wrap,owner.wrap,due.wrap);
         function guidance(){
-          const value=answer.value, excluded=value==='Not triggered', issue=['Partly','No','Not sure'].includes(value);
-          reviewer.wrap.hidden=!excluded;reviewer.node.required=excluded;proof.node.required=excluded||value==='Yes';
+          const value=answer.value, excluded=value==='Not triggered', issue=!routeSetup(q)&&['Partly','No','Not sure'].includes(value);
+          reviewer.wrap.hidden=!excluded;reviewer.node.required=excluded;proof.node.required=routeSetup(q)||excluded||value==='Yes';
           owner.wrap.hidden=due.wrap.hidden=!issue;
           example.textContent=evidenceExample(q,value,current.scope.route);
-          const latest=current.review.applicable.find(item=>item.id===q.id);
-          next.textContent=latest.blocked&&value!=='Not triggered'?latest.next:issue?(value==='Not sure'?'Verify the facts and collect evidence. ':'')+q.action:
+          next.textContent=routeSetup(q)?(value?'Enter the reference confirming this office’s complaint route.':q.next):
+            issue?(value==='Not sure'?'Verify the facts and collect evidence. ':'')+q.action:
             value==='Yes'?'Enter a short reference to the record you checked.':
             excluded?'Record why the condition did not arise and who reviewed it.':q.next;
         }
@@ -241,14 +250,14 @@
     current=state;dirty=false;form.hidden=!!state.scope;$('review').hidden=!state.scope;
     if(!state.scope){fields.year.value=fields.year.max;refreshScope();return;}
     const s=state.scope;
-    $('scope-label').textContent=state.organisation+' · '+s.workplace+' · '+s.district+' · '+s.year+' · '+s.route+' route';
+    $('scope-label').textContent=state.organisation+' · '+s.workplace+' · '+s.district+' · '+s.year+' · '+(s.route?s.route+' route':'Confirm complaint route');
     const items=state.review.applicable, navigation=$('question-nav');
     if(!items.some(q=>q.id===selectedId))selectedId=(items.find(q=>!q.answer)||items[0])?.id??null;
     navigation.replaceChildren(...items.map(q=>new Option(questionLabel(q)+(q.answer?' · Saved':''),String(q.id))));
     navigation.value=String(selectedId);
     $('filter-label').hidden=state.final;
     const rank={Critical:0,High:1,Medium:2,Low:3};
-    const actions=items.filter(q=>q.answer&&(q.blocked||!['Yes','Not triggered'].includes(q.answer.value)))
+    const actions=items.filter(q=>q.answer&&(q.blocked||(!routeSetup(q)&&!['Yes','Not triggered'].includes(q.answer.value))))
       .sort((a,b)=>(rank[a.priority]??4)-(rank[b.priority]??4));
     $('actions-label').textContent='Management action summary ('+actions.length+')';
     $('actions').replaceChildren(...actions.map(q=>el('li',questionLabel(q)+' · '+q.priority+' · '+q.next+' Owner: '+(q.answer.owner||'Unassigned')+' · Target: '+(q.answer.due||'Unset'))));
@@ -269,4 +278,5 @@
   });
   run(async()=>{render(await api());notice(current.scope?'Saved assessment loaded.':'Verify the scope before starting.');});
 })();
+
 

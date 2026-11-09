@@ -21,7 +21,7 @@
 </div></fieldset>
 <fieldset class="scope-group"><legend>Worker counts</legend><div class="assessment-grid">
 <label>Total workers across the entire establishment<input name="workers" type="number" min="0" max="10000000" step="1" aria-describedby="workers-help" required><small id="workers-help">Include eligible workers across the head office, branches and other units of this establishment, including eligible contract and temporary workers.</small></label>
-<label id="site-workers" hidden>Workers at this office only<input name="siteWorkers" type="number" min="0" max="10000000" step="1" aria-describedby="site-workers-help"><small id="site-workers-help">This count is part of the establishment total above.</small></label>
+<label id="site-workers" hidden>Workers at the head office or branch being reviewed<input name="siteWorkers" type="number" min="0" max="10000000" step="1" aria-describedby="site-workers-help"><small id="site-workers-help">Count only workers at the office named above. For a small office in a larger establishment, the checklist asks you to verify which complaint route applies.</small></label>
 </div><p id="route-preview" class="scope-route" aria-live="polite"></p></fieldset>
 <fieldset class="scope-group"><legend>What applies this year</legend><div class="assessment-grid">
 <label>Did this workplace receive, handle or carry forward any POSH complaints during the review year?<select name="complaints" aria-describedby="complaints-help" required><option value="">Choose</option><option>Yes</option><option>No</option></select><small id="complaints-help">This answer selects the later complaint-handling checks. Enter no names or case details here.</small></label>
@@ -45,3 +45,4 @@
 <a class="button" id="report" hidden>Download final management PDF</a></section>
 </section>
 </main></body></html>
+

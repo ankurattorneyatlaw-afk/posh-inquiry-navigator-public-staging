@@ -76,15 +76,46 @@ test('PDF pagination keeps wrapped findings and excluded checks with their text'
   }
 });
 
-test('scope uses establishment count, excludes irrelevant checks and blocks portal update until approval',()=>{
+test('office count drives setup and mixed headcounts require a confirmed route',()=>{
   const lc=assessmentView(scopeFrom(input),{},checks);
   assert.deepEqual(lc.applicable.map(q=>q.id),[8,60]);
-  const ic=scopeFrom({...input,workers:10,siteType:'branch',siteWorkers:3});
-  assert.equal(ic.route,'IC');
-  assert.deepEqual(assessmentView(ic,{},checks).applicable.map(q=>q.id),[1,8,61,62]);
-  assert.equal(assessmentView(ic,{},checks).applicable.at(-1).blocked,true);
-  assert.equal(assessmentView(ic,{61:{value:'Yes'}},checks).applicable.at(-1).blocked,false);
+  for(const siteType of ['branch','head office']){
+    const smallOffice=scopeFrom({...input,workers:10,siteType,siteWorkers:3});
+    const portal=siteType==='branch'?61:60;
+    assert.equal(smallOffice.route,'LC');
+    assert.deepEqual(assessmentView(smallOffice,{},checks).applicable.map(q=>q.id),[900]);
+    const lcReview=assessmentView(smallOffice,{900:{value:'No'}},checks);
+    assert.deepEqual(lcReview.applicable.map(q=>q.id),[900,8,portal]);
+    assert.equal(lcReview.open,0);
+    const confirmed={900:{value:'Yes'}};
+    assert.deepEqual(assessmentView(smallOffice,confirmed,checks).applicable.map(q=>q.id),[900,1,8,portal,62]);
+    const blocked=assessmentView(smallOffice,{...confirmed,62:{value:'Not triggered'}},checks).applicable.at(-1);
+    assert.equal(blocked.answer.value,'Blocked');
+    assert.equal(blocked.blocked,true);
+    assert.equal(assessmentView(smallOffice,{...confirmed,[portal]:{value:'Yes'}},checks).applicable.at(-1).blocked,false);
+    assert.equal(scopeFrom({...input,workers:15,siteType,siteWorkers:10}).route,'IC');
+  }
   assert.throws(()=>scopeFrom({...input,siteType:'branch',siteWorkers:9}),/office headcount/);
+});
+
+test('old drafts request route confirmation and avoid reusing answers from the other route',()=>{
+  const scope={...scopeFrom({...input,workers:10,siteType:'branch',siteWorkers:8}),route:'IC'};
+  const shared={id:10,title:'Policy access',question:'Can workers access it?'};
+  const catalogue=[...checks,shared];
+  const old={8:{value:'Yes',evidence:'IC contacts'},10:{value:'Yes',evidence:'Policy'}};
+  assert.deepEqual(assessmentView(scope,old,catalogue).applicable.map(q=>q.id),[900]);
+  const view=assessmentView(scope,{...old,900:{value:'No'}},catalogue);
+  assert.equal(view.applicable.find(q=>q.id===8).answer,null);
+  assert.equal(view.applicable.find(q=>q.id===10).answer.evidence,'Policy');
+  const refreshed={...old,8:{value:'Yes',evidence:'LC contacts',route:'LC'},900:{value:'No'}};
+  assert.equal(assessmentView(scope,refreshed,catalogue).applicable.find(q=>q.id===8).answer.evidence,'LC contacts');
+});
+
+test('a new SHe-Box approval invalidates an earlier update answer after a blocker',()=>{
+  const scope=scopeFrom({...input,workers:10});
+  const oldUpdate={value:'Yes',sequence:3};
+  assert.equal(assessmentView(scope,{60:{value:'No',sequence:4},62:oldUpdate},checks).applicable.at(-1).answer.value,'Blocked');
+  assert.equal(assessmentView(scope,{60:{value:'Yes',sequence:5},62:oldUpdate},checks).applicable.at(-1).answer,null);
 });
 
 test('saved answers choose the next question and changed parent answers invalidate stale follow-ups',()=>{
@@ -171,3 +202,4 @@ test('review year is bounded by the current year in India',()=>{
   assert.equal(scopeFrom({...base,year:2027},after).year,2027);
   assert.throws(()=>scopeFrom({...base,year:2028},after),/2013 to 2027/);
 });
+

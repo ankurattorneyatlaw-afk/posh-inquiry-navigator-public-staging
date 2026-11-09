@@ -3,6 +3,15 @@ const {stagingOrigin}=require('./plan-store.cjs');
 const {ic,lc,referenceExamples}=require('./compliance-reference.cjs');
 const orderPattern=/^order_[A-Za-z0-9]{1,40}$/;
 const choices=['Yes','Partly','No','Not sure'];
+const coverageId=900;
+const officeCount=scope=>scope.siteType==='standalone'?scope.workers:scope.siteWorkers;
+const needsCoverage=scope=>officeCount(scope)<10&&scope.workers>=10;
+function reviewScope(scope,answers){
+  const route=needsCoverage(scope)
+    ?({Yes:'IC',No:'LC'}[answers?.[coverageId]?.value]||null)
+    :officeCount(scope)>=10?'IC':'LC';
+  return {...scope,route};
+}
 const followUps={
   1:'issuing or locating the signed IC constitution order',
   7:'displaying the current IC order',
@@ -44,11 +53,26 @@ function scopeFrom(input, now=Date.now()) {
   }
   return {workplace,district,year,workers,siteType,siteWorkers:siteType==='standalone'?null:siteWorkers,
     complaints,employer,listed:employer==='company'&&listed,mca:employer==='company'&&mca,
-    sebi:employer==='company'&&listed&&sebi,route:workers>=10?'IC':'LC'};
+    sebi:employer==='company'&&listed&&sebi,route:(siteType==='standalone'?workers:siteWorkers)>=10?'IC':'LC'};
 }
 
 function assessmentView(scope,answers,catalogue) {
   const applicable=[],excluded=[];
+  const storedRoute=scope.route;
+  scope=reviewScope(scope,answers);
+  if(needsCoverage(scope)){
+    const answer=answers[coverageId]||null;
+    applicable.push({id:coverageId,title:'Confirm the complaint route for this office',topic:'Review setup',
+      priority:'Critical',authority:'Act sections 4(1) and 6(1)',
+      question:'Has HR or Legal confirmed that an Internal Committee (IC) covers this office or must be constituted for it?',
+      proof:'Check the written IC order, which workplaces it covers and how this office is organised. Ask HR or Legal to confirm the route for this office.',
+      action:'Confirm the route for this office before continuing.',
+      referenceExamples:{Yes:'HR confirmed coverage in the signed IC order IC-01, which names this office.',
+        No:'Legal confirmed the district LC route for this office in review note ROUTE-01.'},
+      answer,blocked:false,availableAnswers:['Yes','No'],
+      next:answer?'Route confirmed for this assessment.':'Choose Yes for the IC route. Choose No only after HR or Legal confirms the district LC route. Record the confirmation reference either way.'});
+    if(!scope.route)return {applicable,excluded,remaining:1,open:0};
+  }
   for (const check of catalogue) {
     const reason=check.ic&&scope.route==='LC'?'IC-only check. This assessment follows the LC route.':
       check.case&&!scope.complaints?'No complaints were received, handled or carried forward in the review year.':
@@ -64,9 +88,17 @@ function assessmentView(scope,answers,catalogue) {
     const action=lcCheck&&check.id!==23
       ?'Check authorised LC correspondence and follow up on any employer action that is outstanding.'
       :text.action;
-    const answer=answers[check.id]||null;
-    const blocked=check.id===62&&answer?.value!=='Not triggered'&&answers[scope.siteType==='branch'?61:60]?.value!=='Yes';
-    const next=blocked?'SHe-Box IC update is blocked until Head Office approval or branch mapping is verified.':
+    const savedAnswer=answers[check.id];
+    const routeSensitive=Boolean(check.ic||check.IC||check.LC||lc[check.id]||ic[check.id]);
+    const prerequisite=answers[scope.siteType==='branch'?61:60];
+    const blocked=check.id===62&&prerequisite?.value!=='Yes';
+    const blockedNext=scope.siteType==='branch'
+      ?'SHe-Box IC update is blocked until this branch is confirmed under its approved Head Office login.'
+      :'SHe-Box IC update is blocked until District Officer approval of Head Office registration is confirmed.';
+    const answer=blocked?{value:'Blocked',evidence:prerequisite?.evidence||'',owner:prerequisite?.owner||'',due:prerequisite?.due||''}:
+      savedAnswer&&(!routeSensitive||(savedAnswer.route||storedRoute)===scope.route)&&
+        !(check.id===62&&savedAnswer.sequence<prerequisite?.sequence)?savedAnswer:null;
+    const next=blocked?blockedNext:
       !answer?'Review the suggested evidence and choose an answer.':
       answer.value==='Yes'?'Evidence recorded.':
       answer.value==='Not triggered'?'Exclusion reason and reviewer recorded.':
@@ -74,7 +106,7 @@ function assessmentView(scope,answers,catalogue) {
     applicable.push({id:check.id,title,topic:check.topic,priority:check.priority,
       authority:check.authority,question,proof,action,referenceExamples:referenceExamples(check.id,scope),
       ...(lcCheck?{referenceNote:'Use only authorised references and dates. If you cannot verify an LC step, choose Not sure. Keep names and case details out of this assessment and PDF.'}:{}),
-      conditional:check.conditional,answer,next,blocked});
+      conditional:check.conditional,answer,next,blocked,routeSensitive});
     const task=followUps[check.id];
     if(!task||!['No','Partly','Not sure'].includes(answer?.value))continue;
     const verification=answer.value==='Not sure';
@@ -92,15 +124,18 @@ function assessmentView(scope,answers,catalogue) {
       action:followUpAction,conditional:false,answer:saved,next:saved?.value==='Yes'?'Follow-up assignment recorded.':followUpAction,blocked:false});
   }
   return {applicable,excluded,remaining:applicable.filter(q=>!q.answer).length,
-    open:applicable.filter(q=>q.answer&&(q.blocked||!['Yes','Not triggered'].includes(q.answer.value))).length};
+    open:applicable.filter(isOpen).length};
 }
+
+const isOpen=q=>q.answer&&(q.blocked||(q.id!==coverageId&&!['Yes','Not triggered'].includes(q.answer.value)));
 
 function answerFrom(input,check) {
   if (!object(input)||!check) throw problem(400,'Choose an applicable check.');
   const value=input.value, evidence=clean(input.evidence,300), reviewer=clean(input.reviewer,80);
   const owner=clean(input.owner,80), due=clean(input.due,10);
-  if (!choices.includes(value)&&!(check.conditional&&value==='Not triggered')) throw problem(400,'Choose an available answer.');
-  if (value==='Yes'&&check.blocked) throw problem(409,'Verify Head Office approval or branch mapping before marking the IC update Yes.');
+  if (check.blocked) throw problem(409,check.next);
+  if (!(check.availableAnswers||choices).includes(value)&&!(check.conditional&&value==='Not triggered')) throw problem(400,'Choose an available answer.');
+  if (check.id===coverageId&&!evidence) throw problem(400,'Add the reference confirming the complaint route for this office.');
   if (value==='Yes'&&!evidence) throw problem(400,'Add a record reference before marking Yes.');
   if (value==='Not triggered'&&(evidence.length<10||!reviewer)) throw problem(400,'Add the reason and the reviewer’s role before excluding this check.');
   if (due&&!isoDate(due)) throw problem(400,'Enter a valid target date.');
@@ -159,11 +194,12 @@ function pdf(snapshot) {
   line('Applicable: '+review.applicable.length+' | Open findings and follow-ups: '+review.open+' | Excluded by setup: '+review.excluded.length);
   line(); line('FINDINGS AND ACTIONS');
   const rank={Critical:0,High:1,Medium:2,Low:3};
-  const open=q=>q.blocked||!['Yes','Not triggered'].includes(q.answer.value);
+  const open=isOpen;
   const ordered=[...review.applicable].sort((a,b)=>Number(open(b))-Number(open(a))||(rank[a.priority]??4)-(rank[b.priority]??4));
   for (const q of ordered) {
     const parent=q.parentId&&review.applicable.find(item=>item.id===q.parentId);
-    line((parent?parent.title+' | ':'')+q.title+' | '+q.priority+' | '+q.answer.value);
+    const value=q.id===coverageId?'Confirmed '+scope.route+' route':q.answer.value;
+    line((parent?parent.title+' | ':'')+q.title+' | '+q.priority+' | '+value);
     if(q.parentId)line(q.question);
     if (q.authority) line('Basis: '+q.authority);
     if (q.answer.evidence) line('Reference / reason: '+q.answer.evidence);
@@ -224,7 +260,8 @@ function createAssessmentHandler({identify,store,origin,now=Date.now}) {
       }
       const response=value=>{
         const {catalogue,answers,...rest}=value;
-        return send(200,{...rest,review:value.final?.review||(value.scope?assessmentView(value.scope,answers,catalogue):null),final:!!value.final});
+        return send(200,{...rest,scope:value.final?.scope||(value.scope?reviewScope(value.scope,answers):null),
+          review:value.final?.review||(value.scope?assessmentView(value.scope,answers,catalogue):null),final:!!value.final});
       };
       if(req.method==='GET')return response(current);
       let size=0;const chunks=[];
@@ -242,10 +279,11 @@ function createAssessmentHandler({identify,store,origin,now=Date.now}) {
       let saved;
       if(data.action==='save'){
         const check=review.applicable.find(q=>q.id===data.id);
-        saved=await store(buyer,order,'save',{id:data.id,answer:{...answerFrom(data.answer,check),sequence:data.revision+1}},data.revision);
+        saved=await store(buyer,order,'save',{id:data.id,answer:{...answerFrom(data.answer,check),sequence:data.revision+1,
+          ...(check.routeSensitive?{route:reviewScope(current.scope,current.answers).route}:{})}},data.revision);
       }else if(data.action==='finish'){
         if(review.remaining)return send(409,{error:'Answer all applicable checks before finalising.'});
-        saved=await store(buyer,order,'finish',{scope:current.scope,review,organisation:current.organisation,order,finalisedAt:new Date(now()).toISOString()},data.revision);
+        saved=await store(buyer,order,'finish',{scope:reviewScope(current.scope,current.answers),review,organisation:current.organisation,order,finalisedAt:new Date(now()).toISOString()},data.revision);
       }else return send(400,{error:'Unknown assessment action.'});
       return saved?.conflict?send(409,{error:'The assessment changed. Reload it before continuing.'}):response(saved);
     }catch(error){return send(error.status||503,{error:error.status?error.message:'The assessment could not be opened or saved. Retry from your order.'});}
@@ -268,3 +306,4 @@ function fromEnvironment(identify) {
   return createAssessmentHandler({identify,store,origin});
 }
 module.exports={fromEnvironment,createAssessmentHandler,scopeFrom,assessmentView,pdf};
+
