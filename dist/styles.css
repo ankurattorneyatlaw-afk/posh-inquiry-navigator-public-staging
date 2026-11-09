@@ -627,3 +627,7 @@ body{overflow-wrap:anywhere}
 .preview-start li{padding:0;margin:0 0 .6em}
 
 .required-mark{color:#146346;font-weight:750;white-space:nowrap}
+.finder-jump{justify-content:flex-start;flex-wrap:wrap}
+.finder-jump[hidden]{display:none}
+.finder-jump label{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0;font-weight:700}
+.finder-jump select{width:auto;min-width:5rem;margin:0}
