@@ -149,6 +149,9 @@ function professionalTools(data){
       const file=input.files[0];
       if(!file||file.size>2_000_000)throw Error('Choose a Navigator recovery file up to 2 MB.');
       const content=JSON.parse(await file.text());
+      const evidenceUrl=new URL("/evidence.js",location.origin);
+      if(testOrder)evidenceUrl.searchParams.set("testOrder",testOrder);
+      try{await import(evidenceUrl.href);}catch{throw Error("Evidence import is unavailable. Verify your plan access and try again.");}
       evidence=window.NavigatorEvidence.restore(content.evidence?.record||content.record||content).items;
       summary.textContent=evidence.length+' coded references loaded in this tab.';
     }catch(error){evidence=[];summary.textContent=error.message;}
