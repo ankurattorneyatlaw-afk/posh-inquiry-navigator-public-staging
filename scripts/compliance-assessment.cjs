@@ -1,6 +1,6 @@
 'use strict';
 const {stagingOrigin}=require('./plan-store.cjs');
-const {lc,referenceExamples}=require('./compliance-reference.cjs');
+const {ic,lc,referenceExamples}=require('./compliance-reference.cjs');
 const orderPattern=/^order_[A-Za-z0-9]{1,40}$/;
 const choices=['Yes','Partly','No','Not sure'];
 const followUps={
@@ -58,7 +58,9 @@ function assessmentView(scope,answers,catalogue) {
     if (reason) {excluded.push({id:check.id,title:check.title,reason});continue;}
     const text=check[scope.route]||check;
     const lcCheck=scope.route==='LC'&&lc[check.id];
-    const [question,proof]=lcCheck||[text.question,text.proof];
+    const icCheck=scope.route==='IC'&&ic[check.id];
+    const [question,proof]=lcCheck||icCheck||[text.question,text.proof];
+    const title=scope.route==='IC'&&check.id===32?'IC member contacts':check.title;
     const action=lcCheck&&check.id!==23
       ?'Check authorised LC correspondence and follow up on any employer action that is outstanding.'
       :text.action;
@@ -69,8 +71,8 @@ function assessmentView(scope,answers,catalogue) {
       answer.value==='Yes'?'Evidence recorded.':
       answer.value==='Not triggered'?'Exclusion reason and reviewer recorded.':
       answer.value==='Not sure'?'Verify the facts and collect evidence. '+action:action;
-    applicable.push({id:check.id,title:check.title,topic:check.topic,priority:check.priority,
-      authority:check.authority,question,proof,action,referenceExamples:referenceExamples(check.id,scope.route),
+    applicable.push({id:check.id,title,topic:check.topic,priority:check.priority,
+      authority:check.authority,question,proof,action,referenceExamples:referenceExamples(check.id,scope),
       ...(lcCheck?{referenceNote:'Use only authorised references and dates. If you cannot verify an LC step, choose Not sure. Keep names and case details out of this assessment and PDF.'}:{}),
       conditional:check.conditional,answer,next,blocked});
     const task=followUps[check.id];
@@ -107,7 +109,7 @@ function answerFrom(input,check) {
 }
 
 function pdf(snapshot) {
-  const maxLines=52, pageLines=[];
+  const lineHeight=13, maxLines=56, pageLines=[];
   let lines=[];
   function line(value='') {
     // WinAnsi standard fonts are available in PDF readers. Preserve unsupported characters as code points.
@@ -178,7 +180,7 @@ function pdf(snapshot) {
     const page=objects.length+1;
     pages.push(page+' 0 R');
     objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents '+(page+1)+' 0 R >>');
-    const stream='BT /F1 10 Tf 42 800 Td 14 TL '+pageContent.map(t=>'('+escape(t)+') Tj T*').join('\n')+' ET';
+    const stream='BT /F1 10 Tf 42 800 Td '+lineHeight+' TL '+pageContent.map(t=>'('+escape(t)+') Tj T*').join('\n')+' ET';
     objects.push('<< /Length '+Buffer.byteLength(stream,'latin1')+' >>\nstream\n'+stream+'\nendstream');
   }
   objects[1]='<< /Type /Pages /Count '+pages.length+' /Kids ['+pages.join(' ')+'] >>';

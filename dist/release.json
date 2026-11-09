@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.34.0-compliance-record-references-staging",
+  "version": "6.35.0-compliance-ic-review-staging",
   "environment": "staging",
   "search": {
     "indexable": false,

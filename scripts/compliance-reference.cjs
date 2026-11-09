@@ -1,5 +1,18 @@
 'use strict';
 
+const ic = {
+  8:['Can workers find the district Local Committee (LC) contact and instructions for complaints against the employer?',
+    'Verified district LC or nodal officer contact and a dated staff communication explaining when to use that route.'],
+  22:['Did the Internal Committee send its findings report to the employer within 10 days of completing the inquiry and make it available to both parties?',
+    'Restricted reference showing the inquiry completion date, report dispatch date and when both parties could access it.'],
+  23:['Were the Internal Committee’s recommendations acted on within 60 days of receipt, and was the appeal route communicated?',
+    'Restricted reference showing the recommendation receipt and implementation dates and how the appeal route was communicated.'],
+  28:['Does the IC annual report include all five required details?',
+    'Complaints received, complaints disposed of, cases pending over 90 days, workshops or awareness programmes held, and the nature of action taken by the employer or District Officer.'],
+  32:['Can workers find the names and current contact details of all IC members?',
+    'Current IC roster and a dated staff notice showing the names and contact details of all members.']
+};
+
 // The buyer records what they can verify from authorised correspondence.
 // The committee's internal file remains in restricted custody.
 const lc = {
@@ -65,9 +78,9 @@ const examples = {
     No:'The noticeboard still shows v2. Workers cannot access the approved v3.',
     Partly:'The intranet has v3. The staff noticeboard still shows v2.',
     'Not sure':'HR holds v3. Worker access to the latest version still needs to be checked.'},
-  11:{Yes:'12 Oct awareness briefing. Agenda and facilitator details in TRAIN-04, with attendance for all 8 workers.',
+  11:{Yes:'TRAIN-04 lists the awareness session dates, agendas and facilitators. Attendance records cover the relevant shifts and locations.',
     No:'The training calendar and attendance register show no employee POSH session during the review year.',
-    Partly:'TRAIN-04 records 6 of 8 workers at the 12 Oct briefing. Catch-up is scheduled for the other 2 on 20 Nov.',
+    Partly:'TRAIN-04 shows day-shift attendance at the 12 Oct briefing. A catch-up session for the evening shift is scheduled for 20 Nov.',
     'Not sure':'An invitation for the 12 Oct briefing is on file. Attendance and session delivery still need verification.'},
   29:{Yes:'Annual report, POSH disclosure on p. 8, records complaints filed and their disposal.',
     No:'The annual report omits POSH figures, and no district intimation is on file.',
@@ -76,8 +89,31 @@ const examples = {
   50:{'Not sure':'Last year’s district circular is on file. The reporting channel and deadline for the review year still need verification.'}
 };
 
-function referenceExamples(id, route) {
-  const samples={...examples[id]};
+const icExamples = {
+  8:{Yes:'Staff notice LC-08 explains how to contact the district LC for a complaint against the employer. Contact verified on 9 Nov.',
+    Partly:'Staff notice LC-08 lists the district LC number. It still needs to explain when workers should use it.'},
+  22:{Yes:'Restricted dispatch log FIND-01 records inquiry completion on 2 Nov, delivery to the employer on 5 Nov, and availability to both parties on 5 Nov.',
+    No:'FIND-01 shows that the inquiry ended on 2 Nov and the report was first sent to the employer on 17 Nov.',
+    Partly:'FIND-01 shows completion on 2 Nov and delivery to the employer on 5 Nov. Availability to both parties still needs verification.',
+    'Not sure':'The signed report is on file. Its completion date and dated dispatch record still need verification.'},
+  23:{Yes:'Restricted action tracker IMPL-01 records receipt on 5 Nov, implementation on 20 Nov and when appeal information was shared.'},
+  28:{Yes:'IC annual report AR-01, p. 2, records one complaint received and disposed of, none pending over 90 days, two awareness programmes and a summary of action taken.',
+    Partly:'AR-01 records complaints received and disposed of. The pending-over-90-days count, awareness programme count and description of action still need checking.'},
+  32:{Yes:'Staff notice IC-CONTACT-01, dated 9 Nov, lists the names and current contact details of every member on the signed IC roster.',
+    No:'The current IC roster is on file. No notice giving workers the member names and contact details was found.',
+    Partly:'The staff notice names all current IC members. Contact details for the newly appointed member still need to be added.',
+    'Not sure':'A dated staff notice is on file. Check the member names and contact details against the current IC roster.'},
+  44:{Yes:'Website screenshot WEB-IC-01, dated 9 Nov, shows current IC contacts and how to reach the district LC for complaints against the employer.',
+    No:'The website reporting page gives neither the IC contact details nor instructions for complaints against the employer.',
+    Partly:'WEB-IC-01 shows current IC contact details. The district LC instructions for complaints against the employer are missing.',
+    'Not sure':'The website reporting page is live. Check the IC contacts and verify the district LC details against the official directory.'}
+};
+
+function referenceExamples(id, {route,complaints}) {
+  const samples={...examples[id],...(route==='IC'?icExamples[id]:undefined)};
+  if (route==='IC'&&id===28&&!complaints) {
+    samples.Yes='IC annual report AR-01, p. 2, records zero complaints received, disposed of or pending over 90 days, two awareness programmes and no case action taken.';
+  }
   if (route==='LC'&&lc[id]) {
     const proof=lc[id][1].replace(/\.$/,'');
     const evidence=proof[0].toLowerCase()+proof.slice(1);
@@ -94,4 +130,4 @@ function referenceExamples(id, route) {
   return samples;
 }
 
-module.exports={lc,referenceExamples};
+module.exports={ic,lc,referenceExamples};

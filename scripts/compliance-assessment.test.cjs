@@ -14,15 +14,42 @@ const checks=[
   {id:62,title:'IC update',topic:'Portal',question:'Is the IC current?',proof:'Receipt',action:'Update the IC',ic:true,conditional:true}
 ];
 const input={workplace:'Gurugram office',district:'Gurugram',year:2026,workers:8,siteType:'standalone',complaints:false,employer:'other'};
-test('the LC inquiry report check uses authorised records without changing the IC question',()=>{
+test('the inquiry report check distinguishes IC dispatch and authorised LC confirmation',()=>{
   const report={id:22,title:'Inquiry report',case:true,question:'Original IC question',proof:'Original IC proof'};
   const [lc]=assessmentView(scopeFrom({...input,complaints:true}),{},[report]).applicable;
   assert.match(lc.question,/Local Committee.*District Officer within 10 days/);
   assert.match(lc.referenceNote,/choose Not sure/);
   assert.match(lc.referenceExamples.Yes,/LC confirmation LC-22/);
   const [ic]=assessmentView(scopeFrom({...input,workers:10,complaints:true}),{},[report]).applicable;
-  assert.equal(ic.question,report.question);
+  assert.match(ic.question,/Internal Committee.*within 10 days/);
+  assert.match(ic.referenceExamples.Yes,/completion on 2 Nov, delivery to the employer on 5 Nov/);
   assert.equal(ic.referenceNote,undefined);
+});
+
+test('IC examples show the reporting routes and select annual report details based on complaint setup',()=>{
+  const ids=[8,11,28,32,44];
+  const catalogue=ids.map(id=>({id,title:'Check '+id,question:'Question',proof:'Proof'}));
+  const scope=scopeFrom({...input,workers:10});
+  const byId=complaints=>Object.fromEntries(assessmentView({...scope,complaints},{},catalogue).applicable.map(q=>[q.id,q]));
+  const no=byId(false), yes=byId(true);
+  assert.match(no[28].question,/five required details/);
+  assert.match(no[28].referenceExamples.Yes,/zero complaints.*two awareness programmes.*no case action/);
+  assert.match(yes[28].referenceExamples.Yes,/one complaint.*summary of action/);
+  assert.match(no[8].referenceExamples.Yes,/complaint against the employer/);
+  assert.match(no[11].referenceExamples.Yes,/relevant shifts and locations/);
+  assert.match(no[32].referenceExamples.Yes,/contact details of every member/);
+  assert.match(no[44].referenceExamples.Yes,/current IC contacts.*district LC.*against the employer/);
+});
+
+test('a pair of short exclusions fits with the last findings without creating another PDF page',()=>{
+  const applicable=Array.from({length:11},(_,i)=>({
+    title:'Finding '+i,priority:'High',authority:'Basis '+i,answer:{value:'Yes',evidence:'Record '+i}
+  }));
+  const excluded=[{title:'Excluded 1',reason:'Company-only.'},{title:'Excluded 2',reason:'Branch-only.'}];
+  const report=pdf({scope:scopeFrom({...input,workers:10}),review:{applicable,excluded,open:0},
+    organisation:'Test employer',order:'order_short_tail',finalisedAt:'2026-11-09T00:00:00Z'}).toString('latin1');
+  assert.match(report,/\/Type \/Pages \/Count 1\b/);
+  assert.match(report,/Excluded 2 \| Branch-only/);
 });
 
 test('PDF pagination keeps wrapped findings and excluded checks with their text',()=>{
