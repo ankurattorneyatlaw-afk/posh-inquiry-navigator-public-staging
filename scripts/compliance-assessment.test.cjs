@@ -25,6 +25,22 @@ test('scope uses establishment count, excludes irrelevant checks and blocks port
   assert.throws(()=>scopeFrom({...input,siteType:'branch',siteWorkers:9}),/office headcount/);
 });
 
+test('saved answers choose the next question and changed parent answers invalidate stale follow-ups',()=>{
+  const scope=scopeFrom(input);
+  const answers={8:{value:'No',sequence:1},1016:{value:'Yes',branchKey:'1',evidence:'Assigned action'}};
+  let review=assessmentView(scope,answers,checks);
+  assert.deepEqual(review.applicable.map(q=>q.id),[8,1016,60]);
+  assert.equal(review.applicable[1].answer.value,'Yes');
+  answers[8]={value:'Not sure',sequence:3};
+  review=assessmentView(scope,answers,checks);
+  assert.deepEqual(review.applicable.map(q=>q.id),[8,1017,60]);
+  assert.match(review.applicable[1].question,/verify the facts/);
+  answers[8]={value:'No',sequence:4};
+  assert.equal(assessmentView(scope,answers,checks).applicable[1].answer,null);
+  answers[8]={value:'Yes',sequence:5,evidence:'Current display record'};
+  assert.deepEqual(assessmentView(scope,answers,checks).applicable.map(q=>q.id),[8,60]);
+});
+
 test('captured order locks one scope, resumes, rejects conflicts and provides a repeatable final PDF',async ()=>{
   const order='order_assessment1';
   const origin='https://navigator.example';
@@ -65,15 +81,22 @@ test('captured order locks one scope, resumes, rejects conflicts and provides a 
   assert.equal((await request({action:'save',id:60,revision:0,answer:{value:'No'}})).status,409);
   const resumed=await (await request()).json();
   assert.equal(resumed.review.applicable[0].answer.owner,'HR');
-  assert.equal((await request({action:'save',id:60,revision:1,answer:{value:'Partly',evidence:'Approval pending'}})).status,200);
-  const done=await (await request({action:'finish',revision:2})).json();
+  assert.equal(resumed.review.applicable[1].id,1016);
+  assert.equal((await request({action:'save',id:1017,revision:1,answer:{value:'No'}})).status,400);
+  assert.equal((await request({action:'save',id:1016,revision:1,answer:{value:'Yes',evidence:'Action reference'}})).status,200);
+  assert.equal((await request({action:'save',id:60,revision:2,answer:{value:'Partly',evidence:'Approval pending'}})).status,200);
+  assert.equal((await request({action:'finish',revision:3})).status,409);
+  assert.equal((await request({action:'save',id:1120,revision:3,answer:{value:'Yes',evidence:'Follow-up assigned'}})).status,200);
+  const done=await (await request({action:'finish',revision:4})).json();
   assert.equal(done.final,true);assert.equal(done.review.open,2);
-  assert.equal((await request({action:'save',id:8,revision:3,answer:{value:'No'}})).status,409);
+  assert.equal((await request({action:'save',id:8,revision:5,answer:{value:'No'}})).status,409);
   const report=await request(null,'owner','/report');
   assert.equal(report.headers.get('content-type'),'application/pdf');
   const file=Buffer.from(await report.arrayBuffer());
   assert.equal(file.subarray(0,8).toString(),'%PDF-1.4');
   assert.match(file.toString('latin1'),/Approval pending/);
+  assert.match(file.toString('latin1'),/MANAGEMENT AND EMPLOYER REVIEW/);
+  assert.match(file.toString('latin1'),/P60 follow-up/);
   assert.deepEqual(file,Buffer.from(await (await request(null,'owner','/report')).arrayBuffer()));
   assert.equal((await request(null,'other','/report')).status,403);
 });

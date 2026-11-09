@@ -4,7 +4,7 @@
   const order=new URLSearchParams(location.search).get('order')||'';
   const endpoint='/api/compliance-assessment?order='+encodeURIComponent(order);
   const form=$('scope'), fields=form.elements;
-  let current=null,busy=false;
+  let current=null,busy=false,selectedId=null,dirty=false;
   const el=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node;};
   function notice(text){$('notice').textContent=text;}
   async function api(body) {
@@ -48,14 +48,13 @@
     if(max)node.maxLength=max;
     node.value=value||'';wrap.append(node);return {wrap,node};
   }
-  function renderChecks() {
-    const selected=$('topic').value;
+  const code=q=>'P'+String(q.parentId??q.id).padStart(2,'0')+(q.parentId?' follow-up':'');
+  function renderChecks(focus=false) {
     const list=$('checks');list.replaceChildren();
-    for(const q of current.review.applicable) {
+    for(const q of current.review.applicable.filter(q=>current.final||q.id===selectedId)) {
       const card=el('article');card.className='assessment-card';
       card.id='check-'+q.id;
-      card.hidden=!!selected&&selected!==q.topic;
-      const title=el('h3','P'+String(q.id).padStart(2,'0')+' · '+q.question);
+      const title=el('h3',code(q)+' · '+q.question);title.tabIndex=-1;
       const meta=el('p',q.topic+' · '+q.priority+' · '+q.authority);meta.className='check-meta';
       card.append(title,meta,el('p','What to look for: '+q.proof));
       const next=el('p',q.next);next.className='next';card.append(next);
@@ -83,20 +82,20 @@
             excluded?'Record why the condition did not arise and who reviewed it.':q.next;
         }
         answer.onchange=guidance;guidance();
-        const save=el('button','Save answer');save.className='button';save.type='submit';
+        const save=el('button','Save and continue');save.className='button';save.type='submit';
         entry.append(grid,save);card.append(entry);
+        entry.oninput=()=>{dirty=true;};
         entry.onsubmit=e=>{e.preventDefault();run(async()=>{
           const saved=await api({action:'save',id:q.id,revision:current.revision,answer:{value:answer.value,
             evidence:proof.node.value,reviewer:reviewer.node.value,owner:owner.wrap.hidden?'':owner.node.value,due:due.wrap.hidden?'':due.node.value}});
-          // Preserve unsaved inputs on other cards. Only update the saved result and progress.
-          current=saved;updateProgress();
-          for(const item of saved.review.applicable) {
-            if(item.id===q.id||item.id===62)$('check-'+item.id).querySelector('.next').textContent=item.next;
-          }
-          notice('Answer saved for P'+String(q.id).padStart(2,'0')+'.');
+          const items=saved.review.applicable, at=items.findIndex(item=>item.id===q.id);
+          selectedId=(items.slice(at+1).find(item=>!item.answer)||items.find(item=>!item.answer))?.id??q.id;
+          render(saved,true);
+          notice(saved.review.remaining?'Saved '+code(q)+'. The next applicable question is ready.':'All applicable questions are saved. Review the actions, then finalise.');
         });};
       }
       list.append(card);
+      if(focus&&!current.final)title.focus();
     }
   }
   function updateProgress() {
@@ -104,23 +103,30 @@
     $('progress').textContent=(v.applicable.length-v.remaining)+' of '+v.applicable.length+' answered · '+v.open+' open actions';
     $('finish').disabled=!!v.remaining;
   }
-  function render(state) {
-    current=state;form.hidden=!!state.scope;$('review').hidden=!state.scope;
+  function render(state,focus=false) {
+    current=state;dirty=false;form.hidden=!!state.scope;$('review').hidden=!state.scope;
     if(!state.scope){fields.year.value=new Date().getFullYear();refreshScope();return;}
     const s=state.scope;
     $('scope-label').textContent=state.organisation+' · '+s.workplace+' · '+s.district+' · '+s.year+' · '+s.route+' route';
-    const topic=$('topic'),old=topic.value;
-    topic.replaceChildren(new Option('All sections',''));
-    for(const item of new Set(state.review.applicable.map(q=>q.topic)))topic.append(new Option(item,item));
-    if(Array.from(topic.options).some(x=>x.value===old))topic.value=old;
+    const items=state.review.applicable, navigation=$('question-nav');
+    if(!items.some(q=>q.id===selectedId))selectedId=(items.find(q=>!q.answer)||items[0])?.id??null;
+    navigation.replaceChildren(...items.map(q=>new Option(code(q)+' · '+q.title+(q.answer?' · Saved':''),String(q.id))));
+    navigation.value=String(selectedId);
+    $('filter-label').hidden=state.final;
+    const rank={Critical:0,High:1,Medium:2,Low:3};
+    const actions=items.filter(q=>q.answer&&(q.blocked||!['Yes','Not triggered'].includes(q.answer.value)))
+      .sort((a,b)=>(rank[a.priority]??4)-(rank[b.priority]??4));
+    $('actions-label').textContent='Management action summary ('+actions.length+')';
+    $('actions').replaceChildren(...actions.map(q=>el('li',code(q)+' · '+q.priority+' · '+q.next+' Owner: '+(q.answer.owner||'Unassigned')+' · Target: '+(q.answer.due||'Unset'))));
     $('excluded-label').textContent='Excluded by setup ('+state.review.excluded.length+')';
     $('excluded').replaceChildren(...state.review.excluded.map(q=>el('li','P'+String(q.id).padStart(2,'0')+' · '+q.title+' — '+q.reason)));
     $('finish').hidden=state.final;$('report').hidden=!state.final;
     if(state.final){$('report').href='/api/compliance-assessment/report?order='+encodeURIComponent(order);$('final-note').textContent='This assessment is final. Download the same report from this order whenever you need it.';}
-    updateProgress();renderChecks();
+    updateProgress();renderChecks(focus);
   }
-  $('topic').onchange=()=>{
-    for(const q of current.review.applicable)$('check-'+q.id).hidden=!!$('topic').value&&$('topic').value!==q.topic;
+  $('question-nav').onchange=e=>{
+    if(dirty&&!confirm('Leave this question and discard its unsaved edits?')){e.target.value=String(selectedId);return;}
+    dirty=false;selectedId=Number(e.target.value);renderChecks(true);
   };
   $('reload').onclick=()=>run(async()=>{if(!confirm('Reload saved answers? Unsaved edits on this page will be discarded.'))return;render(await api());notice('Saved assessment loaded.');});
   $('finish').onclick=()=>run(async()=>{

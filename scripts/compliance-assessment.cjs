@@ -2,6 +2,25 @@
 const {stagingOrigin}=require('./plan-store.cjs');
 const orderPattern=/^order_[A-Za-z0-9]{1,40}$/;
 const choices=['Yes','Partly','No','Not sure'];
+const followUps={
+  1:'issuing or locating the signed IC constitution order',
+  7:'displaying the current IC order',
+  8:'confirming and displaying the district LC contact route',
+  9:'approving or locating the POSH policy',
+  11:'arranging the outstanding employee awareness sessions',
+  12:'arranging the outstanding IC orientation',
+  26:'submitting the annual report to the employer',
+  27:'submitting the annual report to the District Officer',
+  29:'completing the applicable employer disclosure or intimation',
+  39:'verifying committee coverage for the workplace',
+  44:'updating the website with the applicable complaint information',
+  57:'completing the applicable MCA or listed-entity disclosures',
+  60:'following up on Head Office registration and approval',
+  61:'adding this branch under the approved Head Office login',
+  62:'updating the IC after the portal prerequisite is verified',
+  63:'updating applicable SHe-Box compliance records',
+  64:'sending the current IC order through the applicable district channel'
+};
 const object=x=>x&&typeof x==='object'&&!Array.isArray(x);
 const clean=(v,max)=>typeof v==='string'?v.trim().slice(0,max):'';
 const integer=(v,min,max)=>Number.isInteger(v)&&v>=min&&v<=max;
@@ -44,6 +63,19 @@ function assessmentView(scope,answers,catalogue) {
     applicable.push({id:check.id,title:check.title,topic:check.topic,priority:check.priority,
       authority:check.authority,question:text.question,proof:text.proof,action:text.action,
       conditional:check.conditional,answer,next,blocked});
+    const task=followUps[check.id];
+    if(!task||!['No','Partly','Not sure'].includes(answer?.value))continue;
+    const verification=answer.value==='Not sure';
+    const id=1000+check.id*2+Number(verification);
+    const branchKey=String(answer.sequence??0);
+    const saved=answers[id]?.branchKey===branchKey?answers[id]:null;
+    const action=(verification?'Assign someone to verify the facts and report back before ':'Assign a responsible role and target date for ')+task+'.';
+    applicable.push({id,parentId:check.id,branchKey,title:verification?'Verification follow-up':'Corrective action follow-up',
+      topic:check.topic,priority:check.priority,authority:'Management follow-up',
+      question:verification?'Has a responsible person been assigned to verify the facts before '+task+'?':
+        'Has management assigned a responsible person and target date for '+task+'?',
+      proof:verification?'Verification request or task reference.':'Action assignment and target date reference.',
+      action,conditional:false,answer:saved,next:saved?.value==='Yes'?'Follow-up assignment recorded.':action,blocked:false});
   }
   return {applicable,excluded,remaining:applicable.filter(q=>!q.answer).length,
     open:applicable.filter(q=>q.answer&&(q.blocked||!['Yes','Not triggered'].includes(q.answer.value))).length};
@@ -58,7 +90,8 @@ function answerFrom(input,check) {
   if (value==='Yes'&&!evidence) throw problem(400,'Add a record reference before marking Yes.');
   if (value==='Not triggered'&&(evidence.length<10||!reviewer)) throw problem(400,'Add the reason and the reviewer’s role before excluding this check.');
   if (due&&!isoDate(due)) throw problem(400,'Enter a valid target date.');
-  return {value,evidence,reviewer:value==='Not triggered'?reviewer:'',owner,due};
+  return {value,evidence,reviewer:value==='Not triggered'?reviewer:'',owner,due,
+    ...(check.branchKey===undefined?{}:{branchKey:check.branchKey})};
 }
 
 function pdf(snapshot) {
@@ -76,19 +109,20 @@ function pdf(snapshot) {
     }
   }
   const {scope,review,organisation,order,finalisedAt}=snapshot;
-  line('POSH COMPLIANCE ASSESSMENT | THE COSMIC ENERGIZERS');
+  line('POSH COMPLIANCE ASSESSMENT | MANAGEMENT AND EMPLOYER REVIEW');
   line('STAGING TEST REPORT | SELF-ASSESSMENT');
   line('Organisation: '+organisation+' | Workplace: '+scope.workplace+' | '+scope.siteType);
   line('District: '+scope.district+' | Review year: '+scope.year+' | Route: '+scope.route);
   line('Establishment workers: '+scope.workers+(scope.siteWorkers===null?'':' | Office workers: '+scope.siteWorkers));
   line('Finalised: '+new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(finalisedAt))+' IST | '+order);
-  line('Applicable: '+review.applicable.length+' | Open actions: '+review.open+' | Excluded by setup: '+review.excluded.length);
+  line('Applicable: '+review.applicable.length+' | Open findings and follow-ups: '+review.open+' | Excluded by setup: '+review.excluded.length);
   line(); line('FINDINGS AND ACTIONS');
   const rank={Critical:0,High:1,Medium:2,Low:3};
   const open=q=>q.blocked||!['Yes','Not triggered'].includes(q.answer.value);
   const ordered=[...review.applicable].sort((a,b)=>Number(open(b))-Number(open(a))||(rank[a.priority]??4)-(rank[b.priority]??4));
   for (const q of ordered) {
-    line(q.id+' | '+q.title+' | '+q.priority+' | '+q.answer.value);
+    line((q.parentId?'P'+q.parentId+' follow-up':'P'+q.id)+' | '+q.title+' | '+q.priority+' | '+q.answer.value);
+    if(q.parentId)line(q.question);
     if (q.authority) line('Basis: '+q.authority);
     if (q.answer.evidence) line('Reference / reason: '+q.answer.evidence);
     if (q.answer.reviewer) line('Reviewer: '+q.answer.reviewer);
@@ -159,7 +193,7 @@ function createAssessmentHandler({identify,store,origin,now=Date.now}) {
       let saved;
       if(data.action==='save'){
         const check=review.applicable.find(q=>q.id===data.id);
-        saved=await store(buyer,order,'save',{id:data.id,answer:answerFrom(data.answer,check)},data.revision);
+        saved=await store(buyer,order,'save',{id:data.id,answer:{...answerFrom(data.answer,check),sequence:data.revision+1}},data.revision);
       }else if(data.action==='finish'){
         if(review.remaining)return send(409,{error:'Answer all applicable checks before finalising.'});
         saved=await store(buyer,order,'finish',{scope:current.scope,review,organisation:current.organisation,order,finalisedAt:new Date(now()).toISOString()},data.revision);

@@ -7,7 +7,7 @@
 <nav aria-label="Main navigation"><a href="/shop.html?product=compliance-checklist">Compliance checklist</a><a href="/workspace">My workspace</a></nav></header>
 <main id="assessment" class="digital-main">
 <p class="kicker">Organisation self-assessment</p><h1>POSH compliance checklist</h1>
-<p id="scope-label" class="lead">One workplace or branch per order. Save as you go, then finalise to download your report.</p>
+<p id="scope-label" class="lead">One workplace or branch per order. Answer online and the checklist adapts as you go. The management PDF is available after finalisation.</p>
 <p id="notice" role="status" aria-live="polite">Checking order access…</p>
 <a id="signin" hidden href="/account?product=compliance-checklist">Sign in to continue</a>
 <form id="scope" class="assessment-card" hidden>
@@ -29,12 +29,13 @@
 <button class="button" type="submit">Start this assessment</button>
 </form>
 <section id="review" hidden>
-<div class="assessment-card review-bar"><strong id="progress"></strong><label id="filter-label">Section <select id="topic"></select></label><button class="button" id="reload" type="button">Reload saved answers</button></div>
+<div class="assessment-card review-bar"><strong id="progress"></strong><label id="filter-label">Current question <select id="question-nav"></select></label><button class="button" id="reload" type="button">Reload saved answers</button></div>
 <p class="small">Use references or role names. Keep complaint identities, allegations and source documents in your organisation’s restricted records.</p>
 <div id="checks" class="check-list"></div>
+<details class="assessment-card"><summary id="actions-label">Management action summary</summary><ul id="actions"></ul></details>
 <details class="assessment-card"><summary id="excluded-label">Excluded checks</summary><ul id="excluded"></ul></details>
-<section class="assessment-card" id="final-panel"><h2>Final report</h2><p id="final-note">Answer every applicable question. Open issues can remain in the final report. Finalising locks this assessment.</p>
+<section class="assessment-card" id="final-panel"><h2>Management and employer report</h2><p id="final-note">Save the applicable questions and follow-ups. Open issues can remain in the report. Finalising locks this assessment and makes the PDF available.</p>
 <button class="button" id="finish" type="button">Finalise assessment</button>
-<a class="button" id="report" hidden>Download final PDF</a></section>
+<a class="button" id="report" hidden>Download final management PDF</a></section>
 </section>
 </main></body></html>

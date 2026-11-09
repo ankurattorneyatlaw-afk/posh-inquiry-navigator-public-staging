@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.32.0-online-inquiry-checklist-staging",
+  "version": "6.32.1-adaptive-compliance-assessment-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -21,8 +21,8 @@
     "checkout.js": "32eb7088245c0229226a39f5fa85ca8723ca2c03c9695b8e3ff83fe6b0e74c67",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "compliance-assessment.css": "6536338afc9262964809471bb6007fd061dd3acc536dbc68f70a01355c45e6c8",
-    "compliance-assessment.html": "4accffad51678a817f0de65726068f0552aaab027bbd4dd83e0a8438a6af2d65",
-    "compliance-assessment.js": "2d6a5d93ac94caa4124bcdcedc4cae055f58d87e8144ec84d8c4f4878eb04229",
+    "compliance-assessment.html": "d67852eab8b69bd680f863f1c93a55abe3c7f11d5df4e30c677bea6a73f8a9b2",
+    "compliance-assessment.js": "0945aef68cf6446fab5ef52a91f5337f611ef032beecc4fa3ca2ef65abffc75a",
     "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
     "digital-delivery.html": "c8de4ffe0381a0e814d8c46ea77b3bcd3419852236a5757e682ab74d10f92aef",
     "digital.css": "bc96c04ff15dd79e71819556a46b45c6a3280209d90d135c0a93acc9fc527334",
@@ -57,7 +57,7 @@
     "privacy.html": "905aad95816b243a2a9331ceea401b9997f6b5682c30de27cce78263c5fbaa9d",
     "private-session-tools.js": "8941b253bfe7b887124ab9e75c529aef4218280b69484ad301aa8762d5602113",
     "product-terms.html": "3e3985ad2b647d17a409f9cee1dbecc74f5a7b2781f1f30ee2a6c44281d578ed",
-    "products.js": "e82ed65dddd6cfa1fe39399a094f7142335ae9878409668f5f6c2141fde86575",
+    "products.js": "6342e5d0b4ce79b79944d5b2e8193baf9a5319e40f9255d3dd37f59e3e6fd276",
     "purchase-terms.html": "29aa6c24c751a15f4fb8b951bd4ef319a3edbb1f81d1d65dc4ce87af06496a54",
     "refund-policy.html": "773038da898fe5d8310d4535580ece57b458110af4d812bd6c6de0dd40341f43",
     "resources.html": "b123c9a52ec65330342294109b4bff2cdfe92dde9d795f91ec31bedab2b5ff13",
