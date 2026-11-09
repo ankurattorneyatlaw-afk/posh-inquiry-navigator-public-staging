@@ -247,7 +247,7 @@ function createAssessmentHandler({identify,store,origin,now=Date.now}) {
       if (!['GET','POST'].includes(req.method)||(report&&req.method!=='GET')) return send(405,{error:'Method not allowed.'});
       if (req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:;|$)/i.test(req.headers['content-type']||''))) return send(403,{error:'Use the Navigator assessment page.'});
       const buyer=await identify(req,res);
-      if (!buyer) return send(401,{error:'Sign in to continue.'});
+      if (!buyer) return send(401,{error:'Open the link in your checklist receipt, or sign in for an earlier account purchase.'});
       if (!store) return send(503,{error:'Assessment staging is unavailable.'});
       if (!orderPattern.test(order||'')) return send(400,{error:'Open the assessment from a captured checklist order.'});
       const read=()=>store(buyer,order,'read');
@@ -290,11 +290,12 @@ function createAssessmentHandler({identify,store,origin,now=Date.now}) {
   };
 }
 
-function fromEnvironment(identify) {
+function fromEnvironment(identify,guest) {
   const {NAVIGATOR_AUTH_URL:url,NAVIGATOR_AUTH_PUBLISHABLE_KEY:key,NAVIGATOR_CHECKLIST_STORE_TOKEN:token,
     NAVIGATOR_CHECKLIST_TEST_MODE:mode,RENDER_EXTERNAL_URL:origin}=process.env;
   const configured=origin===stagingOrigin&&['simulated','razorpay-test'].includes(mode)&&/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url||'')&&key&&/^[a-f0-9]{64}$/.test(token||'');
   const store=configured?async (buyer,order,action,payload=null,revision=null)=>{
+    if(buyer.guest)return guest.assessment(buyer,order,action,payload,revision);
     const res=await fetch(url+'/rest/v1/rpc/navigator_compliance_assessment',{
       method:'POST',headers:{apikey:key,Authorization:'Bearer '+buyer.accessToken,'Content-Type':'application/json'},
       body:JSON.stringify({p_token:token,p_gateway:mode,p_order:order,p_action:action,p_payload:payload,p_revision:revision}),
@@ -303,7 +304,7 @@ function fromEnvironment(identify) {
     if(!res.ok)throw Error('Assessment store unavailable.');
     return res.json();
   }:null;
-  return createAssessmentHandler({identify,store,origin});
+  return createAssessmentHandler({identify:guest?.identify(identify,'compliance-checklist')||identify,store,origin});
 }
 module.exports={fromEnvironment,createAssessmentHandler,scopeFrom,assessmentView,pdf};
 

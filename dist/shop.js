@@ -1,4 +1,4 @@
-(function(){'use strict';const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n/100);let catalogue,selected,order,receipt,recovery,busy=false;
+(function(){'use strict';const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n/100);let catalogue,selected,order,receipt,recovery,guestEnabled=false,busy=false;
 async function api(path,data,base='shop'){const r=await fetch('/api/'+base+'/'+path,{credentials:'same-origin',...(data?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}:{}),signal:AbortSignal.timeout(20000)});let d;try{d=await r.json()}catch{throw Error('The service is temporarily unavailable. No real payment has been taken.');}if(!r.ok)throw Error(d.error||'The test request could not be completed.');return d;}
 function status(s,error=false){$('shop-status').textContent=s;$('shop-status').className=error?'error':'status';}
 async function run(fn){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await fn()}catch(e){status(e.message,true)}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;}}
@@ -17,6 +17,11 @@ function complete(d){recovery?.hide();receipt=d;$('shop-order').hidden=true;$('o
     const date=new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(d.accessUntil));
     expiry.textContent=(d.delivery?'Online access until ':'Online access ended on ')+date+' IST.';
   }
+  const mail=$('guest-receipt-status');
+  mail.hidden=!d.receiptStatus;
+  mail.textContent=d.receiptStatus==='sent'?'Test receipt and private resume link sent.':
+    d.receiptStatus==='review'?'The test receipt needs delivery review. You can open the purchase now.':
+    'Your test receipt and private resume link are queued for email. You can open the purchase now.';
   status(d.delivery?'Test access ready. No real payment was taken.':selected.kind==='checklist'?'The 120-day online access period has ended.':'Open your order to check access.');
 }
 async function verifyChecklist(proof){
@@ -44,7 +49,7 @@ function reviewChecklist(value){
   status('Test order saved. Continue with the test payment.');
 }
 $('test-another-checklist').onclick=()=>{order=null;receipt=null;$('order-complete').hidden=true;$('shop-order').reset();$('shop-order').hidden=false;void recovery?.show();status('Enter the organisation for a new test order.');};
-$('shop-order').onsubmit=e=>{e.preventDefault();run(async()=>{if(!$('shop-consent').checked)throw Error('Confirm test mode before continuing.');await recovery?.begin();try{if(checklistCheckout()){reviewChecklist(await checklist('order',{organisation:$('buyer-organisation').value,testConsent:true}));return;}order=await api('order',{product:selected.id,testConsent:true,termsVersion:catalogue.termsVersion});$('shop-order').hidden=true;$('order-review').hidden=false;$('order-summary').innerHTML='<p><strong>'+esc(order.name)+'</strong></p>'+(order.organisation?'<p>Licence holder: '+esc(order.organisation)+'</p>':'')+'<p>Catalogue price: '+money(order.catalogueAmount)+'</p><p><strong>Due now: ₹0 · simulation only</strong></p><p class="small">No real access plan, payment or invoice is activated.</p>';$('order-title').tabIndex=-1;$('order-title').focus();}catch(error){await recovery?.failed();throw error;}});};
+$('shop-order').onsubmit=e=>{e.preventDefault();run(async()=>{if(!$('shop-consent').checked)throw Error('Confirm test mode before continuing.');await recovery?.begin();try{if(checklistCheckout()){if(guestEnabled)await api('start',{product:selected.id,email:$('guest-email').value},'guest-checkout');reviewChecklist(await checklist('order',{organisation:$('buyer-organisation').value,testConsent:true}));return;}order=await api('order',{product:selected.id,testConsent:true,termsVersion:catalogue.termsVersion});$('shop-order').hidden=true;$('order-review').hidden=false;$('order-summary').innerHTML='<p><strong>'+esc(order.name)+'</strong></p>'+(order.organisation?'<p>Licence holder: '+esc(order.organisation)+'</p>':'')+'<p>Catalogue price: '+money(order.catalogueAmount)+'</p><p><strong>Due now: ₹0 · simulation only</strong></p><p class="small">No real access plan, payment or invoice is activated.</p>';$('order-title').tabIndex=-1;$('order-title').focus();}catch(error){await recovery?.failed();throw error;}});};
 $('order-confirm').onclick=()=>run(async()=>{if(!order)throw Error('Start test checkout again.');await recovery?.begin({resume:true});if(checklistCheckout()){await launchChecklist();return;}complete(await api('confirm',{orderId:order.orderId,testConsent:true}));});
 $('order-cancel').onclick=()=>run(async()=>{
   if(checklistCheckout()){
@@ -78,7 +83,7 @@ function productDetails(product){
     <h3>What you get for ${money(product.amount)}</h3>
     <ul>
       <li><strong>All 43 checks online.</strong> Tick checks and resume your saved progress on another device by signing in.</li>
-      <li><strong>120 days for the purchased edition.</strong> Access starts at verified payment capture and uses the original buyer account.</li>
+      <li><strong>120 days for the purchased edition.</strong> Access starts at verified payment capture. Use the link in your receipt to return.</li>
       <li><strong>Linked legal sources and an internal-use licence.</strong> Use this edition within one organisation.</li>
     </ul>
     <h3>Six stages covered</h3>
@@ -99,5 +104,17 @@ function productDetails(product){
     <p class="small">Edition ${esc(product.edition)}</p>
     ${freeGuide}`;
 }
-(async()=>{try{catalogue=await api('catalogue');const id=new URLSearchParams(location.search).get('product')||'checklist';$('product-tabs').innerHTML=catalogue.products.map(p=>'<a href="/shop.html?product='+esc(p.id)+'" '+(p.id===id?'aria-current="page"':'')+'>'+esc(p.name)+'</a>').join('');selected=catalogue.products.find(p=>p.id===id);if(!selected)throw Error('This product is unavailable. Choose one of the listed products above.');recovery=window.NavigatorCheckoutRecovery?.checkout(id);$('organisation-row').hidden=!checklistCheckout();$('buyer-organisation').required=checklistCheckout();$('product-detail').innerHTML=productDetails(selected);$('product-licence').textContent=selected.licence;$('shop-content').hidden=false;const session=checklistCheckout()?await checklist('session'):await api('session?product='+id);if(session.signedIn)await recovery?.show();if(checklistCheckout()&&session.signedIn){if(!session.available){status('Checklist test checkout is currently unavailable.');return;}if(session.latest?.captured){complete(session.latest);return;}if(session.latest){reviewChecklist({...session.latest,keyId:session.keyId,mode:session.mode});return;}}if(session.hasTestAccess)complete(session);else if(session.signedIn){$('shop-order').hidden=false;status('Review the scope, then start test checkout.');}else{$('shop-signin').hidden=false;$('shop-signin-link').href='/account?product='+id;status('Choose your product, then sign in for test checkout.');}}catch(e){status(e.message,true);}})();
+(async()=>{try{
+  if(location.hash.startsWith('#resume=')){
+    const token=location.hash.slice('#resume='.length);
+    history.replaceState(null,'',location.pathname+location.search);
+    status('Opening your checklist purchase…');
+    const resumed=await api('resume',{token},'guest-checkout');
+    if(!/^\/(?:inquiry-checklist|compliance-assessment)\.html\?order=order_[A-Za-z0-9]{1,40}$/.test(resumed.delivery||''))throw Error('This receipt link is unavailable.');
+    location.replace(resumed.delivery);
+    return;
+  }
+  catalogue=await api('catalogue');const id=new URLSearchParams(location.search).get('product')||'checklist';$('product-tabs').innerHTML=catalogue.products.map(p=>'<a href="/shop.html?product='+esc(p.id)+'" '+(p.id===id?'aria-current="page"':'')+'>'+esc(p.name)+'</a>').join('');selected=catalogue.products.find(p=>p.id===id);if(!selected)throw Error('This product is unavailable. Choose one of the listed products above.');recovery=window.NavigatorCheckoutRecovery?.checkout(id);$('organisation-row').hidden=!checklistCheckout();$('buyer-organisation').required=checklistCheckout();$('product-detail').innerHTML=productDetails(selected);$('product-licence').textContent=selected.licence;$('shop-content').hidden=false;const session=checklistCheckout()?await checklist('session'):await api('session?product='+id);guestEnabled=checklistCheckout()&&session.guestCheckout===true;
+if(guestEnabled){recovery=null;$('guest-email-row').hidden=false;$('guest-email').required=true;}
+if(session.signedIn)await recovery?.show();if(checklistCheckout()&&(session.signedIn||session.guestOrder||guestEnabled)){if(!session.available){status('Checklist test checkout is currently unavailable.');return;}if(session.latest?.captured){complete(session.latest);return;}if(session.latest){reviewChecklist({...session.latest,keyId:session.keyId,mode:session.mode});return;}}if(session.hasTestAccess)complete(session);else if(session.signedIn||guestEnabled){$('shop-order').hidden=false;status(guestEnabled?'Enter your email for guest test checkout. No Navigator account is required.':'Review the scope, then start test checkout.');}else{$('shop-signin').hidden=false;$('shop-signin-link').href='/account?product='+id;status('Choose your product, then sign in for test checkout.');}}catch(e){status(e.message,true);}})();
 })();

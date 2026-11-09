@@ -15,9 +15,10 @@ const shop=require('./shop-api.cjs').createShopHandler({
   requireDurable:process.env.RENDER_EXTERNAL_URL===stagingOrigin
 });
 const {fromEnvironment:checklistCheckout}=require('./checklist-checkout.cjs');
-const checklist=checklistCheckout(accounts.checkoutIdentity);
-const complianceChecklist=checklistCheckout(accounts.checkoutIdentity,'compliance-checklist');
-const complianceAssessment=require('./compliance-assessment.cjs').fromEnvironment(accounts.checkoutIdentity);
+const guest=require('./guest-checkout.cjs').guestCheckout();
+const checklist=checklistCheckout(accounts.checkoutIdentity,'checklist',guest);
+const complianceChecklist=checklistCheckout(accounts.checkoutIdentity,'compliance-checklist',guest);
+const complianceAssessment=require('./compliance-assessment.cjs').fromEnvironment(accounts.checkoutIdentity,guest);
 const {getPlanTools}=require('./plan-tools.cjs');
 const analytics=require('./analytics-api.cjs').createAnalytics();
 const enquiryMailer=require('./enquiry-mail.cjs').createEnquiryMailer();
@@ -69,6 +70,7 @@ const server = http.createServer(async(req,res)=>{
   if(await community(req,res,parsed))return;
   if(await recovery(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
+  if(await guest.handle(req,res,parsed))return;
   if(await checklist(req,res,parsed)||await complianceChecklist(req,res,parsed))return;
   if(await complianceAssessment(req,res,parsed))return;
   if(await shop(req,res,parsed))return;
