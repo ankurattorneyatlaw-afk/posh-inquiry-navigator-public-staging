@@ -253,7 +253,7 @@
     $('scope-label').textContent=state.organisation+' · '+s.workplace+' · '+s.district+' · '+s.year+' · '+(s.route?s.route+' route':'Confirm complaint route');
     const items=state.review.applicable, navigation=$('question-nav');
     if(!items.some(q=>q.id===selectedId))selectedId=(items.find(q=>!q.answer)||items[0])?.id??null;
-    navigation.replaceChildren(...items.map(q=>new Option(questionLabel(q)+(q.answer?' · Saved':''),String(q.id))));
+    navigation.replaceChildren(...items.map(q=>new Option(questionLabel(q)+(q.blocked?' · Blocked':q.answer?' · Saved':''),String(q.id))));
     navigation.value=String(selectedId);
     $('filter-label').hidden=state.final;
     const rank={Critical:0,High:1,Medium:2,Low:3};

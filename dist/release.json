@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.23-online-checklist-copy-staging",
+  "version": "6.35.24-blocked-check-menu-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -22,7 +22,7 @@
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "compliance-assessment.css": "87cde7713532f6d227230ceb75864bf42f7221c1992053a45c898ce33f1ae66c",
     "compliance-assessment.html": "6397b338056c40a2efb0b93c580b882b4236d07f9b2b216fd974da4733bcb01d",
-    "compliance-assessment.js": "46644e2821e6f400176fbe20faf9d9b418a83e4034690bcbab21801f564d4f7e",
+    "compliance-assessment.js": "8ab5288f0d0e9aa85051a1cb68d66ef83e54dfd0b16c0151b037b7737135faa4",
     "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
     "digital-delivery.html": "209acd651d0f622627a0d63333870a758c3f4ee952ee8390317454cd9f0878cb",
     "digital.css": "53b8e3f1d63736e85d6b8f6d45f52617b6443dd400132bdc396b8686547c2d26",
