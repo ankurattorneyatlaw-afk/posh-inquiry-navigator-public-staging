@@ -1,16 +1,23 @@
 'use strict';
 const {createHmac, randomBytes, timingSafeEqual}=require('node:crypto');
 const {generate, organisationName}=require('./buyer-checklist.cjs');
-const amount=99900;
+const {existsSync}=require('node:fs');
+const path=require('node:path');
+const {products}=require('../dist/products.js');
+const {buildDocx}=require('../dist/personal-docx.js');
+const legacyProduct='checklist';
+const complianceProduct='compliance-checklist';
+const price=product=>products.find(item=>item.id===product).amount;
 const currency='INR';
 const orderPattern=/^order_[A-Za-z0-9]{1,40}$/;
 const paymentPattern=/^pay_[A-Za-z0-9]{1,50}$/;
 const stagingOrigin='https://posh-inquiry-navigator-staging.onrender.com';
 
-function supabaseOrders({url,key,token,fetchImpl=fetch}) {
+function supabaseOrders({url,key,token,product=legacyProduct,fetchImpl=fetch}) {
   if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url||'') || !key || !/^[a-f0-9]{64}$/.test(token||'')) return null;
+  const rpc=product===complianceProduct?'navigator_compliance_checklist_order':'navigator_checklist_order';
   return async (buyer, action, gateway, values={}) => {
-    const response=await fetchImpl(url+'/rest/v1/rpc/navigator_checklist_order',{
+    const response=await fetchImpl(url+'/rest/v1/rpc/'+rpc,{
       method:'POST',headers:{apikey:key,Authorization:'Bearer '+buyer.accessToken,'Content-Type':'application/json'},
       body:JSON.stringify({p_token:token,p_action:action,p_gateway:gateway,...values}),signal:AbortSignal.timeout(8000)
     });
@@ -19,7 +26,7 @@ function supabaseOrders({url,key,token,fetchImpl=fetch}) {
   };
 }
 
-function razorpayTest({keyId,secret,fetchImpl=fetch}) {
+function razorpayTest({keyId,secret,product=legacyProduct,fetchImpl=fetch}) {
   if (!/^rzp_test_[A-Za-z0-9]+$/.test(keyId||'') || !secret) return null;
   async function call(path,body) {
     const response=await fetchImpl('https://api.razorpay.com/v1/'+path,{
@@ -37,7 +44,7 @@ function razorpayTest({keyId,secret,fetchImpl=fetch}) {
   }
   return {
     name:'razorpay-test', keyId,
-    create:()=>call('orders',{amount,currency,receipt:'navcheck_'+randomBytes(12).toString('hex'),notes:{product:'checklist',mode:'test'}}),
+    create:()=>call('orders',{amount:price(product),currency,receipt:'navcheck_'+randomBytes(12).toString('hex'),notes:{product,mode:'test'}}),
     verify:async (id,{paymentId,signature})=>{
       if (!paymentPattern.test(paymentId||'') || !/^[a-f0-9]{64}$/.test(signature||'')) return null;
       const expected=createHmac('sha256',secret).update(id+'|'+paymentId).digest();
@@ -48,7 +55,8 @@ function razorpayTest({keyId,secret,fetchImpl=fetch}) {
   };
 }
 
-function simulatedGateway() {
+function simulatedGateway(product=legacyProduct) {
+  const amount=price(product);
   return {
     name:'simulated',
     create:async()=>({id:'order_sim'+randomBytes(12).toString('hex'),amount,currency}),
@@ -56,7 +64,11 @@ function simulatedGateway() {
   };
 }
 
-function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now=Date.now}) {
+function createChecklistCheckout({identify,origin,store,gateway,readTemplate,renderDocument,product=legacyProduct,now=Date.now}) {
+  const amount=price(product);
+  const prefix='/api/'+product+'/';
+  const filename=product===complianceProduct?'POSH-Compliance-Checklist':'POSH-Checklist';
+  const createFile=renderDocument||(readTemplate&&((organisation,id)=>generate(readTemplate(),organisation,id)));
   const orderLimits=new Map();
   let limitUntil=now()+600000;
   const send=(res,status,value)=>{
@@ -64,22 +76,22 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
     res.end(JSON.stringify(value));
     return true;
   };
-  const delivery=id=>'/api/checklist/download?order='+encodeURIComponent(id);
+  const delivery=id=>prefix+'download?order='+encodeURIComponent(id);
   const summary=order=>order?{
     orderId:order.id,organisation:order.organisation,captured:order.captured,
     downloadUntil:order.downloadUntil??null,
     delivery:order.captured&&order.downloadAvailable===true?delivery(order.id):null
   }:null;
   return async (req,res,url)=>{
-    if (!url.pathname.startsWith('/api/checklist/')) return false;
-    const action=url.pathname.slice('/api/checklist/'.length);
+    if (!url.pathname.startsWith(prefix)) return false;
+    const action=url.pathname.slice(prefix.length);
     if (!['session','download','order','verify','cancel'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
     if (req.method!==(['session','download'].includes(action)?'GET':'POST')) return send(res,405,{error:'Method not allowed.'});
     if (req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))) return send(res,403,{error:'Use the Navigator checkout page.'});
     let phase='session';
     try {
       const buyer=await identify(req,res);
-      const available=!!(store&&gateway&&readTemplate);
+      const available=!!(store&&gateway&&createFile);
       if (action==='session') {
         const latest=buyer&&available?await store(buyer,'latest',gateway.name):null;
         return send(res,200,{signedIn:!!buyer,available,mode:gateway?.name||'disabled',keyId:gateway?.keyId,livePaymentsEnabled:false,latest:summary(latest)});
@@ -92,9 +104,9 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
         const order=await store(buyer,'get',gateway.name,{p_id:id});
         if (!order?.captured) return send(res,403,{error:'This captured order is unavailable for your account.'});
         if (order.downloadAvailable!==true) return send(res,410,{error:'The 90-day redownload period has ended.'});
-        const file=generate(readTemplate(),order.organisation,order.id);
+        const file=createFile(order.organisation,order.id);
         res.writeHead(200,{'Content-Type':'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'Content-Disposition':`attachment; filename="POSH-Checklist-${order.id}.docx"`,'Cache-Control':'private, no-store','Vary':'Cookie'});
+          'Content-Disposition':`attachment; filename="${filename}-${order.id}.docx"`,'Cache-Control':'private, no-store','Vary':'Cookie'});
         res.end(file);return true;
       }
       let size=0;const chunks=[];
@@ -113,7 +125,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
         orderLimits.set(buyer.id,count);
         // Verify the protected asset can be generated before starting checkout.
         phase='prepare-template';
-        generate(readTemplate(),organisation,'PREVIEW');
+        createFile(organisation,'PREVIEW');
         phase='create-gateway-order';
         const order=await gateway.create();
         if (!orderPattern.test(order?.id||'')||order.amount!==amount||order.currency!==currency) throw Error('Invalid gateway order');
@@ -149,7 +161,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
       if (!saved?.captured||saved.paymentId!==payment.id) throw Error('Capture not saved');
       return send(res,200,summary(saved));
     } catch(error) {
-      console.warn('Checklist checkout failed', {action,phase,mode:gateway?.name,
+      console.warn('Checklist checkout failed', {product,action,phase,mode:gateway?.name,
         source:error.checkoutSource,status:error.status,reason:error.reason});
       const errorMessage=error.checkoutSource==='razorpay'?
         error.reason==='credentials'||error.status===401?'Razorpay rejected the staging test credentials. Check the test key pair in Render.':
@@ -161,13 +173,27 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,now
   };
 }
 
-function fromEnvironment(identify) {
+function compliancePreview(organisation,orderId) {
+  const title='Compliance Checklist';
+  return Buffer.from(buildDocx(title,[
+    {type:'title',text:title},
+    {type:'heading',text:'Staging test file'},
+    {type:'p',text:'This file verifies delivery. The final Compliance Checklist is being prepared.'},
+    {type:'meta',text:'Organisation: '+organisation},
+    {type:'meta',text:'Test order: '+orderId}
+  ]));
+}
+
+function fromEnvironment(identify,product=legacyProduct) {
   const origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173';
   const mode=process.env.NAVIGATOR_CHECKLIST_TEST_MODE;
-  const gateway=origin!==stagingOrigin?null:mode==='simulated'?simulatedGateway():mode==='razorpay-test'?razorpayTest({keyId:process.env.RAZORPAY_KEY_ID,secret:process.env.RAZORPAY_KEY_SECRET}):null;
-  const store=supabaseOrders({url:process.env.NAVIGATOR_AUTH_URL,key:process.env.NAVIGATOR_AUTH_PUBLISHABLE_KEY,token:process.env.NAVIGATOR_CHECKLIST_STORE_TOKEN});
+  const gateway=origin!==stagingOrigin?null:mode==='simulated'?simulatedGateway(product):mode==='razorpay-test'?razorpayTest({product,keyId:process.env.RAZORPAY_KEY_ID,secret:process.env.RAZORPAY_KEY_SECRET}):null;
+  const store=supabaseOrders({product,url:process.env.NAVIGATOR_AUTH_URL,key:process.env.NAVIGATOR_AUTH_PUBLISHABLE_KEY,token:process.env.NAVIGATOR_CHECKLIST_STORE_TOKEN});
   const assetKey=process.env.NAVIGATOR_CHECKLIST_ASSET_KEY;
   const reader=require('./product-assets.cjs').productReader({key:assetKey});
-  return createChecklistCheckout({identify,origin,store,gateway,readTemplate:/^[a-f0-9]{64}$/.test(assetKey||'')?()=>JSON.parse(reader('buyer-checklist-template.json').toString('utf8')):null});
+  const template=product===complianceProduct?'compliance-checklist-template.json':'buyer-checklist-template.json';
+  const preview=product===complianceProduct&&origin===stagingOrigin&&!existsSync(path.join(__dirname,'../products',template+'.enc'));
+  const readTemplate=/^[a-f0-9]{64}$/.test(assetKey||'')?()=>JSON.parse(reader(template).toString('utf8')):null;
+  return createChecklistCheckout({identify,origin,store,gateway,product,readTemplate,renderDocument:preview?compliancePreview:null});
 }
 module.exports={createChecklistCheckout,fromEnvironment,razorpayTest,simulatedGateway,supabaseOrders};

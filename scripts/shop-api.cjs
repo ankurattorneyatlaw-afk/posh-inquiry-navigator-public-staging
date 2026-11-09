@@ -14,7 +14,7 @@ function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,ori
  const fulfilment=(o,p)=>({mode:'test',status:'test_fulfilled',charged:0,realPaymentsEnabled:false,serviceActivated:false,coreInquiryAccessGranted:false,orderId:o.id,product:p.id,name:p.name,catalogueAmount:p.amount,currency:'INR',termsVersion:o.termsVersion,delivery:destination(p),testAccessUntil:new Date(o.until).toISOString(),message:'Test order complete. No charge, tax invoice or real subscription was created.'});
  return async function(req,res,url){if(!url.pathname.startsWith('/api/shop/'))return false;
   const p=product(url.searchParams.get('product'));
-  if(!allowLegacyChecklist&&p?.id==='checklist'){send(res,409,{error:'Use the checklist checkout page.'});return true;}
+  if(p?.id==='compliance-checklist'||(!allowLegacyChecklist&&p?.id==='checklist')){send(res,409,{error:'Use the checklist checkout page.'});return true;}
   try{
    if(req.method==='GET'&&url.pathname==='/api/shop/catalogue'){send(res,200,catalogue);return true;}
    if(!['/api/shop/session','/api/shop/content','/api/shop/download','/api/shop/order','/api/shop/confirm'].includes(url.pathname)){send(res,404,{error:'This shop action is unavailable.'});return true;}
@@ -35,7 +35,7 @@ function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,ori
    for(const [id,o]of orders)if((o.expires<now()&&!o.until)||(o.until&&o.until<=now()))orders.delete(id);for(const [k,e]of access)if(e.until<now())access.delete(k);
    if(url.pathname==='/api/shop/order'){
     const chosen=product(data.product);if(!chosen||data.termsVersion!==catalogue.termsVersion){send(res,400,{error:'Review the current product scope and terms.'});return true;}if(orders.size>=1000||access.size>=1000){send(res,503,{error:'Test checkout capacity reached. No payment was taken.'});return true;}
-    if(!allowLegacyChecklist&&chosen.id==='checklist'){send(res,409,{error:'Use the checklist checkout page.'});return true;}
+    if(chosen.id==='compliance-checklist'||(!allowLegacyChecklist&&chosen.id==='checklist')){send(res,409,{error:'Use the checklist checkout page.'});return true;}
     readAsset(chosen.kind==='download'?'inquiry-checklist-v1.pdf':'individual-guides.json');
     const id='NAVTEST-'+randomUUID();
     const o=store?await store(buyer,'create',{p_id:id,p_product:chosen.id,p_terms_version:catalogue.termsVersion}):

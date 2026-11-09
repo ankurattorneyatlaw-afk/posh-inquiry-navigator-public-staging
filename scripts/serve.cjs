@@ -13,7 +13,9 @@ const shop=require('./shop-api.cjs').createShopHandler({
   identify:accounts.checkoutIdentity,allowLegacyChecklist:false,store:guideStoreFromEnvironment(),
   requireDurable:process.env.RENDER_EXTERNAL_URL===stagingOrigin
 });
-const checklist=require('./checklist-checkout.cjs').fromEnvironment(accounts.checkoutIdentity);
+const {fromEnvironment:checklistCheckout}=require('./checklist-checkout.cjs');
+const checklist=checklistCheckout(accounts.checkoutIdentity);
+const complianceChecklist=checklistCheckout(accounts.checkoutIdentity,'compliance-checklist');
 const {getPlanTools}=require('./plan-tools.cjs');
 const analytics=require('./analytics-api.cjs').createAnalytics();
 const enquiryMailer=require('./enquiry-mail.cjs').createEnquiryMailer();
@@ -64,7 +66,7 @@ const server = http.createServer(async(req,res)=>{
   if(await enquiries(req,res,parsed))return;
   if(await community(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
-  if(await checklist(req,res,parsed))return;
+  if(await checklist(req,res,parsed)||await complianceChecklist(req,res,parsed))return;
   if(await shop(req,res,parsed))return;
   if(parsed.pathname==='/checkout.html'||parsed.pathname==='/shop.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
   const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/account/':'account.html','/workspace':'workspace.html','/workspace/':'workspace.html','/admin':'admin.html','/admin/':'admin.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
