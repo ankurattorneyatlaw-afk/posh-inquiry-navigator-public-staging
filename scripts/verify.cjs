@@ -63,6 +63,10 @@ assert(caseDirectory.filter('11889/2025')[0].related.includes('HC077'));
 assert(caseDirectory.filter('2026:GAU-AS:3698-DB').some(c=>c.id==='HC077'&&c.url.endsWith('.pdf/stream')));
 assert(caseDirectory.filter('Seema Joshi')[0].linkedOrders.some(o=>o.docket.includes('34428/2025')));
 assert(!caseDirectory.data.some(c=>c.masterId==='POSH-0502'));
+const sahityaExpedition=caseDirectory.data.find(c=>c.id==='SC041');
+assert(caseDirectory.checked(sahityaExpedition));
+assert(!sahityaExpedition.url&&!sahityaExpedition.sourceArchive&&!sahityaExpedition.caseNumber);
+assert.equal(sahityaExpedition.citation,'Supreme Court order dated 30 January 2024');
 assert(caseDirectory.filter('','All topics','All forums','Procedural orders').length===17);
 for(const number of [69,211,214,248,292,404,438,444]){
   const record=finder.search('FAQ '+number)[0];

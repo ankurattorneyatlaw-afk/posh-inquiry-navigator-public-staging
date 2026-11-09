@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.17-verified-judgments-directory-staging",
+  "version": "6.35.18-sahitya-source-privacy-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -46,7 +46,7 @@
     "inquiry-checklist.js": "0e3ae9ef91a9744b23f78a36b632072f0be4471593fd609452824fce287747f1",
     "institutions.html": "d292b90f5b0843e3783b2c7003075086700382ce2b5b5bd8b5414948961da6d9",
     "legal.js": "51c4bf6ab42d32bf7940c806acf61eeb700a88a15726eeb66f303fab08094bcf",
-    "library.js": "5411a1647f3c2a8bb15ac2c6bc952ab80cf8ff15a9d3467f29f7d6d30b1306d0",
+    "library.js": "ead1790cdcd149c0c686b66c48e2fff4587b410d103e8fef5d679621bba13565",
     "main.js": "fa5a3ae568f9c59b26b8ef2c6b2137ba77f629b0d2e39ea1fedb5c3e04a6f325",
     "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plan-tools.html": "284fe7188a4d9b48126faf17a4e0482bbe91f91d9a2c655cccbeaecf20727b4d",
