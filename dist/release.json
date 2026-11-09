@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.27.0-shared-text-wrap-staging",
+  "version": "6.28.0-checklist-sample-clarity-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -13,7 +13,7 @@
     "admin.html": "c756e66bd321a38362d429b950d15129a2f61c89357ce02859ef1aa0370c240a",
     "analytics.js": "d630f01b882580e330d80f2b732b1c1a26b28a534548860d8350901328043361",
     "cases.js": "ca9172f84052b32d2347767c0f1d3b982d5a2a7e19adefc9ad476fbfe7c66470",
-    "checklist-sample.pdf": "dfcee8895af46fa4af976aafbbd320d69080b096ac7faa19970bf486f5f4854d",
+    "checklist-sample.pdf": "5acd229ced21cf6e99f71f5c215592c782026cc172ef257befc9a354a78c50de",
     "checkout.html": "6284c3d784a1bae848a7e496efdcb6498d140a01c40e6af8616564def488f73a",
     "checkout.js": "5c2c82397d2e192d9f1341be2fe52d189b731b84a02dc412f5a3fae8726c3537",
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
