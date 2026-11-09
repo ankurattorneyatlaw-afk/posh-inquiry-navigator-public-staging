@@ -41,15 +41,15 @@ test('IC examples show the reporting routes and select annual report details bas
   assert.match(no[44].referenceExamples.Yes,/current IC contacts.*district LC.*against the employer/);
 });
 
-test('a pair of short exclusions fits with the last findings without creating another PDF page',()=>{
-  const applicable=Array.from({length:11},(_,i)=>({
+test('compact finding gaps leave room for short exclusions in an LC Branch PDF',()=>{
+  const applicable=Array.from({length:12},(_,i)=>({
     title:'Finding '+i,priority:'High',authority:'Basis '+i,answer:{value:'Yes',evidence:'Record '+i}
   }));
-  const excluded=[{title:'Excluded 1',reason:'Company-only.'},{title:'Excluded 2',reason:'Branch-only.'}];
-  const report=pdf({scope:scopeFrom({...input,workers:10}),review:{applicable,excluded,open:0},
+  const excluded=[{title:'Excluded 1',reason:'Company-only.'},{title:'Excluded 2',reason:'IC-only.'}];
+  const report=pdf({scope:scopeFrom({...input,siteType:'branch',siteWorkers:3}),review:{applicable,excluded,open:0},
     organisation:'Test employer',order:'order_short_tail',finalisedAt:'2026-11-09T00:00:00Z'}).toString('latin1');
   assert.match(report,/\/Type \/Pages \/Count 1\b/);
-  assert.match(report,/Excluded 2 \| Branch-only/);
+  assert.match(report,/Excluded 2 \| IC-only/);
 });
 
 test('PDF pagination keeps wrapped findings and excluded checks with their text',()=>{

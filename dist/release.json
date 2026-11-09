@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.0-compliance-ic-review-staging",
+  "version": "6.35.1-compliance-pdf-spacing-staging",
   "environment": "staging",
   "search": {
     "indexable": false,

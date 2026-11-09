@@ -109,7 +109,8 @@ function answerFrom(input,check) {
 }
 
 function pdf(snapshot) {
-  const lineHeight=13, maxLines=56, pageLines=[];
+  const lineHeight=13, paragraphGap=6, pageHeight=728, pageLines=[];
+  const entryHeight=entry=>entry===''?paragraphGap:lineHeight;
   let lines=[];
   function line(value='') {
     // WinAnsi standard fonts are available in PDF readers. Preserve unsupported characters as code points.
@@ -123,20 +124,28 @@ function pdf(snapshot) {
       pos=end+(text[end]===' '?1:0);
     }
   }
+  function startPage() {
+    const page={entries:[],height:0};
+    pageLines.push(page);
+    return page;
+  }
   function addBlock(spaced=false) {
-    let page=pageLines.at(-1);
-    if (!page||page.length+lines.length+Number(spaced)>maxLines) {
-      page=[];
-      pageLines.push(page);
+    let page=pageLines.at(-1)||startPage();
+    const gap=spaced&&page.entries.length?paragraphGap:0;
+    const blockHeight=lines.reduce((total,entry)=>total+entryHeight(entry),0);
+    if (page.entries.length&&page.height+gap+blockHeight>pageHeight) {
+      page=startPage();
     }
-    if(spaced&&page.length)page.push('');
+    if(spaced&&page.entries.length) {
+      page.entries.push('');
+      page.height+=paragraphGap;
+    }
     // Long text can expand during encoding. Only split a block that exceeds a full page.
     for(const entry of lines) {
-      if(page.length===maxLines) {
-        page=[];
-        pageLines.push(page);
-      }
-      page.push(entry);
+      const height=entryHeight(entry);
+      if(page.height+height>pageHeight)page=startPage();
+      page.entries.push(entry);
+      page.height+=height;
     }
     lines=[];
   }
@@ -176,11 +185,12 @@ function pdf(snapshot) {
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'];
   const pages=[];
   const escape=t=>t.replace(/[\\()]/g,'\\$&');
-  for (const pageContent of pageLines) {
+  for (const {entries} of pageLines) {
     const page=objects.length+1;
     pages.push(page+' 0 R');
     objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents '+(page+1)+' 0 R >>');
-    const stream='BT /F1 10 Tf 42 800 Td '+lineHeight+' TL '+pageContent.map(t=>'('+escape(t)+') Tj T*').join('\n')+' ET';
+    const stream='BT /F1 10 Tf 42 800 Td '+lineHeight+' TL '+entries.map(entry=>
+      entry===''?'0 -'+paragraphGap+' Td':'('+escape(entry)+') Tj T*').join('\n')+' ET';
     objects.push('<< /Length '+Buffer.byteLength(stream,'latin1')+' >>\nstream\n'+stream+'\nendstream');
   }
   objects[1]='<< /Type /Pages /Count '+pages.length+' /Kids ['+pages.join(' ')+'] >>';
