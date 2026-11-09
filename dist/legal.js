@@ -82,7 +82,12 @@ function basisHTML(x){
  const hasAct=mixed?/\bPOSH (?:Act|Sections?)\b|^Act Sections?\b/i.test(b):/Sections?|§|\bAct\b/i.test(b);
  const hasRules=mixed?/\bCentral (?:POSH )?Rules?\b/i.test(b):/\bRules?\b|\bR\d/i.test(b);
 return `<p class="faq-basis"><strong>Legal basis / context:</strong> ${referenceHTML(b.replace(/§§/g,'Sections ').replace(/§/g,'Section ').replace(/\bR(\d+)/g,'Central Rule $1'))}${hasAct?` · <a href="${act}" target="_blank" rel="noopener noreferrer">POSH Act</a>`:''}${hasRules?` · <a href="${rules}" target="_blank" rel="noopener noreferrer">Central Rules</a>`:''}</p>`;}
-function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Related tools">${x.links.map(link=>`<a href="${esc(link.url)}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
+function answerLink(link,faq){
+  if(!/^\/?#faq\/case-[a-z0-9]+$/i.test(link.url))return link.url;
+  const hash=link.url.slice(link.url.indexOf('#'));
+  return hash+'?from='+encodeURIComponent(faq.id);
+}
+function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Related tools">${x.links.map(link=>`<a href="${esc(answerLink(link,x))}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
 if(typeof module==='object'&&module.exports){module.exports={terms,provisions,referenceHTML,checkedCases,fullAnswer,basisHTML,citationHTML};return;}
 root.NavigatorLegal={terms,provisions,referenceHTML,fullAnswer,basisHTML,citationHTML};
 let referenceActive=null,referencePinned=false,ignoreReferenceFocus=false,referenceHoverBlocked=false,referencePointer=null;

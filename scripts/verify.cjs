@@ -39,6 +39,10 @@ const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQue
 assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:444},(_,i)=>i+1));
 for(const [number,id] of [[364,"who-is-protected"],[440,"online-inquiry-checklist-access"],[441,"choose-compliance-checklist"],[442,"walkthrough-request-next-step"],[443,"outside-presiding-officer-all-men-workforce"],[444,"preliminary-notes-and-inquiry-report"]])assert.equal(finder.search("FAQ "+number)[0].id,id);
 
+for (const [source,target] of [[69,404],[404,69],[211,214],[214,438],[438,211],[292,444],[444,292]]){
+  const record=finder.search('FAQ '+source)[0];
+  assert(finder.relatedTo(record).some(faq=>Number(faq.number)===target));
+}
 const caseDirectory=require('../dist/cases.js');
 assert.equal(caseDirectory.data.length,55);
 assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,55);
