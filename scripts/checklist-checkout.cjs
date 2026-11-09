@@ -5,6 +5,7 @@ const {existsSync}=require('node:fs');
 const path=require('node:path');
 const {products}=require('../dist/products.js');
 const {buildDocx}=require('../dist/personal-docx.js');
+const {onlineFromEnvironment,accessUntil}=require('./online-checklist.cjs');
 const legacyProduct='checklist';
 const complianceProduct='compliance-checklist';
 const price=product=>products.find(item=>item.id===product).amount;
@@ -64,7 +65,7 @@ function simulatedGateway(product=legacyProduct) {
   };
 }
 
-function createChecklistCheckout({identify,origin,store,gateway,readTemplate,renderDocument,product=legacyProduct,assessment=false,now=Date.now}) {
+function createChecklistCheckout({identify,origin,store,gateway,readTemplate,renderDocument,online,product=legacyProduct,assessment=false,now=Date.now}) {
   const amount=price(product);
   const prefix='/api/'+product+'/';
   const filename=product===complianceProduct?'POSH-Compliance-Checklist':'POSH-Checklist';
@@ -77,26 +78,45 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
     return true;
   };
   const delivery=id=>(assessment?'/compliance-assessment.html?order=':prefix+'download?order=')+encodeURIComponent(id);
-  const summary=order=>order?{
+  const summary=order=>{
+    if(!order)return null;
+    if(online){
+      const until=accessUntil(order);
+      return {orderId:order.id,organisation:order.organisation,captured:order.captured,accessUntil:until,
+        delivery:until&&now()<Date.parse(until)?'/inquiry-checklist.html?order='+encodeURIComponent(order.id):null};
+    }
+    return {
     orderId:order.id,organisation:order.organisation,captured:order.captured,
     downloadUntil:assessment?null:order.downloadUntil??null,
     delivery:order.captured&&(assessment||order.downloadAvailable===true)?delivery(order.id):null
-  }:null;
+    };
+  };
   return async (req,res,url)=>{
     if (!url.pathname.startsWith(prefix)) return false;
     const action=url.pathname.slice(prefix.length);
-    if (!['session','download','order','verify','cancel'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
-    if (req.method!==(['session','download'].includes(action)?'GET':'POST')) return send(res,405,{error:'Method not allowed.'});
+    if (!['session','download','content','order','verify','cancel'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
+    if (req.method!==(['session','download','content'].includes(action)?'GET':'POST')) return send(res,405,{error:'Method not allowed.'});
     if (req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))) return send(res,403,{error:'Use the Navigator checkout page.'});
     let phase='session';
     try {
       const buyer=await identify(req,res);
-      const available=!!(store&&gateway&&(assessment||createFile));
+      const available=!!(store&&gateway&&(online||assessment||createFile));
       if (action==='session') {
         const latest=buyer&&available?await store(buyer,'latest',gateway.name):null;
         return send(res,200,{signedIn:!!buyer,available,mode:gateway?.name||'disabled',keyId:gateway?.keyId,livePaymentsEnabled:false,latest:summary(latest)});
       }
       if (!buyer) return send(res,401,{error:'Sign in to continue.'});
+      if (action==='content') {
+        if (!online) return send(res,404,{error:'Checklist action not found.'});
+        const id=url.searchParams.get('order');
+        if (id!==null&&!orderPattern.test(id)) return send(res,400,{error:'Check the order reference.'});
+        const entitlement=await online.access(buyer,id);
+        if (!entitlement) return send(res,403,{error:'A captured IC / LC Inquiry Checklist order is required for this account.'});
+        if (!entitlement.active) return send(res,410,{error:'The 120-day online access period has ended.',accessUntil:entitlement.accessUntil});
+        const {stages,sources}=online.read(entitlement.edition);
+        return send(res,200,{orderId:entitlement.id,organisation:entitlement.organisation,edition:entitlement.edition,accessUntil:entitlement.accessUntil,stages,sources});
+      }
+      if (online&&action==='download') return send(res,410,{error:'This checklist is now online. Open it from your workspace.'});
       if (!available) return send(res,503,{error:'Checklist test checkout is not configured.'});
       if (action==='download') {
         if (assessment) return send(res,410,{error:'Open your online assessment to download its final report.'});
@@ -126,7 +146,8 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
         orderLimits.set(buyer.id,count);
         // Verify the protected asset can be generated before starting checkout.
         phase='prepare-template';
-        if (!assessment) createFile(organisation,'PREVIEW');
+        if(online)online.read('2.0');
+        else if(!assessment)createFile(organisation,'PREVIEW');
         phase='create-gateway-order';
         const order=await gateway.create();
         if (!orderPattern.test(order?.id||'')||order.amount!==amount||order.currency!==currency) throw Error('Invalid gateway order');
@@ -195,7 +216,6 @@ function fromEnvironment(identify,product=legacyProduct) {
   const template=product===complianceProduct?'compliance-checklist-template.json':'buyer-checklist-template.json';
   const preview=product===complianceProduct&&origin===stagingOrigin&&!existsSync(path.join(__dirname,'../products',template+'.enc'));
   const readTemplate=/^[a-f0-9]{64}$/.test(assetKey||'')?()=>JSON.parse(reader(template).toString('utf8')):null;
-  return createChecklistCheckout({identify,origin,store,gateway,product,readTemplate,renderDocument:preview?compliancePreview:null,assessment:product===complianceProduct});
+  return createChecklistCheckout({identify,origin,store,gateway,product,readTemplate,renderDocument:preview?compliancePreview:null,online:product===legacyProduct?onlineFromEnvironment():null,assessment:product===complianceProduct});
 }
 module.exports={createChecklistCheckout,fromEnvironment,razorpayTest,simulatedGateway,supabaseOrders};
-

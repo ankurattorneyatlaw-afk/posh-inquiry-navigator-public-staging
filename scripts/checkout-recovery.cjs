@@ -5,8 +5,8 @@ const { stagingOrigin } = require('./plan-store.cjs');
 const { createBrevoTransport } = require('./enquiry-mail.cjs');
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const products = {
-  checklist: ['IC / LC Inquiry Checklist', 'Use 43 checks to review the steps from complaint receipt to annual reporting. Preview six checks in the free PDF before choosing the personalised Word file.', '/checklist-sample.pdf'],
-  'compliance-checklist': ['Compliance Checklist', 'See the separate organisational compliance resource and its staging Word placeholder. The final checklist is being prepared.'],
+  checklist: ['IC / LC Inquiry Checklist', 'Use 43 checks to review the steps from complaint receipt to annual reporting. Preview six checks in the free PDF before choosing the 120-day online edition.', '/checklist-sample.pdf'],
+  'compliance-checklist': ['Compliance Checklist', 'Review workplace compliance for one workplace or branch and one review year, with saved answers and a priority action list.'],
   aggrieved: ['Aggrieved Woman Advanced Guide', 'The guide brings together preparation steps, editable Word drafts and a private planner. Review the guidance and draft scope before choosing.'],
   respondent: ['Respondent Advanced Guide', 'The guide helps organise replies, documents and hearing preparation with editable Word drafts and a private planner. Review the scope before choosing.'],
   essential: ['Inquiry Essential', 'Guide up to two users through one inquiry with stage-specific drafts and timeline checks.'],
@@ -23,8 +23,8 @@ function recoveryMessage(job, origin) {
   const intro = job.step === 1
     ? (job.failed ? 'Your recent test checkout did not finish.' : 'You asked for a reminder about your unfinished test checkout.')
     : 'Here is your final reminder. If you have a question about access or delivery, reply and we can help.';
-  const access = job.product==='checklist' ? 'The personalised Word copy is for one organisation. Save it locally and redownload it for 90 days.'
-    : job.product==='compliance-checklist' ? 'The staging download is a Word test placeholder. The final Compliance Checklist is still being prepared.'
+  const access = job.product==='checklist' ? 'The purchased edition stays open online for 120 days from verified payment capture. Ticks stay in the browser used to mark them.'
+    : job.product==='compliance-checklist' ? 'Sign in to resume your assessment. Finalise it when the applicable checks are complete and download the report for internal review.'
     : plans.has(job.product) ? 'The plan page shows the included users, editing period and read-only period. You can review these details before starting again.'
     : 'The advanced guide provides 90 days of self-service access. Downloaded drafts remain available for your personal use.';
   return {

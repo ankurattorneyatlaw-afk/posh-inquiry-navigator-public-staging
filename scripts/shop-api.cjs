@@ -36,7 +36,7 @@ function createShopHandler({identify=async()=>null,allowLegacyChecklist=true,ori
    if(url.pathname==='/api/shop/order'){
     const chosen=product(data.product);if(!chosen||data.termsVersion!==catalogue.termsVersion){send(res,400,{error:'Review the current product scope and terms.'});return true;}if(orders.size>=1000||access.size>=1000){send(res,503,{error:'Test checkout capacity reached. No payment was taken.'});return true;}
     if(chosen.id==='compliance-checklist'||(!allowLegacyChecklist&&chosen.id==='checklist')){send(res,409,{error:'Use the checklist checkout page.'});return true;}
-    readAsset(chosen.kind==='download'?'inquiry-checklist-v1.pdf':'individual-guides.json');
+    readAsset(chosen.kind==='guide'?'individual-guides.json':'inquiry-checklist-v1.pdf');
     const id='NAVTEST-'+randomUUID();
     const o=store?await store(buyer,'create',{p_id:id,p_product:chosen.id,p_terms_version:catalogue.termsVersion}):
       {id,account:buyer.id,product:chosen.id,termsVersion:catalogue.termsVersion,expires:now()+900000};
