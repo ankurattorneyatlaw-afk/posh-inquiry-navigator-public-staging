@@ -2,7 +2,7 @@
 const {Readable}=require('node:stream');
 const assert=require('node:assert/strict');
 const test=require('node:test');
-const {createAssessmentHandler,scopeFrom,assessmentView}=require('./compliance-assessment.cjs');
+const {createAssessmentHandler,scopeFrom,assessmentView,pdf}=require('./compliance-assessment.cjs');
 
 const checks=[
   {id:1,title:'IC order',topic:'IC',question:'Is the order signed?',proof:'Order',action:'Issue the order',ic:true,priority:'Critical'},
@@ -14,6 +14,41 @@ const checks=[
   {id:62,title:'IC update',topic:'Portal',question:'Is the IC current?',proof:'Receipt',action:'Update the IC',ic:true,conditional:true}
 ];
 const input={workplace:'Gurugram office',district:'Gurugram',year:2026,workers:8,siteType:'standalone',complaints:false,employer:'other'};
+test('the LC inquiry report check uses authorised records without changing the IC question',()=>{
+  const report={id:22,title:'Inquiry report',case:true,question:'Original IC question',proof:'Original IC proof'};
+  const [lc]=assessmentView(scopeFrom({...input,complaints:true}),{},[report]).applicable;
+  assert.match(lc.question,/Local Committee.*District Officer within 10 days/);
+  assert.match(lc.referenceNote,/choose Not sure/);
+  assert.match(lc.referenceExamples.Yes,/LC confirmation LC-22/);
+  const [ic]=assessmentView(scopeFrom({...input,workers:10,complaints:true}),{},[report]).applicable;
+  assert.equal(ic.question,report.question);
+  assert.equal(ic.referenceNote,undefined);
+});
+
+test('PDF pagination keeps wrapped findings and excluded checks with their text',()=>{
+  const applicable=Array.from({length:25},(_,i)=>({
+    title:'Finding '+i,priority:'High',authority:'Basis '+i,next:'Action '+i,
+    answer:{value:'Partly',evidence:('A long record reference '.repeat(8))+'end marker '+i,owner:'Owner '+i}
+  }));
+  const excluded=Array.from({length:22},(_,i)=>({
+    title:'Excluded '+i,reason:'The condition did not apply in the review year. '.repeat(3)+'end exclusion '+i
+  }));
+  const report=pdf({scope:scopeFrom(input),review:{applicable,excluded,open:25},
+    organisation:'Test employer',order:'order_pagination',finalisedAt:'2026-11-09T00:00:00Z'}).toString('latin1');
+  const pages=[...report.matchAll(/stream\nBT (.*?) ET\nendstream/gs)].map(match=>match[1].replace(/\) Tj T\*\n\(/g,' '));
+  assert(pages.length>2);
+  for(let i=0;i<applicable.length;i++){
+    const finding=pages.find(p=>p.includes('Finding '+i+' | High'));
+    assert(finding?.includes('end marker '+i+' Action: Action '+i+' Owner: Owner '+i+' |'));
+  }
+  const exclusionPage=pages.find(p=>p.includes('CHECKS EXCLUDED BY SETUP'));
+  assert(exclusionPage?.includes('Excluded 0 |'));
+  for(let i=0;i<excluded.length;i++){
+    const page=pages.find(p=>p.includes('Excluded '+i+' |'));
+    assert(page?.match(new RegExp('end exclusion '+i+'\\b')));
+  }
+});
+
 test('scope uses establishment count, excludes irrelevant checks and blocks portal update until approval',()=>{
   const lc=assessmentView(scopeFrom(input),{},checks);
   assert.deepEqual(lc.applicable.map(q=>q.id),[8,60]);

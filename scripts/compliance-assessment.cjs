@@ -1,5 +1,6 @@
 'use strict';
 const {stagingOrigin}=require('./plan-store.cjs');
+const {lc,referenceExamples}=require('./compliance-reference.cjs');
 const orderPattern=/^order_[A-Za-z0-9]{1,40}$/;
 const choices=['Yes','Partly','No','Not sure'];
 const followUps={
@@ -56,15 +57,21 @@ function assessmentView(scope,answers,catalogue) {
       check.office==='head'&&scope.siteType==='branch'?'Applies to a Head Office or standalone review.':null;
     if (reason) {excluded.push({id:check.id,title:check.title,reason});continue;}
     const text=check[scope.route]||check;
+    const lcCheck=scope.route==='LC'&&lc[check.id];
+    const [question,proof]=lcCheck||[text.question,text.proof];
+    const action=lcCheck&&check.id!==23
+      ?'Check authorised LC correspondence and follow up on any employer action that is outstanding.'
+      :text.action;
     const answer=answers[check.id]||null;
     const blocked=check.id===62&&answer?.value!=='Not triggered'&&answers[scope.siteType==='branch'?61:60]?.value!=='Yes';
     const next=blocked?'SHe-Box IC update is blocked until Head Office approval or branch mapping is verified.':
       !answer?'Review the suggested evidence and choose an answer.':
       answer.value==='Yes'?'Evidence recorded.':
       answer.value==='Not triggered'?'Exclusion reason and reviewer recorded.':
-      answer.value==='Not sure'?'Verify the facts and collect evidence. '+text.action:text.action;
+      answer.value==='Not sure'?'Verify the facts and collect evidence. '+action:action;
     applicable.push({id:check.id,title:check.title,topic:check.topic,priority:check.priority,
-      authority:check.authority,question:text.question,proof:text.proof,action:text.action,
+      authority:check.authority,question,proof,action,referenceExamples:referenceExamples(check.id,scope.route),
+      ...(lcCheck?{referenceNote:'Use only authorised references and dates. If you cannot verify an LC step, choose Not sure. Keep names and case details out of this assessment and PDF.'}:{}),
       conditional:check.conditional,answer,next,blocked});
     const task=followUps[check.id];
     if(!task||!['No','Partly','Not sure'].includes(answer?.value))continue;
@@ -72,13 +79,15 @@ function assessmentView(scope,answers,catalogue) {
     const id=1000+check.id*2+Number(verification);
     const branchKey=String(answer.sequence??0);
     const saved=answers[id]?.branchKey===branchKey?answers[id]:null;
-    const action=(verification?'Assign someone to verify the facts and report back before ':'Assign a responsible role and target date for ')+task+'.';
+    const followUpAction=(verification?'Assign someone to verify the facts and report back before ':'Assign a responsible role and target date for ')+task+'.';
     applicable.push({id,parentId:check.id,branchKey,title:verification?'Verification follow-up':'Corrective action follow-up',
       topic:check.topic,priority:check.priority,authority:'Management follow-up',
       question:verification?'Has a responsible person been assigned to verify the facts before '+task+'?':
         'Has management assigned a responsible person and target date for '+task+'?',
       proof:verification?'Verification request or task reference.':'Action assignment and target date reference.',
-      action,conditional:false,answer:saved,next:saved?.value==='Yes'?'Follow-up assignment recorded.':action,blocked:false});
+      referenceExamples:{Yes:verification?'Verification task VERIFY-01 assigned to the HR lead. Check due on 30 Nov.':
+        'Action tracker ACTION-01 names the responsible role and sets a target of 30 Nov.'},
+      action:followUpAction,conditional:false,answer:saved,next:saved?.value==='Yes'?'Follow-up assignment recorded.':followUpAction,blocked:false});
   }
   return {applicable,excluded,remaining:applicable.filter(q=>!q.answer).length,
     open:applicable.filter(q=>q.answer&&(q.blocked||!['Yes','Not triggered'].includes(q.answer.value))).length};
@@ -98,7 +107,8 @@ function answerFrom(input,check) {
 }
 
 function pdf(snapshot) {
-  const lines=[];
+  const maxLines=52, pageLines=[];
+  let lines=[];
   function line(value='') {
     // WinAnsi standard fonts are available in PDF readers. Preserve unsupported characters as code points.
     const text=String(value).normalize('NFC').replace(/[‘’“”–—]/g,c=>({'‘':"'",'’':"'",'“':'"','”':'"','–':'-','—':'-'})[c])
@@ -110,6 +120,23 @@ function pdf(snapshot) {
       lines.push(text.slice(pos,end).trim());
       pos=end+(text[end]===' '?1:0);
     }
+  }
+  function addBlock(spaced=false) {
+    let page=pageLines.at(-1);
+    if (!page||page.length+lines.length+Number(spaced)>maxLines) {
+      page=[];
+      pageLines.push(page);
+    }
+    if(spaced&&page.length)page.push('');
+    // Long text can expand during encoding. Only split a block that exceeds a full page.
+    for(const entry of lines) {
+      if(page.length===maxLines) {
+        page=[];
+        pageLines.push(page);
+      }
+      page.push(entry);
+    }
+    lines=[];
   }
   const {scope,review,organisation,order,finalisedAt}=snapshot;
   line('POSH COMPLIANCE ASSESSMENT | MANAGEMENT AND EMPLOYER REVIEW');
@@ -134,18 +161,24 @@ function pdf(snapshot) {
       line('Action: '+q.next);
       line('Owner: '+(q.answer.owner||'Unassigned')+' | Target: '+(q.answer.due||'Unset'));
     }
-    line();
+    addBlock(true);
   }
-  line('CHECKS EXCLUDED BY SETUP');
-  for (const q of review.excluded) line(q.title+' | '+q.reason);
+  if(review.excluded.length) {
+    line('CHECKS EXCLUDED BY SETUP');
+    for (const [index,q] of review.excluded.entries()) {
+      line(q.title+' | '+q.reason);
+      addBlock(index===0);
+    }
+  }
+  if(lines.length)addBlock();
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'];
   const pages=[];
   const escape=t=>t.replace(/[\\()]/g,'\\$&');
-  for (let at=0;at<lines.length;at+=52) {
+  for (const pageContent of pageLines) {
     const page=objects.length+1;
     pages.push(page+' 0 R');
     objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents '+(page+1)+' 0 R >>');
-    const stream='BT /F1 10 Tf 42 800 Td 14 TL '+lines.slice(at,at+52).map(t=>'('+escape(t)+') Tj T*').join('\n')+' ET';
+    const stream='BT /F1 10 Tf 42 800 Td 14 TL '+pageContent.map(t=>'('+escape(t)+') Tj T*').join('\n')+' ET';
     objects.push('<< /Length '+Buffer.byteLength(stream,'latin1')+' >>\nstream\n'+stream+'\nendstream');
   }
   objects[1]='<< /Type /Pages /Count '+pages.length+' /Kids ['+pages.join(' ')+'] >>';

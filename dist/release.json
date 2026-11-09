@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.33.1-compliance-setup-clarity-staging",
+  "version": "6.34.0-compliance-record-references-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -22,7 +22,7 @@
     "community.js": "cb7b424ffaa7853cd067e8d9d22937bcfb21299ac5572841ddabdc4e1e4c20bc",
     "compliance-assessment.css": "87cde7713532f6d227230ceb75864bf42f7221c1992053a45c898ce33f1ae66c",
     "compliance-assessment.html": "c4b256c9c0ad395497468603b7aea080104b3a7aa64464b3b683d5da87c7365e",
-    "compliance-assessment.js": "0d69517aafb3cde8aa2e6bacc3b5d765dc47ee3c2cb0fea1e7c554e0581a616b",
+    "compliance-assessment.js": "ed8cedc961d5d5305c6b8a31f68b248abdfb6cb074c6d34c6ee124ecdb6ff094",
     "contact.html": "4e418800aecf8033e6dafb57b65af62cafa5dd4ed09208d4c2eb2648f7265a3e",
     "digital-delivery.html": "209acd651d0f622627a0d63333870a758c3f4ee952ee8390317454cd9f0878cb",
     "digital.css": "53b8e3f1d63736e85d6b8f6d45f52617b6443dd400132bdc396b8686547c2d26",

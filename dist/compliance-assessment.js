@@ -152,6 +152,8 @@
   };
   function evidenceExample(q,value,route){
     if(!value)return 'Select an answer to see an example.';
+    const tailored=q.referenceExamples?.[value];
+    if(tailored)return 'Example only · '+tailored;
     const examples={
       10:{No:'Workers can only find the previous policy version on the noticeboard.',Partly:'The updated policy is on the intranet. The noticeboard still shows the earlier version.', 'Not sure':'The current policy is in the HR folder. I still need to verify whether workers can access it.'},
       14:{No:'The induction materials do not cover expected conduct or where to report concerns.',Partly:'The October induction deck covers expected conduct. It does not show the reporting channel.', 'Not sure':'I have the induction agenda. I still need to check the slides for the reporting channel and verify the completion log.'}
@@ -184,6 +186,7 @@
       const title=el('h3',q.question);title.tabIndex=-1;
       const meta=el('p',q.topic+' · '+q.priority+' · '+q.authority);meta.className='check-meta';
       card.append(title,meta,el('p','What to look for: '+q.proof));
+      if(q.referenceNote&&!current.final)card.append(el('p',q.referenceNote));
       if(q.id===11)card.append(el('p','Regular worker awareness applies on both the IC and LC routes, including establishments with fewer than 10 workers. IC member orientation is a separate check.'));
       const next=el('p',q.next);next.className='next';card.append(next);
       if(current.final) {
