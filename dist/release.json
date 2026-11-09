@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.5-faq-content-flow-staging",
+  "version": "6.35.6-lc-membership-allowance-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -31,7 +31,7 @@
     "essential-sample-invoice.pdf": "d55b97769ebbbbd80cd56fd94d25d6d54232f1032e1ffdd88f02f6d39b2e9b4b",
     "evidence-ui.js": "4c0dd4cf035a637fe7c538c42406e49ea6cabe565803bb86f342f371837934b3",
     "evidence.js": "86c1fab32d62ebc669f1726d4736bee2e4595ab58ac5117b34592bd9424d9718",
-    "faq.js": "5b1fb6ceba9aca62a3a79d63360e68a849eca8d0a42113c2147585a9250c8da2",
+    "faq.js": "8714ba0339de0701eb3f5325b10f9b5a284622035469b3fbbfcc43a578742c9d",
     "finder.js": "398337af59081b0e9b92bc22fd2b79ccd903ff1c86c9e780b39195542f75f5d7",
     "guidance-context.js": "5b3fa9f587ce7c8d0ef6b5655adaa247f761223f53313bc0705e6ca23ba8e587",
     "guided-continuation.js": "b16343b50aa02d80ebee75afd4759f177a43878263b7c79cabe9c8266f57901d",
