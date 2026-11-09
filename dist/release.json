@@ -1,6 +1,6 @@
 {
   "product": "POSH Inquiry Navigator",
-  "version": "6.35.20-curated-court-library-staging",
+  "version": "6.35.21-fresh-committee-reference-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -31,7 +31,7 @@
     "essential-sample-invoice.pdf": "d55b97769ebbbbd80cd56fd94d25d6d54232f1032e1ffdd88f02f6d39b2e9b4b",
     "evidence-ui.js": "4c0dd4cf035a637fe7c538c42406e49ea6cabe565803bb86f342f371837934b3",
     "evidence.js": "86c1fab32d62ebc669f1726d4736bee2e4595ab58ac5117b34592bd9424d9718",
-    "faq.js": "341d71f46fcb50608a7513881485d671579619390f99860c8915a6dfc52379d9",
+    "faq.js": "22be89120b57169db27c9f2db3706c465183147437abb920e5fc9926d71706c4",
     "finder.js": "70b9d915e604e41665066cf89d34819d2b4a6b4a7f01bb3d5f01bd3289c0aa5d",
     "guidance-context.js": "5b3fa9f587ce7c8d0ef6b5655adaa247f761223f53313bc0705e6ca23ba8e587",
     "guided-continuation.js": "b16343b50aa02d80ebee75afd4759f177a43878263b7c79cabe9c8266f57901d",
@@ -46,7 +46,7 @@
     "inquiry-checklist.js": "0e3ae9ef91a9744b23f78a36b632072f0be4471593fd609452824fce287747f1",
     "institutions.html": "d292b90f5b0843e3783b2c7003075086700382ce2b5b5bd8b5414948961da6d9",
     "legal.js": "51c4bf6ab42d32bf7940c806acf61eeb700a88a15726eeb66f303fab08094bcf",
-    "library.js": "c3475c5ce09b97812659a94193b4fb6bb29bdb94310fe290a0aceefdf51024de",
+    "library.js": "05102638b9e5d15e6dd4f4b5333e33f57928dfc4f681aa56c86163e0717059ce",
     "main.js": "fa5a3ae568f9c59b26b8ef2c6b2137ba77f629b0d2e39ea1fedb5c3e04a6f325",
     "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plan-tools.html": "284fe7188a4d9b48126faf17a4e0482bbe91f91d9a2c655cccbeaecf20727b4d",
