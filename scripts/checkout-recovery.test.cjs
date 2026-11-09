@@ -15,7 +15,7 @@ const state={email:inbox,product:'checklist',step:1,failed:true,unsubscribe:stop
 
 async function fixture(run,{jobs=[],payments=[],mode='preview'}={}){
   const calls=[],sent=[];
-  let index=0,current;
+  let index=0,current,ticketUsed=false;
   const recovery=createRecovery({
     origin:stagingOrigin,url:'https://synthetic.supabase.co',key:'fixture',storeToken:checkoutToken,workerToken,
     mode,allowEmail:inbox,keyId:'rzp_test_fixture',gatewaySecret:'fixture',
@@ -24,6 +24,9 @@ async function fixture(run,{jobs=[],payments=[],mode='preview'}={}){
     fetchImpl:async(url,options)=>{
       if(url.startsWith('https://api.razorpay.com'))return Response.json({items:payments});
       const body=JSON.parse(options.body);calls.push({body,headers:options.headers});
+      if(url.endsWith('/navigator_claim_checkout_dispatch')){
+        const valid=!ticketUsed&&body.p_ticket===stopToken;ticketUsed||=valid;return Response.json(valid);
+      }
       if(body.p_action==='claim'){current=jobs[index++];return Response.json(current?{claim:attempt}:null);}
       if(body.p_action==='authorize')return Response.json(current??null);
       return Response.json({attempt});
@@ -32,8 +35,8 @@ async function fixture(run,{jobs=[],payments=[],mode='preview'}={}){
   const server=http.createServer(async(req,res)=>{if(!await recovery(req,res,new URL(req.url,'http://localhost')))res.end();});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base='http://127.0.0.1:'+server.address().port+'/api/checkout-recovery/';
-  async function request(action,data,{signed=true,origin=stagingOrigin,authorization}={}){
-    const headers={Origin:origin,'Content-Type':'application/json',...(signed?{'x-test-signed-in':'yes'}:{}),...(authorization?{authorization}:{})};
+  async function request(action,data,{signed=true,origin=stagingOrigin,authorization,ticket}={}){
+    const headers={Origin:origin,'Content-Type':'application/json',...(signed?{'x-test-signed-in':'yes'}:{}),...(authorization?{authorization}:{}),...(ticket?{'x-navigator-dispatch':ticket}:{})};
     const r=await fetch(base+action,{method:'POST',headers,body:JSON.stringify(data)});
     return {status:r.status,body:await r.json()};
   }
@@ -74,3 +77,8 @@ test('mail transport can reach only the configured staging inbox',()=>fixture(as
   assert.match(role.textContent,/90 days/);
 },{mode:'test-inbox',jobs:[state,{...state,email:'other@example.invalid'}]}));
 
+
+test('a scheduler ticket can be redeemed only once',()=>fixture(async({request})=>{
+  assert.equal((await request('dispatch',{}, {ticket:stopToken})).status,200);
+  assert.equal((await request('dispatch',{}, {ticket:stopToken})).status,403);
+}));

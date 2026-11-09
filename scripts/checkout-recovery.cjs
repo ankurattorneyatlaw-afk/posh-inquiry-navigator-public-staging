@@ -121,7 +121,10 @@ function createRecovery({
       if(route==='/api/checkout-recovery/dispatch'){
         const supplied=req.headers.authorization||'';
         const expected='Bearer '+workerToken;
-        if(Buffer.byteLength(supplied)!==Buffer.byteLength(expected)||!timingSafeEqual(Buffer.from(supplied),Buffer.from(expected)))return send(res,403,{error:'Not permitted.'});
+        const authorized=Buffer.byteLength(supplied)===Buffer.byteLength(expected)&&timingSafeEqual(Buffer.from(supplied),Buffer.from(expected));
+        const ticket=req.headers['x-navigator-dispatch'];
+        if(!authorized && (!uuid.test(ticket)||await rpc('navigator_claim_checkout_dispatch',null,{p_token:workerToken,p_ticket:ticket})!==true))
+          return send(res,403,{error:'Not permitted.'});
         return send(res,200,{results:await dispatch()});
       }
       if(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))return send(res,403,{error:'Not permitted.'});

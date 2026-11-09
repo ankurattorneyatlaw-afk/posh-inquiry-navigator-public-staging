@@ -144,15 +144,5 @@ $$;
 revoke all on function public.navigator_checkout_recovery_worker(text,text,uuid,text) from public, authenticated;
 grant execute on function public.navigator_checkout_recovery_worker(text,text,uuid,text) to anon;
 
-select cron.schedule('navigator-checkout-recovery', '*/5 * * * *', $job$
-  delete from navigator_private.checkout_recovery where updated_at<now()-interval '30 days';
-  select net.http_post(
-    url:='https://posh-inquiry-navigator-staging.onrender.com/api/checkout-recovery/dispatch',
-    headers:=jsonb_build_object('Authorization','Bearer '||s.decrypted_secret),
-    timeout_milliseconds:=90000
-  ) from vault.decrypted_secrets s
-  where s.name='navigator_checkout_recovery_worker'
-    and exists(select 1 from navigator_private.checkout_recovery
-      where due_at<=now() and consent_at is not null and claim is null);
-$job$);
-
+select cron.schedule('navigator-checkout-recovery', '*/5 * * * *', 'select 1');
+select cron.alter_job(job_id=>jobid,active=>false) from cron.job where jobname='navigator-checkout-recovery';
