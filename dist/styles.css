@@ -608,3 +608,8 @@ body[data-account-page="workspace"] h1{margin:8px 0 12px}.dashboard-intro{margin
 
 /* Let the layout column set the line width and keep long references inside it. */
 body{overflow-wrap:anywhere}
+
+@media(max-width:480px){.topic-directory nav{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:400px){
+  .inquiry-workspace .timeline-basic li{display:grid;grid-template-columns:minmax(0,1fr)}
+}

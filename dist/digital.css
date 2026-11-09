@@ -24,6 +24,7 @@
 .public-pricing .pricing-status{width:fit-content;padding:8px 14px;border-radius:8px;background:#e9f2f2;border:1px solid var(--line)}
 .public-pricing .pricing-notes{margin-top:20px}
 .public-pricing .plan-table-scroll{overflow-x:auto}
+.public-pricing .plan-table-scroll thead th:first-child{width:145px}
 
 .tools-start{margin:0 0 22px;background:#edf5f5;border-left:4px solid var(--teal)}
 .tools-index{margin:0 0 24px}

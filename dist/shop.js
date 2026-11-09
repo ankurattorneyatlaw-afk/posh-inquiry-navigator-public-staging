@@ -3,7 +3,14 @@ async function api(path,data,base='shop'){const r=await fetch('/api/'+base+'/'+p
 function status(s,error=false){$('shop-status').textContent=s;$('shop-status').className=error?'error':'status';}
 async function run(fn){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await fn()}catch(e){status(e.message,true)}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;}}
 const checklist=(path,data)=>api(path,data,selected.id);
-function complete(d){receipt=d;$('shop-order').hidden=true;$('order-review').hidden=true;$('order-complete').hidden=false;$('test-another-checklist').hidden=selected.kind!=='download';$('complete-summary').textContent=(d.orderId?'Test reference '+d.orderId+'. ':'')+'Test access is confirmed for '+selected.name+'.';const delivery=$('product-delivery');delivery.hidden=!d.delivery;if(d.delivery)delivery.href=d.delivery;else delivery.removeAttribute('href');$('product-delivery').textContent=selected.kind==='download'?(selected.id==='checklist'?'Download your protected Word checklist':'Download your Word checklist'):'Open your advanced guide';const expiry=$('checklist-download-window');
+function appendOrderReference(element, reference){
+  const segments=String(reference).match(/^[^_]*_|.{1,10}/gu)||[];
+  segments.forEach((segment,index)=>{
+    if(index)element.append(document.createElement('wbr'));
+    element.append(segment);
+  });
+}
+function complete(d){receipt=d;$('shop-order').hidden=true;$('order-review').hidden=true;$('order-complete').hidden=false;$('test-another-checklist').hidden=selected.kind!=='download';const summary=$('complete-summary');summary.replaceChildren();if(d.orderId){summary.append('Test reference ');appendOrderReference(summary,d.orderId);summary.append('. ');}summary.append('Test access is confirmed for '+selected.name+'.');const delivery=$('product-delivery');delivery.hidden=!d.delivery;if(d.delivery)delivery.href=d.delivery;else delivery.removeAttribute('href');$('product-delivery').textContent=selected.kind==='download'?(selected.id==='checklist'?'Download your protected Word checklist':'Download your Word checklist'):'Open your advanced guide';const expiry=$('checklist-download-window');
   expiry.hidden=selected.kind!=='download'||!d.downloadUntil;
   if (!expiry.hidden) {
     const date=new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(d.downloadUntil));
@@ -45,7 +52,7 @@ async function launchChecklist(){
 }
 function reviewChecklist(value){
   order=value;$('shop-order').hidden=true;$('order-review').hidden=false;
-  $('order-summary').textContent=money(selected.amount)+' test payment · '+value.organisation+' · '+value.orderId+'. No real charge.';
+  const summary=$('order-summary');summary.textContent=money(selected.amount)+' test payment · '+value.organisation+' · ';appendOrderReference(summary,value.orderId);summary.append('. No real charge.');
   $('order-confirm').textContent=value.mode==='simulated'?'Simulate '+money(selected.amount)+' test payment':'Open Razorpay test checkout';
   status('Test order saved. Continue with the test payment.');
 }
