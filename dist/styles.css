@@ -190,7 +190,8 @@ html { scroll-padding-top: 22px; }
 .inquiry-workspace .timeline-basic li{padding:20px;min-width:0}
 .inquiry-workspace .timeline-time{max-width:80ch}
 .inquiry-workspace .demo-context{margin-top:14px}
-.inquiry-workspace .demo-context p,.inquiry-workspace .demo-safety p,.inquiry-workspace .demo-boundary p{max-width:100ch}
+.inquiry-workspace .demo-context p,.inquiry-workspace .demo-boundary p{max-width:100ch}
+.inquiry-workspace .demo-safety p{max-width:none;text-wrap:pretty}
 @media(min-width:1500px){.inquiry-workspace .timeline-basic{grid-template-columns:repeat(3,minmax(0,1fr))}.inquiry-workspace .timeline-basic li:last-child:nth-child(odd){grid-column:auto}}
 @media(max-width:850px){.inquiry-workspace .timeline-basic{grid-template-columns:1fr}.inquiry-workspace .timeline-basic li:last-child:nth-child(odd){grid-column:auto}}
 @media(max-width:400px){.inquiry-workspace .timeline-basic li{padding:13px 11px}}
