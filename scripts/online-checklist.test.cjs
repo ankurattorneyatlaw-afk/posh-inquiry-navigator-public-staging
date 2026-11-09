@@ -46,7 +46,7 @@ test('online entitlement uses the verified buyer token and the purchased edition
     url:'https://synthetic.supabase.co',key:'publishable-fixture',token:key,
     readAsset:name=>{assert.equal(name,'buyer-checklist-template.json');return Buffer.from(JSON.stringify(edition()));},
     fetchImpl:async(url,req)=>{
-      assert(url.endsWith('/rpc/navigator_online_checklist'));
+      assert(url.endsWith('/rpc/navigator_inquiry_checklist_progress'));
       assert.equal(req.headers.Authorization,'Bearer buyer-token');
       assert.deepEqual(JSON.parse(req.body),{p_token:key,p_id:null});
       return Response.json({active:true,edition:'2.0'});
@@ -106,3 +106,34 @@ test('simulated verification saves the order and returns an online link with a 1
   assert.equal(verified.body.downloadUntil,undefined);
 });
 
+test('checklist progress writes require a signed-in buyer, an explicit active order, and tick-only values',async()=>{
+ const changes=[];
+ const online={access:async(buyer,id,change)=>{
+   if(buyer.id!=='buyer-a'||id!==orderId)return null;
+   if(change)changes.push(change);
+   return {id,organisation:'Synthetic Committee',edition:'2.0',active:!expired,accessUntil:expiry,checked:[2,5]};
+ },read:()=>({stages:[],sources:[]})};
+ let expired=false;
+ const handler=createChecklistCheckout({origin,online,identify:async req=>req.account?{id:req.account}:null});
+ async function call(path,data,account='buyer-a',from=origin){
+   const req=Readable.from(data===undefined?[]:[Buffer.from(JSON.stringify(data))]);
+   req.account=account;req.method=data===undefined?'GET':'POST';req.headers={origin:from,'content-type':'application/json'};
+   const result={};const res={writeHead(status){result.status=status;},end(body){result.body=JSON.parse(body);}};
+   await handler(req,res,new URL('/api/checklist/'+path,origin));return result;
+ }
+ const path='progress?order='+orderId;
+ assert.equal((await call(path,{number:2,checked:true},'')).status,401);
+ assert.equal((await call(path,{number:2,checked:true},'buyer-b')).status,403);
+ assert.equal((await call(path,{number:2,checked:true},'buyer-a','https://elsewhere.invalid')).status,403);
+ assert.equal((await call('progress',{number:2,checked:true})).status,400);
+ assert.equal((await call(path,{number:44,checked:true})).status,400);
+ assert.equal((await call(path,{number:2,checked:true,note:'case details'})).status,400);
+ assert.deepEqual((await call(path,{number:2,checked:false})).body,{checked:[2,5]});
+ assert.deepEqual((await call(path,{importChecked:[2,5,2]})).body,{checked:[2,5]});
+ assert.deepEqual(changes,[{p_number:2,p_checked:false},{p_import:[2,5]}]);
+ assert.deepEqual((await call('content?order='+orderId)).body.checked,[2,5]);
+ expired=true;
+ const denied=await call(path,{number:2,checked:true});
+ assert.equal(denied.status,410);
+ assert.equal(denied.body.checked,undefined);
+});

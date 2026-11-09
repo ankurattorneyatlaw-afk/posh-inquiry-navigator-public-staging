@@ -23,7 +23,7 @@ function recoveryMessage(job, origin) {
   const intro = job.step === 1
     ? (job.failed ? 'Your recent test checkout did not finish.' : 'You asked for a reminder about your unfinished test checkout.')
     : 'Here is your final reminder. If you have a question about access or delivery, reply and we can help.';
-  const access = job.product==='checklist' ? 'The purchased edition stays open online for 120 days from verified payment capture. Ticks stay in the browser used to mark them.'
+  const access = job.product==='checklist' ? 'The purchased edition stays open online for 120 days from verified payment capture. Ticks are saved to the buyer account for that order.'
     : job.product==='compliance-checklist' ? 'Sign in to resume your assessment. Finalise it when the applicable checks are complete and download the report for internal review.'
     : plans.has(job.product) ? 'The plan page shows the included users, editing period and read-only period. You can review these details before starting again.'
     : 'The advanced guide provides 90 days of self-service access. Downloaded drafts remain available for your personal use.';

@@ -74,11 +74,11 @@ function onlineFromEnvironment({
     if(!editions.has(edition))editions.set(edition,readEdition(JSON.parse(readAsset(assetByEdition[edition]).toString('utf8'))));
     return editions.get(edition);
   }
-  async function access(buyer,id){
+  async function access(buyer,id,change={}){
     if(!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url||'')||!key||! /^[a-f0-9]{64}$/.test(token||'')||!buyer.accessToken)throw Error('Online access is not configured');
-    const response=await fetchImpl(url+'/rest/v1/rpc/navigator_online_checklist',{
+    const response=await fetchImpl(url+'/rest/v1/rpc/navigator_inquiry_checklist_progress',{
       method:'POST',headers:{apikey:key,Authorization:'Bearer '+buyer.accessToken,'Content-Type':'application/json'},
-      body:JSON.stringify({p_token:token,p_id:id}),signal:AbortSignal.timeout(8000)
+      body:JSON.stringify({p_token:token,p_id:id,...change}),signal:AbortSignal.timeout(8000)
     });
     if(!response.ok)throw Error('Online checklist access could not be verified');
     return response.json();

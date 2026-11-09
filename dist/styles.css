@@ -620,3 +620,5 @@ body{overflow-wrap:anywhere}
 .home-walkthrough-form label.enquiry-consent{grid-template-columns:auto minmax(0,1fr);align-items:start;gap:8px;font-weight:400}
 .home-walkthrough-form input[type=checkbox]{margin-top:4px}
 .home-walkthrough-form button{justify-self:start}
+
+.required-mark{color:#146346;font-weight:750;white-space:nowrap}

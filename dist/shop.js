@@ -77,7 +77,7 @@ function productDetails(product){
   const contents=checklist?`
     <h3>What you get for ${money(product.amount)}</h3>
     <ul>
-      <li><strong>All 43 checks online.</strong> Tick checks in your browser and return on the same browser to see your saved progress.</li>
+      <li><strong>All 43 checks online.</strong> Tick checks and resume your saved progress on another device by signing in.</li>
       <li><strong>120 days for the purchased edition.</strong> Access starts at verified payment capture and uses the original buyer account.</li>
       <li><strong>Linked legal sources and an internal-use licence.</strong> Use this edition within one organisation.</li>
     </ul>
