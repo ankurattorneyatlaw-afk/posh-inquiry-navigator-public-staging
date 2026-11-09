@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const act='https://www.indiacode.nic.in/bitstream/123456789/2104/1/A2013-14.pdf';
+const act='https://www.indiacode.nic.in/bitstream/123456789/19302/1/sexual_harrassment_of_women_at_workplace_act_2013.pdf';
 const rules='https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf';
 const terms={
  'Fair opportunity':{text:'Natural justice calls for impartial consideration, adequate notice and a meaningful opportunity to answer relevant allegations and material before a decision. Apply this through the governing procedure, with confidentiality and appropriate safeguards. Central Rule 7(4) expressly requires natural justice where that procedure applies.',basis:'Principles of natural justice; Central POSH Rules, Rule 7(4); verify applicable service rules'},
@@ -56,12 +56,12 @@ const provisionData={
  'Central Rule 7(7)':['Minimum hearing attendance','Where applicable, at least three Committee members, including the Presiding Officer or Chairperson, must be present while conducting the inquiry. This does not replace full Committee-composition requirements.'],
  'Central Rule 13':['Workshops and capacity building','Subject to Section 19, covers internal policy, IC orientation, employee awareness, capacity and skill building, publication of IC contacts, and use of State-developed sensitisation modules.']
 };
-const actPages={3:5,4:5,6:6,7:6,9:7,10:7,11:8,12:8,13:9,14:9,15:10,16:10,18:10,19:10};
-const provisions=Object.fromEntries(Object.entries(provisionData).map(([key,[title,text]])=>[key,{title,text,source:key.startsWith('Central Rule')?rules+'#page='+(/13/.test(key)?3:2):'https://socialjustice.gov.in/writereaddata/UploadFile/15571713871775.pdf#page='+(actPages[Number(key.match(/\d+/)[0])]||1),kind:key.startsWith('Central Rule')?'Central POSH Rules, 2013':'POSH Act, 2013'}]));
+const provisions=Object.fromEntries(Object.entries(provisionData).map(([key,[title,text]])=>[key,{title,text,source:key.startsWith('Central Rule')?rules+'#page='+(/13/.test(key)?3:2):act,kind:key.startsWith('Central Rule')?'Central POSH Rules, 2013':'POSH Act, 2013'}]));
+const mixedLawBasis=/POCSO|\bBNS\b|BNSS|\bIPC\b|UGC|AICTE|\bCCS\b|Standing Orders|RTI Act|Constitution|Penal Code|Companies \(Accounts\)|Industrial Relations Code|Information Technology Act|General Clauses Act|DPDP Act|Rights of Persons with Disabilities Act|Armed Forces Tribunal Act/i;
 function referenceHTML(value){
  const text=String(value??'');
  // Mixed-law bases stay plain: do not mislabel POCSO, service rules or sector regulations as POSH provisions.
- if(/POCSO|BNS|BNSS|IPC|UGC|AICTE|CCS|Standing Orders|RTI Act|Constitution|Penal Code/i.test(text))return esc(text);
+ if(mixedLawBasis.test(text))return esc(text);
  const pattern=/\b(Sections?|(?:Central\s+)?Rules?)\s+(\d+(?:\([a-z0-9]+\))*(?:\s*[–-]\s*\([a-z0-9]+\))?(?:\s*(?:,|and|&)\s*\d+(?:\([a-z0-9]+\))*)*)/gi;
  let out='',pos=0;
  for(const match of text.matchAll(pattern)){
@@ -76,7 +76,12 @@ const verifiedCases=typeof module==='object'&&module.exports?require('./library.
 const checkedCases=Object.fromEntries(verifiedCases.filter(c=>c.verificationLevel==='primary-verified').map(c=>[c.id,{title:c.title,citation:[c.caseNumber,c.citation].join('; '),pinpoint:c.pinpoint,url:c.url,status:c.status}]));
 const directCases={'ic-contact-disclosure':['C05'],'ic-information-online':['C05'],'annual-awareness-planning':['C05'],'awareness-training-mandatory':['C05']};
 function citationHTML(x){const ids=new Set([...(x.cases||[]),...(directCases[x.id]||[]),...(x.members||[]).flatMap(m=>m.cases||[])]);const checked=[...ids].filter(id=>checkedCases[id]);return checked.length?`<div class="finder-citations"><strong>Verified judgment references</strong>${checked.map(id=>{const c=checkedCases[id];return `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.title)} — ${esc(c.citation)}; ${esc(c.pinpoint)}</a><small>${esc(c.status)}</small>`}).join('')}</div>`:'';}
-function basisHTML(x){const b=String(x.basis||'');return `<p class="faq-basis"><strong>Legal basis / context:</strong> ${referenceHTML(b.replace(/§§/g,'Sections ').replace(/§/g,'Section ').replace(/\bR(\d+)/g,'Central Rule $1'))}${/Section|§|Act/.test(b)?` · <a href="${act}" target="_blank" rel="noopener noreferrer">POSH Act</a>`:''}${/Rule|\bR\d/.test(b)?` · <a href="${rules}" target="_blank" rel="noopener noreferrer">Central Rules</a>`:''}</p>`;}
+function basisHTML(x){
+ const b=String(x.basis||'');
+ const mixed=mixedLawBasis.test(b);
+ const hasAct=mixed?/\bPOSH (?:Act|Sections?)\b|^Act Sections?\b/i.test(b):/Sections?|§|\bAct\b/i.test(b);
+ const hasRules=mixed?/\bCentral (?:POSH )?Rules?\b/i.test(b):/\bRules?\b|\bR\d/i.test(b);
+return `<p class="faq-basis"><strong>Legal basis / context:</strong> ${referenceHTML(b.replace(/§§/g,'Sections ').replace(/§/g,'Section ').replace(/\bR(\d+)/g,'Central Rule $1'))}${hasAct?` · <a href="${act}" target="_blank" rel="noopener noreferrer">POSH Act</a>`:''}${hasRules?` · <a href="${rules}" target="_blank" rel="noopener noreferrer">Central Rules</a>`:''}</p>`;}
 function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Related tools">${x.links.map(link=>`<a href="${esc(link.url)}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
 if(typeof module==='object'&&module.exports){module.exports={terms,provisions,referenceHTML,checkedCases,fullAnswer,basisHTML,citationHTML};return;}
 root.NavigatorLegal={terms,provisions,referenceHTML,fullAnswer,basisHTML,citationHTML};
