@@ -96,7 +96,16 @@ test('captured order locks one scope, resumes, rejects conflicts and provides a 
   assert.equal(file.subarray(0,8).toString(),'%PDF-1.4');
   assert.match(file.toString('latin1'),/Approval pending/);
   assert.match(file.toString('latin1'),/MANAGEMENT AND EMPLOYER REVIEW/);
-  assert.match(file.toString('latin1'),/P60 follow-up/);
+  assert.match(file.toString('latin1'),/Head Office approval \| Corrective action follow-up/);
+  assert.doesNotMatch(file.toString('latin1'), /\bP(?:08|60)\b/);
   assert.deepEqual(file,Buffer.from(await (await request(null,'owner','/report')).arrayBuffer()));
   assert.equal((await request(null,'other','/report')).status,403);
+});
+test('review year is bounded by the current year in India',()=>{
+  const base={workplace:'Synthetic Workplace',district:'Synthetic District',workers:10,siteWorkers:null,siteType:'standalone',
+    complaints:false,employer:'other',listed:false,mca:false,sebi:false};
+  const before=Date.parse('2026-12-31T18:29:59Z'),after=Date.parse('2026-12-31T18:30:00Z');
+  assert.throws(()=>scopeFrom({...base,year:2027},before),/2013 to 2026/);
+  assert.equal(scopeFrom({...base,year:2027},after).year,2027);
+  assert.throws(()=>scopeFrom({...base,year:2028},after),/2013 to 2027/);
 });

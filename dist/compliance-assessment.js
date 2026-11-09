@@ -4,6 +4,7 @@
   const order=new URLSearchParams(location.search).get('order')||'';
   const endpoint='/api/compliance-assessment?order='+encodeURIComponent(order);
   const form=$('scope'), fields=form.elements;
+  fields.year.max=new Intl.DateTimeFormat('en-IN',{year:'numeric',timeZone:'Asia/Kolkata'}).format(new Date());
   let current=null,busy=false,selectedId=null,dirty=false;
   const el=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node;};
   function notice(text){$('notice').textContent=text;}
@@ -21,8 +22,10 @@
     try{await work();}catch(e){notice(e.message);}finally{busy=false;}
   }
   function refreshScope() {
-    const branch=fields.siteType.value!=='standalone';
-    $('site-workers').hidden=!branch; fields.siteWorkers.required=branch;
+    const hasSiteCount=fields.siteType.value!=='standalone';
+    $('site-workers').hidden=!hasSiteCount; fields.siteWorkers.required=hasSiteCount;
+    fields.siteWorkers.disabled=!hasSiteCount;
+    fields.siteWorkers.max=fields.workers.value===''?'10000000':fields.workers.value;
     const company=fields.employer.value==='company';
     for(const node of document.querySelectorAll('[data-company]'))node.hidden=!company;
     fields.mca.required=fields.listed.required=company;
@@ -37,7 +40,7 @@
     run(async()=>{
       const yes=name=>fields[name].value==='Yes';
       const scope={workplace:fields.workplace.value,district:fields.district.value,year:Number(fields.year.value),workers:Number(fields.workers.value),
-        siteType:fields.siteType.value,siteWorkers:fields.siteWorkers.value===''?null:Number(fields.siteWorkers.value),
+        siteType:fields.siteType.value,siteWorkers:fields.siteWorkers.disabled||fields.siteWorkers.value===''?null:Number(fields.siteWorkers.value),
         complaints:yes('complaints'),employer:fields.employer.value,listed:yes('listed'),mca:yes('mca'),sebi:yes('sebi')};
       render(await api({action:'start',scope}));notice('Assessment started. Save each answer before moving on.');
     });
@@ -48,15 +51,32 @@
     if(max)node.maxLength=max;
     node.value=value||'';wrap.append(node);return {wrap,node};
   }
-  const code=q=>'P'+String(q.parentId??q.id).padStart(2,'0')+(q.parentId?' follow-up':'');
+  function questionLabel(q){
+    const parent=q.parentId&&current.review.applicable.find(item=>item.id===q.parentId);
+    return parent?parent.title+' · '+q.title:q.title;
+  }
+  function evidenceExample(q,value){
+    if(value==='Not triggered')return 'Sample entry · The event that triggers this check did not occur during the review year.';
+    if(q.id===10){
+      if(value==='No')return 'Sample entry · Workers can only find the previous version on the noticeboard.';
+      if(value==='Partly')return 'Sample entry · The updated policy is on the intranet. The noticeboard still shows the earlier version.';
+      if(value==='Not sure')return 'Sample entry · The latest version is in the HR folder. I still need to verify whether workers can access it.';
+      return 'Sample entry · POSH Policy v3, HR intranet › Policies and staff noticeboard, checked 9 Nov 2026.';
+    }
+    if(['No','Partly','Not sure'].includes(value))return 'Sample entry · The record is missing, incomplete or still needs to be checked. State the specific gap you found.';
+    if(q.id===8)return 'Sample entry · Staff noticeboard photo POSH-DISPLAY-02, district LC contact verified on 9 Nov 2026.';
+    if(q.id===11)return 'Sample entry · Awareness session on 12 Oct 2026, attendance register POSH-TRAIN-04 and session slides.';
+    return 'Sample entry · HR compliance register, entry POSH-2026-04, checked 9 Nov 2026.';
+  }
   function renderChecks(focus=false) {
     const list=$('checks');list.replaceChildren();
     for(const q of current.review.applicable.filter(q=>current.final||q.id===selectedId)) {
       const card=el('article');card.className='assessment-card';
       card.id='check-'+q.id;
-      const title=el('h3',code(q)+' · '+q.question);title.tabIndex=-1;
+      const title=el('h3',q.question);title.tabIndex=-1;
       const meta=el('p',q.topic+' · '+q.priority+' · '+q.authority);meta.className='check-meta';
       card.append(title,meta,el('p','What to look for: '+q.proof));
+      if(q.id===11)card.append(el('p','Regular worker awareness applies on both the IC and LC routes, including establishments with fewer than 10 workers. IC member orientation is a separate check.'));
       const next=el('p',q.next);next.className='next';card.append(next);
       if(current.final) {
         const a=q.answer;
@@ -69,6 +89,8 @@
         for(const option of ['Yes','Partly','No','Not sure',...(q.conditional?['Not triggered']:[])])answer.append(new Option(option,option));
         answer.value=q.answer?.value||'';label.append(answer);
         const proof=input('Record reference or reason','textarea',q.answer?.evidence,300);
+        const example=el('small');example.id='evidence-example-'+q.id;
+        proof.node.setAttribute('aria-describedby',example.id);proof.wrap.append(example);
         const reviewer=input('Exclusion reviewer role','text',q.answer?.reviewer,80);
         const owner=input('Action owner or role','text',q.answer?.owner,80), due=input('Target date','date',q.answer?.due);
         grid.append(label,proof.wrap,reviewer.wrap,owner.wrap,due.wrap);
@@ -76,6 +98,7 @@
           const value=answer.value, excluded=value==='Not triggered', issue=['Partly','No','Not sure'].includes(value);
           reviewer.wrap.hidden=!excluded;reviewer.node.required=excluded;proof.node.required=excluded||value==='Yes';
           owner.wrap.hidden=due.wrap.hidden=!issue;
+          example.textContent=evidenceExample(q,value);
           const latest=current.review.applicable.find(item=>item.id===q.id);
           next.textContent=latest.blocked&&value!=='Not triggered'?latest.next:issue?(value==='Not sure'?'Verify the facts and collect evidence. ':'')+q.action:
             value==='Yes'?'Enter a short reference to the record you checked.':
@@ -91,7 +114,7 @@
           const items=saved.review.applicable, at=items.findIndex(item=>item.id===q.id);
           selectedId=(items.slice(at+1).find(item=>!item.answer)||items.find(item=>!item.answer))?.id??q.id;
           render(saved,true);
-          notice(saved.review.remaining?'Saved '+code(q)+'. The next applicable question is ready.':'All applicable questions are saved. Review the actions, then finalise.');
+          notice(saved.review.remaining?'Answer saved. The next applicable question is ready.':'All applicable questions are saved. Review the actions, then finalise.');
         });};
       }
       list.append(card);
@@ -105,21 +128,21 @@
   }
   function render(state,focus=false) {
     current=state;dirty=false;form.hidden=!!state.scope;$('review').hidden=!state.scope;
-    if(!state.scope){fields.year.value=new Date().getFullYear();refreshScope();return;}
+    if(!state.scope){fields.year.value=fields.year.max;refreshScope();return;}
     const s=state.scope;
     $('scope-label').textContent=state.organisation+' · '+s.workplace+' · '+s.district+' · '+s.year+' · '+s.route+' route';
     const items=state.review.applicable, navigation=$('question-nav');
     if(!items.some(q=>q.id===selectedId))selectedId=(items.find(q=>!q.answer)||items[0])?.id??null;
-    navigation.replaceChildren(...items.map(q=>new Option(code(q)+' · '+q.title+(q.answer?' · Saved':''),String(q.id))));
+    navigation.replaceChildren(...items.map(q=>new Option(questionLabel(q)+(q.answer?' · Saved':''),String(q.id))));
     navigation.value=String(selectedId);
     $('filter-label').hidden=state.final;
     const rank={Critical:0,High:1,Medium:2,Low:3};
     const actions=items.filter(q=>q.answer&&(q.blocked||!['Yes','Not triggered'].includes(q.answer.value)))
       .sort((a,b)=>(rank[a.priority]??4)-(rank[b.priority]??4));
     $('actions-label').textContent='Management action summary ('+actions.length+')';
-    $('actions').replaceChildren(...actions.map(q=>el('li',code(q)+' · '+q.priority+' · '+q.next+' Owner: '+(q.answer.owner||'Unassigned')+' · Target: '+(q.answer.due||'Unset'))));
+    $('actions').replaceChildren(...actions.map(q=>el('li',questionLabel(q)+' · '+q.priority+' · '+q.next+' Owner: '+(q.answer.owner||'Unassigned')+' · Target: '+(q.answer.due||'Unset'))));
     $('excluded-label').textContent='Excluded by setup ('+state.review.excluded.length+')';
-    $('excluded').replaceChildren(...state.review.excluded.map(q=>el('li','P'+String(q.id).padStart(2,'0')+' · '+q.title+' — '+q.reason)));
+    $('excluded').replaceChildren(...state.review.excluded.map(q=>el('li',q.title+' — '+q.reason)));
     $('finish').hidden=state.final;$('report').hidden=!state.final;
     if(state.final){$('report').href='/api/compliance-assessment/report?order='+encodeURIComponent(order);$('final-note').textContent='This assessment is final. Download the same report from this order whenever you need it.';}
     updateProgress();renderChecks(focus);

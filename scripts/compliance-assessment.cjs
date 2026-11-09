@@ -27,11 +27,14 @@ const integer=(v,min,max)=>Number.isInteger(v)&&v>=min&&v<=max;
 const isoDate=v=>/^\d{4}-\d{2}-\d{2}$/.test(v)&&!Number.isNaN(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
 function problem(status,message){return Object.assign(Error(message),{status});}
 
-function scopeFrom(input) {
+const reviewYear=new Intl.DateTimeFormat('en-IN',{year:'numeric',timeZone:'Asia/Kolkata'});
+function scopeFrom(input, now=Date.now()) {
   if (!object(input)) throw problem(400,'Complete the assessment scope.');
   const workplace=clean(input.workplace,100), district=clean(input.district,100);
   const {year,workers,siteWorkers,siteType,complaints,employer,listed,mca,sebi}=input;
-  if (!workplace||!district||!integer(year,2013,new Date().getUTCFullYear())||!integer(workers,0,10000000)||
+  const maxYear=Number(reviewYear.format(now));
+  if(!integer(year,2013,maxYear))throw problem(400,'Enter a review year from 2013 to '+maxYear+'.');
+  if (!workplace||!district||!integer(workers,0,10000000)||
       !['standalone','head office','branch'].includes(siteType)||typeof complaints!=='boolean'||
       !['company','other'].includes(employer)) throw problem(400,'Enter workplace, district, review year, total headcount and the applicable setup choices.');
   if (siteType!=='standalone'&&!integer(siteWorkers,0,workers)) throw problem(400,'Enter the office headcount, up to the total establishment headcount.');
@@ -47,7 +50,7 @@ function assessmentView(scope,answers,catalogue) {
   const applicable=[],excluded=[];
   for (const check of catalogue) {
     const reason=check.ic&&scope.route==='LC'?'IC-only check. This assessment follows the LC route.':
-      check.case&&!scope.complaints?'No complaints were handled or carried forward in the review year.':
+      check.case&&!scope.complaints?'No complaints were received, handled or carried forward in the review year.':
       check.id===57&&!scope.mca&&!scope.sebi?'Neither company filing check applies.':
       check.office==='branch'&&scope.siteType!=='branch'?'Applies to a branch review.':
       check.office==='head'&&scope.siteType==='branch'?'Applies to a Head Office or standalone review.':null;
@@ -121,7 +124,8 @@ function pdf(snapshot) {
   const open=q=>q.blocked||!['Yes','Not triggered'].includes(q.answer.value);
   const ordered=[...review.applicable].sort((a,b)=>Number(open(b))-Number(open(a))||(rank[a.priority]??4)-(rank[b.priority]??4));
   for (const q of ordered) {
-    line((q.parentId?'P'+q.parentId+' follow-up':'P'+q.id)+' | '+q.title+' | '+q.priority+' | '+q.answer.value);
+    const parent=q.parentId&&review.applicable.find(item=>item.id===q.parentId);
+    line((parent?parent.title+' | ':'')+q.title+' | '+q.priority+' | '+q.answer.value);
     if(q.parentId)line(q.question);
     if (q.authority) line('Basis: '+q.authority);
     if (q.answer.evidence) line('Reference / reason: '+q.answer.evidence);
@@ -133,7 +137,7 @@ function pdf(snapshot) {
     line();
   }
   line('CHECKS EXCLUDED BY SETUP');
-  for (const q of review.excluded) line(q.id+' | '+q.title+' | '+q.reason);
+  for (const q of review.excluded) line(q.title+' | '+q.reason);
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'];
   const pages=[];
   const escape=t=>t.replace(/[\\()]/g,'\\$&');
@@ -185,7 +189,7 @@ function createAssessmentHandler({identify,store,origin,now=Date.now}) {
       if(!object(data))return send(400,{error:'Invalid assessment request.'});
       if(data.action==='start'){
         if(current.scope)return response(current);
-        return response(await store(buyer,order,'start',scopeFrom(data.scope)));
+        return response(await store(buyer,order,'start',scopeFrom(data.scope,now())));
       }
       if(current.final&&data.action==='finish')return response(current);
       if(!current.scope||current.final||data.revision!==current.revision)return send(409,{error:'The assessment changed. Reload it before continuing.'});

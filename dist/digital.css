@@ -34,7 +34,11 @@
 .tools-index a{display:inline-flex;align-items:center;min-height:44px}
 @media print{.tools-start,.tools-index{display:none!important}}
 
-#checkout-recovery{margin:16px 0;background:#edf5f5}
+#checkout-recovery{margin:12px 0;font-size:.95rem}
+#checkout-recovery summary{width:fit-content;cursor:pointer;font-weight:650}
+#checkout-recovery[open] .check{margin-top:8px}
+#checkout-recovery #checkout-recovery-stop{background:transparent;color:var(--teal);border:0;padding:0;min-height:44px;text-decoration:underline}
+#checkout-recovery-status{margin:0 0 8px}
 #checkout-recovery-status:empty{display:none}
 
 .inquiry-checklist #checklist-status:empty{display:none}

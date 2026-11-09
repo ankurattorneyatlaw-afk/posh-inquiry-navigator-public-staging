@@ -1,9 +1,19 @@
 .assessment-card{padding:1.35rem;margin:1rem 0;border:1px solid #d4dee3;border-radius:12px;background:#fff;color:#102039}
-.assessment-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+#assessment{max-width:1120px}
+.scope-group{min-width:0;margin:1.15rem 0;padding:1rem 0 0;border:0;border-top:1px solid #d4dee3}
+.scope-group legend{padding:0 .5rem 0 0;font-weight:750}
+.assessment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:.9rem 1.25rem}
+.assessment-grid small{font-weight:400;color:#435568;line-height:1.45}
+.franchise-help{align-self:start;margin:1.5rem 0 0}
+.franchise-help summary{cursor:pointer;font-weight:650}
+.franchise-help p{margin:.5rem 0}
+.scope-route:not(:empty){margin:.8rem 0 0;padding:.6rem .8rem;background:#eef5f3;border-radius:6px}
+@media(max-width:600px){.assessment-grid{grid-template-columns:minmax(0,1fr)}.franchise-help{margin:0}.assessment-card{padding:1rem}}
 .assessment-card label{display:grid;gap:.35rem;font-weight:600}
 .assessment-card input:not([type=checkbox]),.assessment-card select,.assessment-card textarea{width:100%;padding:.65rem;border:1px solid #6c7b88;border-radius:5px;color:#102039;background:#fff;font:inherit}
 .assessment-card textarea{resize:vertical;min-height:3rem}
-.assessment-card .confirm{display:flex;gap:.6rem;margin:1rem 0}
+.assessment-card .confirm{display:flex;align-items:flex-start;gap:.65rem;margin:1rem 0}
+.assessment-card .confirm input{flex:0 0 1.25rem;width:1.25rem;height:1.25rem;min-height:0;margin:.2rem 0 0;padding:0;accent-color:#17675a}
 .review-bar{display:flex;align-items:end;flex-wrap:wrap;gap:1rem}
 .review-bar strong{margin-right:auto}
 .check-list h3{margin:.2rem 0 .5rem}

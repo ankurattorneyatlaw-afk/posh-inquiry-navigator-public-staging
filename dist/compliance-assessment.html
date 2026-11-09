@@ -11,22 +11,28 @@
 <p id="notice" role="status" aria-live="polite">Checking order access…</p>
 <a id="signin" hidden href="/account?product=compliance-checklist">Sign in to continue</a>
 <form id="scope" class="assessment-card" hidden>
-<h2>Set up the review</h2><div class="assessment-grid">
+<h2>Set up the review</h2>
+<fieldset class="scope-group"><legend>Workplace and review year</legend><div class="assessment-grid identity-grid">
 <label>Workplace or branch name<input name="workplace" maxlength="100" required></label>
 <label>District for this workplace<input name="district" maxlength="100" required></label>
-<label>Review year<input name="year" type="number" min="2013" required></label>
-<label>Total workers in the establishment<input name="workers" type="number" min="0" max="10000000" required></label>
-<label>Workplace type<select name="siteType"><option value="standalone">Standalone</option><option>head office</option><option>branch</option></select></label>
-<label id="site-workers" hidden>Workers at this office only<input name="siteWorkers" type="number" min="0" max="10000000"></label>
-<label>Were any complaints handled or carried forward?<select name="complaints" required><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
+<label>Review year<input name="year" type="number" min="2013" step="1" aria-describedby="year-help" required><small id="year-help">Use the current year or an earlier year.</small></label>
+<label>Workplace type<select name="siteType" aria-describedby="franchise-help"><option value="standalone">Standalone</option><option value="head office">Head Office</option><option value="branch">Branch</option></select></label>
+<details id="franchise-help" class="franchise-help"><summary>How to classify a franchise</summary><p>Identify the employer responsible for managing and supervising the workplace. If an independent franchisee operates a single workplace, choose Standalone. If it operates multiple sites, choose Head Office or Branch within the franchisee’s own establishment. Choose Branch for a location operated as a unit of the same employer. Check the franchise and employment arrangements if responsibility is shared or unclear.</p><a href="https://www.indiacode.nic.in/bitstream/123456789/15239/1/sexual_harassment_act_2013.pdf" target="_blank" rel="noopener noreferrer">Read sections 2(g) and 4 of the POSH Act</a></details>
+</div></fieldset>
+<fieldset class="scope-group"><legend>Worker counts</legend><div class="assessment-grid">
+<label>Total workers across the entire establishment<input name="workers" type="number" min="0" max="10000000" step="1" aria-describedby="workers-help" required><small id="workers-help">Include eligible workers across the head office, branches and other units of this establishment, including eligible contract and temporary workers.</small></label>
+<label id="site-workers" hidden>Workers at this office only<input name="siteWorkers" type="number" min="0" max="10000000" step="1" aria-describedby="site-workers-help"><small id="site-workers-help">This count is part of the establishment total above.</small></label>
+</div><p id="route-preview" class="scope-route" aria-live="polite"></p></fieldset>
+<fieldset class="scope-group"><legend>What applies this year</legend><div class="assessment-grid">
+<label>Did this workplace receive, handle or carry forward any POSH complaints during the review year?<select name="complaints" aria-describedby="complaints-help" required><option value="">Choose</option><option>Yes</option><option>No</option></select><small id="complaints-help">This answer selects the later complaint-handling checks. Enter no names or case details here.</small></label>
 <label>Employer type<select name="employer"><option value="other">Other employer</option><option value="company">Company</option></select></label>
 <label data-company hidden>Do the MCA POSH disclosure rules apply?<select name="mca"><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
 <label data-company hidden>Is this a listed entity?<select name="listed"><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
 <label id="sebi" hidden>Does the applicable SEBI POSH disclosure rule apply?<select name="sebi"><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
-</div><p id="route-preview"></p>
-<p class="small">Count eligible workers across the establishment. Use an office-level count only in the separate field. Scope is fixed when you start.</p>
-<label class="confirm"><input type="checkbox" required> I have checked that this is the workplace and review year for this order.</label>
-<button class="button" type="submit">Start this assessment</button>
+</div></fieldset>
+<p class="small">These setup answers are fixed when you start the assessment.</p>
+<label class="confirm"><input type="checkbox" required><span>I have checked the workplace, review year and setup answers for this order.</span></label>
+<button class="button primary" type="submit">Start this assessment</button>
 </form>
 <section id="review" hidden>
 <div class="assessment-card review-bar"><strong id="progress"></strong><label id="filter-label">Current question <select id="question-nav"></select></label><button class="button" id="reload" type="button">Reload saved answers</button></div>
