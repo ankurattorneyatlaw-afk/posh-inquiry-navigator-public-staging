@@ -64,7 +64,7 @@ function simulatedGateway(product=legacyProduct) {
   };
 }
 
-function createChecklistCheckout({identify,origin,store,gateway,readTemplate,renderDocument,product=legacyProduct,now=Date.now}) {
+function createChecklistCheckout({identify,origin,store,gateway,readTemplate,renderDocument,product=legacyProduct,assessment=false,now=Date.now}) {
   const amount=price(product);
   const prefix='/api/'+product+'/';
   const filename=product===complianceProduct?'POSH-Compliance-Checklist':'POSH-Checklist';
@@ -76,11 +76,11 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
     res.end(JSON.stringify(value));
     return true;
   };
-  const delivery=id=>prefix+'download?order='+encodeURIComponent(id);
+  const delivery=id=>(assessment?'/compliance-assessment.html?order=':prefix+'download?order=')+encodeURIComponent(id);
   const summary=order=>order?{
     orderId:order.id,organisation:order.organisation,captured:order.captured,
-    downloadUntil:order.downloadUntil??null,
-    delivery:order.captured&&order.downloadAvailable===true?delivery(order.id):null
+    downloadUntil:assessment?null:order.downloadUntil??null,
+    delivery:order.captured&&(assessment||order.downloadAvailable===true)?delivery(order.id):null
   }:null;
   return async (req,res,url)=>{
     if (!url.pathname.startsWith(prefix)) return false;
@@ -91,7 +91,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
     let phase='session';
     try {
       const buyer=await identify(req,res);
-      const available=!!(store&&gateway&&createFile);
+      const available=!!(store&&gateway&&(assessment||createFile));
       if (action==='session') {
         const latest=buyer&&available?await store(buyer,'latest',gateway.name):null;
         return send(res,200,{signedIn:!!buyer,available,mode:gateway?.name||'disabled',keyId:gateway?.keyId,livePaymentsEnabled:false,latest:summary(latest)});
@@ -99,6 +99,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
       if (!buyer) return send(res,401,{error:'Sign in to continue.'});
       if (!available) return send(res,503,{error:'Checklist test checkout is not configured.'});
       if (action==='download') {
+        if (assessment) return send(res,410,{error:'Open your online assessment to download its final report.'});
         const id=url.searchParams.get('order');
         if (!orderPattern.test(id||'')) return send(res,400,{error:'Check the order reference.'});
         const order=await store(buyer,'get',gateway.name,{p_id:id});
@@ -125,7 +126,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
         orderLimits.set(buyer.id,count);
         // Verify the protected asset can be generated before starting checkout.
         phase='prepare-template';
-        createFile(organisation,'PREVIEW');
+        if (!assessment) createFile(organisation,'PREVIEW');
         phase='create-gateway-order';
         const order=await gateway.create();
         if (!orderPattern.test(order?.id||'')||order.amount!==amount||order.currency!==currency) throw Error('Invalid gateway order');
@@ -194,6 +195,7 @@ function fromEnvironment(identify,product=legacyProduct) {
   const template=product===complianceProduct?'compliance-checklist-template.json':'buyer-checklist-template.json';
   const preview=product===complianceProduct&&origin===stagingOrigin&&!existsSync(path.join(__dirname,'../products',template+'.enc'));
   const readTemplate=/^[a-f0-9]{64}$/.test(assetKey||'')?()=>JSON.parse(reader(template).toString('utf8')):null;
-  return createChecklistCheckout({identify,origin,store,gateway,product,readTemplate,renderDocument:preview?compliancePreview:null});
+  return createChecklistCheckout({identify,origin,store,gateway,product,readTemplate,renderDocument:preview?compliancePreview:null,assessment:product===complianceProduct});
 }
 module.exports={createChecklistCheckout,fromEnvironment,razorpayTest,simulatedGateway,supabaseOrders};
+

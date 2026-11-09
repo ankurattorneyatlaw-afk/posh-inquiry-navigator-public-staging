@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Compliance assessment | POSH Inquiry Navigator</title>
+<link rel="stylesheet" href="/digital.css"><link rel="stylesheet" href="/compliance-assessment.css"><script src="/compliance-assessment.js" defer></script></head>
+<body><a class="skip" href="#assessment">Skip to assessment</a><div class="test-bar">PRIVATE ACCOUNT ACCESS · STAGING TEST</div>
+<header class="digital-header"><a class="wordmark" href="/">POSH <span>Inquiry Navigator</span><small>By The Cosmic Energizers</small></a>
+<nav aria-label="Main navigation"><a href="/shop.html?product=compliance-checklist">Compliance checklist</a><a href="/workspace">My workspace</a></nav></header>
+<main id="assessment" class="digital-main">
+<p class="kicker">Organisation self-assessment</p><h1>POSH compliance checklist</h1>
+<p id="scope-label" class="lead">One workplace or branch per order. Save as you go, then finalise to download your report.</p>
+<p id="notice" role="status" aria-live="polite">Checking order access…</p>
+<a id="signin" hidden href="/account?product=compliance-checklist">Sign in to continue</a>
+<form id="scope" class="assessment-card" hidden>
+<h2>Set up the review</h2><div class="assessment-grid">
+<label>Workplace or branch name<input name="workplace" maxlength="100" required></label>
+<label>District for this workplace<input name="district" maxlength="100" required></label>
+<label>Review year<input name="year" type="number" min="2013" required></label>
+<label>Total workers in the establishment<input name="workers" type="number" min="0" max="10000000" required></label>
+<label>Workplace type<select name="siteType"><option value="standalone">Standalone</option><option>head office</option><option>branch</option></select></label>
+<label id="site-workers" hidden>Workers at this office only<input name="siteWorkers" type="number" min="0" max="10000000"></label>
+<label>Were any complaints handled or carried forward?<select name="complaints" required><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
+<label>Employer type<select name="employer"><option value="other">Other employer</option><option value="company">Company</option></select></label>
+<label data-company hidden>Do the MCA POSH disclosure rules apply?<select name="mca"><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
+<label data-company hidden>Is this a listed entity?<select name="listed"><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
+<label id="sebi" hidden>Does the applicable SEBI POSH disclosure rule apply?<select name="sebi"><option value="">Choose</option><option>Yes</option><option>No</option></select></label>
+</div><p id="route-preview"></p>
+<p class="small">Count eligible workers across the establishment. Use an office-level count only in the separate field. Scope is fixed when you start.</p>
+<label class="confirm"><input type="checkbox" required> I have checked that this is the workplace and review year for this order.</label>
+<button class="button" type="submit">Start this assessment</button>
+</form>
+<section id="review" hidden>
+<div class="assessment-card review-bar"><strong id="progress"></strong><label id="filter-label">Section <select id="topic"></select></label><button class="button" id="reload" type="button">Reload saved answers</button></div>
+<p class="small">Use references or role names. Keep complaint identities, allegations and source documents in your organisation’s restricted records.</p>
+<div id="checks" class="check-list"></div>
+<details class="assessment-card"><summary id="excluded-label">Excluded checks</summary><ul id="excluded"></ul></details>
+<section class="assessment-card" id="final-panel"><h2>Final report</h2><p id="final-note">Answer every applicable question. Open issues can remain in the final report. Finalising locks this assessment.</p>
+<button class="button" id="finish" type="button">Finalise assessment</button>
+<a class="button" id="report" hidden>Download final PDF</a></section>
+</section>
+</main></body></html>

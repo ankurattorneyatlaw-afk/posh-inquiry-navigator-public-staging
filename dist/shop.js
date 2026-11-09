@@ -3,6 +3,7 @@ async function api(path,data,base='shop'){const r=await fetch('/api/'+base+'/'+p
 function status(s,error=false){$('shop-status').textContent=s;$('shop-status').className=error?'error':'status';}
 async function run(fn){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await fn()}catch(e){status(e.message,true)}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;}}
 const checklist=(path,data)=>api(path,data,selected.id);
+const online=()=>selected?.id==='compliance-checklist';
 function appendOrderReference(element, reference){
   const segments=String(reference).match(/^[^_]*_|.{1,10}/gu)||[];
   segments.forEach((segment,index)=>{
@@ -16,6 +17,7 @@ function complete(d){recovery?.hide();receipt=d;$('shop-order').hidden=true;$('o
     const date=new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(d.downloadUntil));
     expiry.textContent=d.delivery?'Redownload before '+date+' IST. Keep your saved Word copy.':'The 90-day redownload period ended on '+date+' IST. Use your saved Word copy.';
   }
+  if(online())$('product-delivery').textContent='Open your compliance assessment';
   status(d.delivery?'Test access ready. No real payment was taken.':'The Word redownload period has ended.');}
 async function downloadChecklist(result){
   const url=new URL(result.delivery,location.origin);
@@ -34,6 +36,7 @@ async function verifyChecklist(proof){
   order.proof=proof;
   const result=await checklist('verify',proof);
   complete(result);
+  if(online()){status('Test order verified. Open your compliance assessment to start or resume.');return;}
   status('Test payment verified and order saved. Preparing your download.');
   if(!result.delivery){status('The 90-day redownload period has ended.');return;}
   if(!await downloadChecklist(result))return;
@@ -58,7 +61,7 @@ function reviewChecklist(value){
   $('order-confirm').textContent=value.mode==='simulated'?'Simulate '+money(selected.amount)+' test payment':'Open Razorpay test checkout';
   status('Test order saved. Continue with the test payment.');
 }
-$('product-delivery').onclick=event=>{if(selected?.kind!=='download')return;event.preventDefault();run(async()=>{if(await downloadChecklist(receipt))status('Your Word download has started.');});};
+$('product-delivery').onclick=event=>{if(selected?.kind!=='download'||online())return;event.preventDefault();run(async()=>{if(await downloadChecklist(receipt))status('Your Word download has started.');});};
 $('test-another-checklist').onclick=()=>{order=null;receipt=null;$('order-complete').hidden=true;$('shop-order').reset();$('shop-order').hidden=false;void recovery?.show();status('Enter the organisation for a new test order.');};
 $('shop-order').onsubmit=e=>{e.preventDefault();run(async()=>{if(!$('shop-consent').checked)throw Error('Confirm test mode before continuing.');await recovery?.begin();try{if(selected.kind==='download'){reviewChecklist(await checklist('order',{organisation:$('buyer-organisation').value,testConsent:true}));return;}order=await api('order',{product:selected.id,testConsent:true,termsVersion:catalogue.termsVersion});$('shop-order').hidden=true;$('order-review').hidden=false;$('order-summary').innerHTML='<p><strong>'+esc(order.name)+'</strong></p>'+(order.organisation?'<p>Licence holder: '+esc(order.organisation)+'</p>':'')+'<p>Catalogue price: '+money(order.catalogueAmount)+'</p><p><strong>Due now: ₹0 · simulation only</strong></p><p class="small">No real access plan, payment or invoice is activated.</p>';$('order-title').tabIndex=-1;$('order-title').focus();}catch(error){await recovery?.failed();throw error;}});};
 $('order-confirm').onclick=()=>run(async()=>{if(!order)throw Error('Start test checkout again.');await recovery?.begin({resume:true});if(selected.kind==='download'){await launchChecklist();return;}complete(await api('confirm',{orderId:order.orderId,testConsent:true}));});
@@ -105,7 +108,7 @@ function productDetails(product){
     <details><summary>What is outside this product</summary><ul>${limits}</ul></details>`;
   const freeGuide=download?'':'<a href="'+(product.id==='aggrieved'?'/#woman':'/#respondent')+'">Use the free guidance first</a>';
   return `
-    <p class="kicker">${download?'Personalised Word download':'Advanced self-service guide'}</p>
+    <p class="kicker">${product.id==='compliance-checklist'?'Online assessment':download?'Personalised Word download':'Advanced self-service guide'}</p>
     <h2>${esc(product.name)}</h2>
     <p class="price">${money(product.amount)}</p>
     <p class="small">${offer}</p>
@@ -117,3 +120,4 @@ function productDetails(product){
 }
 (async()=>{try{catalogue=await api('catalogue');const id=new URLSearchParams(location.search).get('product')||'checklist';$('product-tabs').innerHTML=catalogue.products.map(p=>'<a href="/shop.html?product='+esc(p.id)+'" '+(p.id===id?'aria-current="page"':'')+'>'+esc(p.name)+'</a>').join('');selected=catalogue.products.find(p=>p.id===id);if(!selected)throw Error('This product is unavailable. Choose one of the listed products above.');recovery=window.NavigatorCheckoutRecovery?.checkout(id);$('organisation-row').hidden=selected.kind!=='download';$('buyer-organisation').required=selected.kind==='download';$('product-detail').innerHTML=productDetails(selected);$('product-licence').textContent=selected.licence;$('shop-content').hidden=false;const session=selected.kind==='download'?await checklist('session'):await api('session?product='+id);if(session.signedIn)await recovery?.show();if(selected.kind==='download'&&session.signedIn){if(!session.available){status('Checklist test checkout is currently unavailable.');return;}if(session.latest?.captured){complete(session.latest);return;}if(session.latest){reviewChecklist({...session.latest,keyId:session.keyId,mode:session.mode});return;}}if(session.hasTestAccess)complete(session);else if(session.signedIn){$('shop-order').hidden=false;status('Review the scope, then start test checkout.');}else{$('shop-signin').hidden=false;$('shop-signin-link').href='/account?product='+id;status('Choose your product, then sign in for test checkout.');}}catch(e){status(e.message,true);}})();
 })();
+

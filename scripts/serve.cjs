@@ -17,6 +17,7 @@ const shop=require('./shop-api.cjs').createShopHandler({
 const {fromEnvironment:checklistCheckout}=require('./checklist-checkout.cjs');
 const checklist=checklistCheckout(accounts.checkoutIdentity);
 const complianceChecklist=checklistCheckout(accounts.checkoutIdentity,'compliance-checklist');
+const complianceAssessment=require('./compliance-assessment.cjs').fromEnvironment(accounts.checkoutIdentity);
 const {getPlanTools}=require('./plan-tools.cjs');
 const analytics=require('./analytics-api.cjs').createAnalytics();
 const enquiryMailer=require('./enquiry-mail.cjs').createEnquiryMailer();
@@ -69,6 +70,7 @@ const server = http.createServer(async(req,res)=>{
   if(await recovery(req,res,parsed))return;
   if(await payments(req,res,parsed))return;
   if(await checklist(req,res,parsed)||await complianceChecklist(req,res,parsed))return;
+  if(await complianceAssessment(req,res,parsed))return;
   if(await shop(req,res,parsed))return;
   if(parsed.pathname==='/checkout.html'||parsed.pathname==='/shop.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
   const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/account/':'account.html','/workspace':'workspace.html','/workspace/':'workspace.html','/admin':'admin.html','/admin/':'admin.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
@@ -108,3 +110,4 @@ server.keepAliveTimeout=5000;
 server.maxRequestsPerSocket=100;
 server.listen(Number(process.env.PORT || 4173),process.env.RENDER ? '0.0.0.0' : '127.0.0.1',()=>console.log('POSH Inquiry Navigator staging ready'));
 process.on('SIGTERM',()=>server.close());
+
