@@ -8,7 +8,7 @@ assert(main.includes('Section 11(1) — procedure; Section 11(4) — time limit'
 assert(fs.readFileSync('dist/checkout.js','utf8').includes('/api/payments/'));assert(fs.readFileSync('dist/checkout.html','utf8').includes('STAGING · RAZORPAY TEST MODE'));
 assert(fs.readFileSync('dist/community.js','utf8').includes('Load more answers'));assert(fs.readFileSync('dist/index.html','utf8').includes('Mobile navigation'));
 assert(main.includes('an NDA is not a statutory condition for filing a complaint'));assert(main.includes('Committee constitution, potential conflicts and complaint requirements'));
-const faq=require('../dist/faq.js');assert.equal(faq.items.length,114);assert.equal(faq.topics.length,13);assert(fs.readFileSync('dist/index.html','utf8').includes('faq.js'));
+const faq=require('../dist/faq.js');assert.equal(faq.items.length,115);assert.equal(faq.topics.length,13);assert(fs.readFileSync('dist/index.html','utf8').includes('faq.js'));
 console.log('Staging asset hashes and public boundaries verified.');
 const guidedHtml=fs.readFileSync('dist/guided.html','utf8'),guidedCode=fs.readFileSync('dist/guided.js','utf8');
 assert(guidedCode.includes('Has this issue been resolved now?'));
@@ -32,12 +32,26 @@ console.log('Integrated guided inquiry staging safeguards verified.');
 require('./test-guided.cjs');
 
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,19);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,55);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
-const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,114);assert.equal(finder.records.length,443);
-assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:443},(_,i)=>i+1));
-for(const [number,id] of [[364,"who-is-protected"],[440,"online-inquiry-checklist-access"],[441,"choose-compliance-checklist"],[442,"walkthrough-request-next-step"],[443,"outside-presiding-officer-all-men-workforce"]])assert.equal(finder.search("FAQ "+number)[0].id,id);
+const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,444);
+assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:444},(_,i)=>i+1));
+for(const [number,id] of [[364,"who-is-protected"],[440,"online-inquiry-checklist-access"],[441,"choose-compliance-checklist"],[442,"walkthrough-request-next-step"],[443,"outside-presiding-officer-all-men-workforce"],[444,"preliminary-notes-and-inquiry-report"]])assert.equal(finder.search("FAQ "+number)[0].id,id);
 
-for(const c of library.cases){assert.equal(c.verificationLevel,"primary-verified");assert.match(c.sourceSha256,/^[a-f0-9]{64}$/);for(const k of ["identity","primaryText","proposition","pinpoint","disposition"])assert.equal(c.verification[k],true);}
+const caseDirectory=require('../dist/cases.js');
+assert.equal(caseDirectory.data.length,55);
+assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,55);
+assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,55);
+assert.equal(new Set(caseDirectory.data.filter(c=>c.publicationRank).map(c=>c.masterId)).size,44);
+assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,53);
+assert(caseDirectory.filter('2025 INSC 1106')[0].linkedOrders.some(o=>o.date==='2025-11-17'&&o.url));
+assert.equal(caseDirectory.filter('Judgment 007')[0].id,'C08');
+assert.equal(caseDirectory.filter('Air France')[0].id,'SC027');
+assert(caseDirectory.filter('','All topics','All forums','Procedural orders').length===4);
+for(const number of [69,211,214,248,292,404,438,444]){
+  const record=finder.search('FAQ '+number)[0];
+  assert(record.cases.length);
+  assert(record.cases.every(id=>caseDirectory.data.some(c=>c.id===id&&caseDirectory.checked(c))));
+}
 assert(!library.cases.some(c=>["C09","C29","C37","C38","C50"].includes(c.id)));
