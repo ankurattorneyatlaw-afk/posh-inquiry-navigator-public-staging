@@ -51,3 +51,34 @@
 .checklist-stage li{margin:0;border-top:1px solid var(--line)}
 .checklist-stage label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:10px;min-height:44px;padding:10px 0;cursor:pointer}
 .checklist-stage input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--teal)}
+
+/* V4 judicial-defensibility: primary checklist before the previous 43-point edition. */
+.inquiry-checklist .checklist-primary-intro{margin-bottom:18px;background:#f4faf8;border-color:#b7d8d0}
+.inquiry-checklist .checklist-primary-intro h2{margin-top:5px}
+.inquiry-checklist .checklist-primary-links{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin:16px 0}
+.inquiry-checklist .checklist-primary-links a{min-height:42px;display:inline-flex;align-items:center}
+.inquiry-checklist #v4-inquiry-audit{margin-bottom:20px;scroll-margin-top:20px}
+.inquiry-checklist .checklist-audit-success{font-weight:650;color:#175647}
+.inquiry-checklist .checklist-audit-error{font-weight:650;color:#922f25;padding:12px 15px;border:1px solid #d9a39d;border-radius:8px;background:#fff5f4}
+.inquiry-checklist #legacy-checklist{margin-top:22px;scroll-margin-top:20px}
+.inquiry-checklist #legacy-checklist>summary{font-size:1.08rem;font-weight:700;cursor:pointer}
+.inquiry-checklist #legacy-checklist[open]>summary{margin-bottom:16px}
+.inquiry-checklist .v4-audit{min-width:0}
+.inquiry-checklist .v4-audit>h2{margin:0 0 12px}
+.inquiry-checklist .v4-audit>details{border:1px solid #d6e1de;border-radius:12px;padding:16px;margin:18px 0;scroll-margin-top:18px}
+.inquiry-checklist .v4-audit>details>summary{font-size:1.08rem;font-weight:700;cursor:pointer}
+.inquiry-checklist .v4-audit>details[open]>summary{margin-bottom:12px}
+.inquiry-checklist .v4-audit .scope-group{border:1px solid #d6e1de;border-radius:12px;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-block:18px}
+.inquiry-checklist .v4-audit .scope-group legend{font-weight:700;padding-inline:6px}
+.inquiry-checklist .v4-audit .v4-field{display:flex;flex-direction:column;gap:6px;max-width:100%;margin-top:10px;font-size:.94rem}
+.inquiry-checklist .v4-audit select,.inquiry-checklist .v4-audit input{width:100%;max-width:100%;min-height:41px;box-sizing:border-box;border:1px solid #aebeb8;border-radius:7px;padding:8px 10px;background:#fff;color:#182b26;font:inherit}
+.inquiry-checklist .v4-audit .v4-domain{padding:12px 14px;border:1px solid #e1e9e6;border-radius:10px;margin-top:10px}
+.inquiry-checklist .v4-audit .v4-domain>summary{font-weight:700;cursor:pointer;line-height:1.4}
+.inquiry-checklist .v4-audit .v4-item{padding:14px 4px;border-top:1px solid #e1e9e6;display:grid;grid-template-columns:minmax(210px,1.3fr) minmax(165px,0.8fr);gap:6px 16px;align-items:start}
+.inquiry-checklist .v4-audit .v4-item>strong{grid-column:1/-1}
+.inquiry-checklist .v4-audit .v4-item>p{grid-column:1/-1;margin:0;color:#53675f}
+.inquiry-checklist .v4-audit .v4-item>select{grid-column:1;align-self:end}
+.inquiry-checklist .v4-audit .v4-item>label{grid-column:2;margin:0}
+.inquiry-checklist .v4-audit .actions{margin-top:20px}
+.inquiry-checklist .v4-audit .actions>label{display:block;max-width:360px}
+@media(max-width:680px){.inquiry-checklist .v4-audit .v4-item{grid-template-columns:1fr}.inquiry-checklist .v4-audit .v4-item>select,.inquiry-checklist .v4-audit .v4-item>label{grid-column:1}.inquiry-checklist .v4-audit .scope-group{grid-template-columns:1fr}.inquiry-checklist .checklist-primary-links>.button{width:100%;justify-content:center}}
