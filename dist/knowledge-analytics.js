@@ -1,0 +1,11 @@
+(function(){'use strict';
+/* Anonymous, aggregated event counts only. Never send search text or case details. */
+const known={ 'Asia/Kolkata':'IN','Asia/Calcutta':'IN','Asia/Dubai':'AE','Asia/Singapore':'SG','Europe/London':'GB','Europe/Dublin':'IE','Europe/Paris':'FR','Europe/Berlin':'DE','Africa/Johannesburg':'ZA','Pacific/Auckland':'NZ','Australia/Sydney':'AU','Australia/Melbourne':'AU','Australia/Perth':'AU','America/New_York':'US','America/Chicago':'US','America/Denver':'US','America/Los_Angeles':'US','America/Toronto':'CA','America/Vancouver':'CA'};
+let enabled=false;const recent=new Map();
+const country=()=>{try{return known[Intl.DateTimeFormat().resolvedOptions().timeZone]||'ZZ'}catch{return 'ZZ'}};
+function emit(event,item){if(!enabled||!event||typeof item!=='string')return;const key=event+':'+item,at=recent.get(key)||0;if(Date.now()-at<12000)return;recent.set(key,Date.now());fetch('/api/knowledge/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event,item,country:country()}),keepalive:true,credentials:'same-origin'}).catch(()=>{});}
+window.NavigatorKnowledgeAnalytics={emit,enabled:()=>enabled};
+fetch('/api/knowledge/config',{credentials:'same-origin'}).then(r=>r.ok?r.json():{}).then(data=>{enabled=data.enabled===true;if(enabled&&location.hash.replace(/^#/,'').split(/[/?]/)[0]==='faq'){emit('library_open','all');const id=location.hash.slice(5).split('?')[0];const record=window.NavigatorFinder?.recordFor(id);if(record)emit('question_open',record.id)}}).catch(()=>{});
+window.addEventListener('hashchange',()=>{if(location.hash.replace(/^#/,'').split(/[/?]/)[0]==='faq')emit('library_open','all')});
+document.addEventListener('click',e=>{const link=e.target.closest('a[href]');if(!link||!location.hash.startsWith('#faq'))return;const url=link.getAttribute('href')||'';if(/shop\.html\?product=checklist/.test(url))emit('action_click','checklist');else if(/shop\.html\?product=compliance-checklist/.test(url))emit('action_click','compliance');else if(/(?:\/guided|#demo)/.test(url))emit('action_click','inquiry');else if(/mailto:.*training/i.test(url))emit('action_click','training');else if(/(?:#enquire|consult)/i.test(url))emit('action_click','consultation');});
+})();
