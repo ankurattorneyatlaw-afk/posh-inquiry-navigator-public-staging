@@ -1,7 +1,7 @@
 (function(){'use strict';const $=id=>document.getElementById(id);
 const form=$('pilot-claim-form'),availability=$('pilot-service-status'),status=$('pilot-my-status'),sharing=$('pilot-sharing'),message=$('pilot-result'),button=$('pilot-claim-submit'),code=$('pilot-code');
 const params=new URLSearchParams(location.search),candidate=(params.get('code')||'').trim().toUpperCase();
-if(/^NAV[0-9A-F]{9}$/.test(candidate))code.value=candidate;
+if(/^NAV[0-9A-F]{9}$/.test(candidate))code.value=candidate;if(/^NAV[0-9A-F]{9}$/.test(candidate)){const signIn=document.querySelector('a[href^="/account?return=partner-referral"]');if(signIn)signIn.href='/account?return=partner-referral&code='+encodeURIComponent(candidate)}
 let enabled=false;
 async function get(path,options={}){const r=await fetch('/api/partners/pilot/'+path,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(12000),...options});let data={};try{data=await r.json()}catch{}return {ok:r.ok,status:r.status,data}}
 async function init(){try{const conf=await get('config');enabled=conf.ok&&conf.data.pilotEnabled===true;if(!enabled){availability.textContent='Referral pilot is not currently available. No real referral codes or payouts are active.';status.textContent='Pilot access is off.';return}
