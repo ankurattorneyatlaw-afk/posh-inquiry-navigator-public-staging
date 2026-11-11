@@ -127,7 +127,7 @@ const numberFor=id=>byAlias.get(id)?.number;
 const audit={referenceQuestions:reference.length,practicalQuestions:practical.length,sourceFormulations:raw.length,canonicalAnswers:records.length,consolidatedFormulations:raw.length-records.length,groups:records.filter(x=>x.members.length>1).map(x=>({number:x.number,question:x.question,ids:x.aliases}))};
 if(typeof module==='object'&&module.exports){module.exports={search,records,topics,numberFor,audit,words,relatedTo};return;}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const tabs=()=>`<nav class="knowledge-tabs" aria-label="Knowledge library"><a href="#faq" aria-current="page">All FAQs <strong>${records.length}</strong></a><a href="#faq/cases">Judgments &amp; orders <strong>${root.NavigatorLibrary.caseCount}</strong></a></nav>`;
+const tabs=()=>`<nav class="knowledge-tabs" aria-label="Knowledge library"><a href="#faq" aria-current="page">All FAQs <strong>${records.length}</strong></a><a href="#faq/cases">Judgments &amp; orders <strong>${root.NavigatorLibrary.caseCount}</strong></a><a href="https://navigator.thecosmicenergizers.com/resources.html#other-resources">Other resources</a></nav>`;
 const faqPageSize=20;
 const faqPageGroupSize=10;
 let lastResultsHash='#faq',lastSearch='';
