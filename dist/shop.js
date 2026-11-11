@@ -75,20 +75,20 @@ function productDetails(product){
   const limits=product.excludes.map(item=>'<li>'+esc(item)+'</li>').join('');
   const preview=checklist?`
     <div class="checklist-preview">
-      <h3>See six checks before signing in</h3>
-      <p>Read one example from each stage, including check 43 on annual reporting. The online edition contains all 43 checks.</p>
-      <a class="button" href="${esc(product.sample)}" target="_blank" rel="noopener">Preview the sample PDF</a>
+      <h3>Current IC/LC legal checklist</h3>
+      <p>84 legal checkpoints across eight domains, with eight independent finalisation gates and conditional legal pathways. The online working review uses coded record references and offers local JSON or editable Word export.</p>
     </div>`:'';
   const contents=checklist?`
     <h3>What you get for ${money(product.amount)}</h3>
     <ul>
-      <li><strong>All 43 checks online.</strong> Tick checks and resume your saved progress on another device by signing in.</li>
-      <li><strong>120 days for the purchased edition.</strong> Access starts at verified payment capture. Use the link in your receipt to return.</li>
-      <li><strong>Linked legal sources and an internal-use licence.</strong> Use this edition within one organisation.</li>
+      <li><strong>One current 84-point checklist.</strong> Jurisdiction, impartiality, complaint scope, fair procedure, evidentiary reasoning, statutory representations, recommendations and report handover.</li>
+      <li><strong>Eight independent finalisation gates.</strong> Record the supporting source or Committee determination; unresolved fundamental defects prevent certification.</li>
+      <li><strong>120 days of licensed online access.</strong> Access starts at verified test payment capture. Save and reopen your coded working review using its local JSON or Word export; it is not synced to the account.</li>
+      <li><strong>Legal source index and case-specific applicability cues.</strong> The Committee decides the facts and authorises its report.</li>
     </ul>
-    <h3>Six stages covered</h3>
+    <h3>Eight review domains</h3>
     <ol>${features}</ol>
-    <p class="small">The guided inquiry workspace, advice and case review are separate. <a href="/#plan-tested">Compare the inquiry plans</a>.</p>`:`
+    <p class="small">Separate IC/LC inquiry-plan tools and the employer's organisation compliance assessment are distinct products. <a href="/#plan-tested">Compare the inquiry plans</a>.</p>`:`
     <h3>What you receive</h3>
     <ul>${features}</ul>
     <details><summary>What is outside this product</summary><ul>${limits}</ul></details>`;
