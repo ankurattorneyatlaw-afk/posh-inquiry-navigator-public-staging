@@ -94,7 +94,8 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
   return async (req,res,url)=>{
     if (!url.pathname.startsWith(prefix)) return false;
     const action=url.pathname.slice(prefix.length);
-    if (!['session','download','content','progress','order','verify','cancel'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
+    if (action==='progress') return send(res,410,{error:'The previous tick-based endpoint has been retired. Use the current 84-point review and export its coded working record.'});
+    if (!['session','download','content','order','verify','cancel'].includes(action)) return send(res,404,{error:'Checkout action not found.'});
     if (req.method!==(['session','download','content'].includes(action)?'GET':'POST')) return send(res,405,{error:'Method not allowed.'});
     if (req.method==='POST'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))) return send(res,403,{error:'Use the Navigator checkout page.'});
     let phase='session';
@@ -107,32 +108,15 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
           available,mode:gateway?.name||'disabled',keyId:gateway?.keyId,livePaymentsEnabled:false,latest:summary(latest)});
       }
       if (!buyer) return send(res,401,{error:'Start guest checkout or use the link in your receipt.'});
-      if (action==='content'||action==='progress') {
+      if (action==='content') {
         if (!online) return send(res,404,{error:'Checklist action not found.'});
         const id=url.searchParams.get('order');
-        if ((id!==null||action==='progress')&&!orderPattern.test(id||'')) return send(res,400,{error:'Check the order reference.'});
-        let change;
-        if(action==='progress'){
-          let size=0;const chunks=[];
-          for await(const chunk of req){size+=chunk.length;if(size>1024)return send(res,413,{error:'Progress update is too large.'});chunks.push(chunk);}
-          let data;
-          try{data=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{return send(res,400,{error:'Invalid progress update.'});}
-          if(!data||typeof data!=='object'||Array.isArray(data))return send(res,400,{error:'Invalid progress update.'});
-          const fields=Object.keys(data);
-          const itemNumber=n=>Number.isInteger(n)&&n>=1&&n<=43;
-          if(fields.length===1&&Array.isArray(data.importChecked)&&data.importChecked.length<=43&&data.importChecked.every(itemNumber)){
-            change={p_import:[...new Set(data.importChecked)]};
-          }else if(fields.length===2&&itemNumber(data.number)&&typeof data.checked==='boolean'){
-            change={p_number:data.number,p_checked:data.checked};
-          }else return send(res,400,{error:'Use a checklist number and checked state.'});
-        }
-        const entitlement=await online.access(buyer,id,change);
+        if(id!==null&&!orderPattern.test(id))return send(res,400,{error:'Check the order reference.'});
+        const entitlement=await online.access(buyer,id);
         if (!entitlement) return send(res,403,{error:'Open this IC / LC Inquiry Checklist from its receipt link or original buyer account.'});
         if (!entitlement.active) return send(res,410,{error:'The 120-day online access period has ended.',accessUntil:entitlement.accessUntil});
-        const checked=entitlement.checked??[];
-        if(action==='progress')return send(res,200,{checked});
-        const {stages,sources}=online.read(entitlement.edition);
-        return send(res,200,{orderId:entitlement.id,organisation:entitlement.organisation,edition:entitlement.edition,accessUntil:entitlement.accessUntil,checked,stages,sources,legalAudit:require('./defensibility-v4.cjs').publicData()});
+        const {legalAudit}=online.read('4.0');
+        return send(res,200,{orderId:entitlement.id,organisation:entitlement.organisation,edition:legalAudit.version,accessUntil:entitlement.accessUntil,legalAudit});
       }
       if (online&&action==='download') return send(res,410,{error:'This checklist is now online. Open it from your workspace.'});
       if (!available) return send(res,503,{error:'Checklist test checkout is not configured.'});
@@ -165,7 +149,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
         orderLimits.set(buyer.id,count);
         // Verify the protected asset can be generated before starting checkout.
         phase='prepare-template';
-        if(online)online.read('2.0');
+        if(online)online.read('4.0');
         else if(!assessment)createFile(organisation,'PREVIEW');
         phase='create-gateway-order';
         const order=await gateway.create();
@@ -235,12 +219,12 @@ function fromEnvironment(identify,product=legacyProduct,guest) {
     buyer.guest?guest.orders(product,buyer,action,values):accountStore(buyer,action,gatewayName,values));
   const assetKey=process.env.NAVIGATOR_CHECKLIST_ASSET_KEY;
   const reader=require('./product-assets.cjs').productReader({key:assetKey});
-  const template=product===complianceProduct?'compliance-checklist-template.json':'buyer-checklist-template.json';
+  const template=product===complianceProduct?'compliance-checklist-template.json':null;
   const preview=product===complianceProduct&&origin===stagingOrigin&&!existsSync(path.join(__dirname,'../products',template+'.enc'));
-  const readTemplate=/^[a-f0-9]{64}$/.test(assetKey||'')?()=>JSON.parse(reader(template).toString('utf8')):null;
+  const readTemplate=template&&/^[a-f0-9]{64}$/.test(assetKey||'')?()=>JSON.parse(reader(template).toString('utf8')):null;
   const accountOnline=product===legacyProduct?onlineFromEnvironment():null;
-  const online=accountOnline&&{...accountOnline,access:(buyer,order,change)=>
-    buyer.guest?guest.progress(buyer,order,change):accountOnline.access(buyer,order,change)};
+  const online=accountOnline&&{...accountOnline,access:(buyer,order)=>
+    buyer.guest?guest.progress(buyer,order):accountOnline.access(buyer,order)};
   return createChecklistCheckout({identify:guest?.identify(identify,product)||identify,origin,store,gateway,product,
     readTemplate,renderDocument:preview?compliancePreview:null,online,assessment:product===complianceProduct,guest});
 }
