@@ -34,7 +34,7 @@ function createKnowledgeAnalytics({enabled=process.env.KNOWLEDGE_ANALYTICS_ENABL
   recent.set(fp,now());return false;
  }
  const request=async(path,options={})=>{
-  const response=await fetchImpl(url+'/rest/v1/'+path,{...options,headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',...(options.headers||{})},signal:AbortSignal.timeout(4500)});
+  const response=await fetchImpl(url+'/rest/v1/'+path,{...options,headers:{apikey:key,...(/^eyJ/.test(key)?{Authorization:'Bearer '+key}:{}),'Content-Type':'application/json',...(options.headers||{})},signal:AbortSignal.timeout(4500)});
   if(!response.ok)throw Error('Storage unavailable');return response;
  };
  return {
