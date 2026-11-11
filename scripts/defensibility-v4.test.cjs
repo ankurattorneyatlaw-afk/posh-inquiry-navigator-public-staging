@@ -50,7 +50,9 @@ test('current client components and Committee document templates parse, with no 
  assert.match(fs.readFileSync('dist/legal-audit-v4.js','utf8'),/Your 84-point coded audit is kept in this browser tab/);
  const report=fs.readFileSync('dist/workflow-documents.js','utf8');
  assert.match(report,/Eight independent release gates/);
- assert.match(report,/Legal report type and exclusions/);
+ assert.match(report,/01 Report identification, status and mandate/);
+ const documents=require('../dist/workflow-documents.js');
+ assert.equal(documents.entries.find(e=>e.id==='inquiry-report').sections.length,13);
 });
 test('licensed 84-point content is accessible only to the verified active purchaser',async()=>{
  const fake={access:async(buyer,id)=>buyer.id==='holder'?{id:'order_Test',organisation:'Test',active:true,accessUntil:'2027-03-01T00:00:00Z'}:null,read:()=>({legalAudit:v4.publicData()})};
