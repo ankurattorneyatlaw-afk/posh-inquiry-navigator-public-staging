@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Partner Referral — Pilot | POSH Legal Navigator</title><meta name="description" content="Register a POSH Legal Navigator partner code before checkout or see your pilot partner status."><link rel="stylesheet" href="/partner.css"><style>
+.pilot-pill{display:inline-block;padding:5px 12px;background:#fff1d7;color:#6f4c22;border-radius:99px;font-weight:750;font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.pilot-bg{background:linear-gradient(135deg,#10283b,#254e61);color:#fff;padding:66px 0}
+.pilot-bg h1{max-width:18ch}
+.pilot-bg p{color:#dce9ed;font-size:18px}
+.pilot-main{padding:54px 0 90px}
+.pilot-form input[type=text]{display:block;width:100%;max-width:420px;text-transform:uppercase;letter-spacing:.1em;font-weight:750;padding:14px;border:1px solid #95b1c0;border-radius:9px;margin:12px 0}
+.pilot-form .check{display:flex;gap:10px;align-items:flex-start;max-width:650px;margin:20px 0}
+.pilot-form .check input{margin-top:7px;flex:none}
+.pilot-status{background:#edf4f6;padding:16px 20px;border-left:4px solid #196263;border-radius:5px;overflow-wrap:anywhere}
+.pilot-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0}
+#pilot-sharing[hidden],#pilot-claim-form[hidden],#pilot-my-status[hidden]{display:none}
+.pilot-code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:clamp(18px,3vw,28px);font-weight:800;color:#14394a;letter-spacing:.08em}
+</style></head><body><a class="skip" href="#main">Skip to main content</a>
+<header class="partner-header"><nav class="partner-nav" aria-label="Main navigation"><a class="partner-mark" href="/">POSH Legal Navigator<small>BY THE COSMIC ENERGIZERS</small></a><div class="partner-links"><a href="/#faq">Knowledge Library</a><a href="/become-a-partner">Become a Partner</a><a href="/resources.html">Digital tools</a><a href="/account">Sign in</a></div></nav></header>
+<section class="pilot-bg"><div class="partner-wrap"><span class="pilot-pill">Staging / test-only</span><h1>Have a Navigator partner code?</h1><p>Enter it before an eligible checkout, or review your own pilot referral status. This preview never charges money or issues payable commission.</p></div></section>
+<main class="partner-wrap pilot-main" id="main">
+<div class="two-col">
+<section class="info-card" aria-labelledby="claim-title"><p class="eyebrow">FOR CUSTOMERS</p><h2 id="claim-title">Register your referral</h2><p>If a professional introduced you to Navigator, you can explicitly register their code with your verified account. We do not place referral-tracking cookies or automatically attribute you based on a link.</p>
+<p id="pilot-service-status" class="pilot-status" role="status">Checking referral pilot availability…</p>
+<form class="pilot-form" id="pilot-claim-form" hidden>
+<label for="pilot-code">Partner pilot code</label><input id="pilot-code" name="code" maxlength="12" minlength="12" pattern="NAV[0-9A-Fa-f]{9}" placeholder="NAVXXXXXXXXX" autocomplete="off" required>
+<label class="check"><input type="checkbox" name="confirmed" required><span>I choose to associate this pilot code with my Navigator account, confirm that this is not my own referral and that I have no related-party or procurement conflict. I understand it creates no monetary benefit or obligation.</span></label>
+<button class="partner-button dark" id="pilot-claim-submit" type="submit">Register test referral</button><p class="pilot-status" id="pilot-result" role="status" aria-live="polite"></p>
+</form>
+<p class="pilot-actions"><a class="partner-button secondary" href="/account">Sign in or create account</a><a href="/shop.html">Explore digital products</a></p><p class="muted">A pilot claim is for functionality testing only. It is not a discount, order, legal advice request or completed commission referral. Your code must be registered before any future live order.</p></section>
+<section class="info-card" aria-labelledby="dashboard-title"><p class="eyebrow">FOR APPLICANTS AND PARTNERS</p><h2 id="dashboard-title">Your pilot partner status</h2><p>Sign in using the same verified email as your partner application to see any issued test-only code. Real partner activation requires an executed agreement and all applicable verification.</p>
+<p id="pilot-my-status" class="pilot-status" role="status">Checking account…</p>
+<div id="pilot-sharing" hidden><p class="muted">Your issued pilot referral code:</p><p id="pilot-code-display" class="pilot-code"></p><div class="pilot-actions"><button id="pilot-copy" class="partner-button secondary" type="button">Copy test referral link</button><a href="/partner-terms.html">Review terms</a></div><p id="pilot-copy-status" role="status"></p><p class="muted">Number of registered pilot referrals: <strong id="pilot-count">0</strong>. This is a test count, not earned revenue.</p></div>
+<p><a href="/become-a-partner#apply">Apply to join the programme</a> · <a href="/partner-terms.html">Commercial and payment policy</a></p></section></div>
+<section class="note" style="margin-top:34px"><strong>Privacy and safety.</strong> Buyers must confirm attribution themselves. We store the account-to-code relationship with its expiry, never complaint evidence, names of parties, or raw case searches. Partner contacts do not get a list of customer identities. Public-sector and conflicted procurement remain excluded from commission. <a href="/privacy.html">Read the privacy notice.</a></section>
+</main>
+<footer class="partner-foot"><div class="partner-wrap partner-foot-inner"><p>POSH Legal Navigator · The Cosmic Energizers</p><p><a href="/#faq">Knowledge Library</a> · <a href="/become-a-partner">Partner Programme</a> · <a href="/privacy.html">Privacy</a></p></div></footer>
+<script src="/partner-referral.js" defer></script></body></html>
