@@ -84,6 +84,33 @@
       saving=false;
     }
   }
+  function mountLegalAudit(data){
+    const target=$('v4-inquiry-audit');
+    const note=$('checklist-legal-status');
+    const valid=Array.isArray(data?.legalAudit?.checks)&&data.legalAudit.checks.length===84
+      &&Array.isArray(data?.legalAudit?.gates)&&data.legalAudit.gates.length===8;
+    if(!valid||!window.NavigatorDefensibilityV4?.mount){
+      target.replaceChildren();
+      note.hidden=false;
+      note.textContent='The current 84-point legal review is not available. The earlier 43 checks are preserved below but are NOT the updated checklist. Reload the page, or use Check access again. Do not rely on the old checklist as the v4 legal review.';
+      note.className='checklist-audit-error';
+      return false;
+    }
+    try{
+      const mounted=window.NavigatorDefensibilityV4.mount(target,data.legalAudit,{id:'v4-inquiry-review'});
+      if(!mounted)throw Error('Missing legal review component');
+      note.hidden=false;
+      note.className='checklist-audit-success';
+      note.textContent='Current v4.0 legal checklist loaded: 84 points in eight domains, plus eight release gates. The earlier 43-point edition is available separately below.';
+      return true;
+    }catch(error){
+      target.replaceChildren();
+      note.hidden=false;
+      note.className='checklist-audit-error';
+      note.textContent='The 84-point review could not be displayed. Try refreshing; the previous 43-point edition is not a substitute for this legal review.';
+      return false;
+    }
+  }
   function render(data){
     order=data.orderId;
     $('checklist-edition').textContent='Edition '+data.edition;
@@ -125,7 +152,7 @@
       link.rel='noopener noreferrer';
     }
     sourcePanel.hidden=!list.children.length;
-    if(data.legalAudit&&window.NavigatorDefensibilityV4)window.NavigatorDefensibilityV4.mount($('v4-inquiry-audit'),data.legalAudit,{id:'v4-inquiry-review'});
+    mountLegalAudit(data);
     showCount();
   }
   function lock(message){
@@ -159,6 +186,7 @@
       const checked=await importBrowserTicks(data);
       if(started!==revision)return;
       if(order!==data.orderId)render(data);
+      else if(!$('v4-inquiry-audit').querySelector('#v4-inquiry-review'))mountLegalAudit(data);
       applyProgress(checked);
       $('checklist-expiry').textContent='Online access until '+dayTime.format(expiresAt)+' IST.';
       actions.hidden=true;
