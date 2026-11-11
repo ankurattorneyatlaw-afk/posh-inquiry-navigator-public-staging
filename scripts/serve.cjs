@@ -69,6 +69,10 @@ const server = http.createServer(async(req,res)=>{
   if(await accounts.handle(req,res,parsed))return;
   if(await analytics.handle(req,res,parsed))return;
   if(await knowledge.handle(req,res,parsed))return;
+  if(parsed.pathname==='/api/partners/admin/applications'){
+    if(!await accounts.isOperator(req,res)){res.writeHead(403,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Administrator access required'}));return;}
+    await partners.summary(req,res);return;
+  }
   if(await partners.handle(req,res,parsed))return;
   if(parsed.pathname==='/api/knowledge/admin/summary'){
     if(!await accounts.isOperator(req,res)){res.writeHead(403,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Administrator access required'}));return;}
@@ -83,9 +87,9 @@ const server = http.createServer(async(req,res)=>{
   if(await complianceAssessment(req,res,parsed))return;
   if(await shop(req,res,parsed))return;
   if(parsed.pathname==='/checkout.html'||parsed.pathname==='/shop.html')res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-  const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/account/':'account.html','/workspace':'workspace.html','/workspace/':'workspace.html','/admin':'admin.html','/admin/':'admin.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html','/knowledge-insights':'knowledge-insights.html','/become-a-partner':'partners.html','/become-a-partner/':'partners.html','/partner-terms':'partner-terms.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
+  const name=({'/institutions':'institutions.html','/institutions/':'institutions.html','/request-demonstration':'index.html','/account':'account.html','/account/':'account.html','/workspace':'workspace.html','/workspace/':'workspace.html','/admin':'admin.html','/admin/':'admin.html','/preview':'preview.html','/guided':'guided.html','/guided/':'guided.html','/knowledge-insights':'knowledge-insights.html','/become-a-partner':'partners.html','/become-a-partner/':'partners.html','/partner-terms':'partner-terms.html','/partner-operations':'partner-operations.html'}[parsed.pathname])||parsed.pathname.slice(1)||'index.html';
   if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
-  if(name==='knowledge-insights.html'||name==='knowledge-insights.js'){
+  if(['knowledge-insights.html','knowledge-insights.js','partner-operations.html','partner-operations.js'].includes(name)){
     if(!await accounts.isOperator(req,res)){res.writeHead(403,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'});res.end('Administrator access required');return;}
   }
   const testOrder=parsed.searchParams.get('testOrder');
