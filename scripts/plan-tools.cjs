@@ -2,6 +2,7 @@
 
 const ACT='https://www.indiacode.nic.in/bitstream/123456789/2104/1/A2013-14.pdf';
 const RULES='https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf';
+const v4=require('./defensibility-v4.cjs');
 const tiers={essential:1,professional:2,advanced:3};
 const labels={essential:'Inquiry Essential',professional:'Inquiry Professional',advanced:'Inquiry Advanced'};
 
@@ -27,13 +28,13 @@ const readiness=[
 ];
 
 const reportSections=[
-  ['Document control','Record the draft version, reviewer code and restricted distribution.'],
+  ['Document control','Record report type (jurisdiction, conciliation, preliminary, statutory, disciplinary, special regime or referral), operative law version, draft status, reviewer code and restricted distribution. Do not pass off a preliminary determination as a final Section 13 report.'],
   ['Proceeding reference','Use the approved internal code. Keep the identity key offline.'],
   ['Committee constitution','Cite the appointment and composition record.'],
   ['Authority and jurisdiction','Record the Committee’s reasons and source references.'],
   ['Members and roles','Record member codes and actual functions.'],
   ['Conflicts and substitutions','Record checks, decisions, reasons and applicable directions.'],
-  ['Applicable procedure','Identify the governing service rules or applicable prescribed procedure.'],
+  ['Applicable procedure','Identify exact governing service-rule instrument, effective date, Section 11 route and Rule 7 applicability. For Central Government CCS matters confirm whether preliminary fact-finding and formal disciplinary inquiries are distinct.'],
   ['Complaint and receipt','Cite the actual complaint and receipt record.'],
   ['Limitation review','Record applicable dates and any reasoned extension decision.'],
   ['Scope of allegations','Identify each allegation code and the scope actually notified.'],
@@ -58,10 +59,10 @@ const reportSections=[
   ['Contrary material','Explain the bearing of contrary material and alternative accounts.'],
   ['Reliability and weight','Record the Committee’s reasons, uncertainty and limits.'],
   ['Material not relied on','Record what was excluded or given no weight and the reasons.'],
-  ['Preliminary findings and representations','Where applicable, cite disclosure of findings and representations.'],
-  ['Allegation-wise reasons','Set out the Committee’s own reasoning for each allegation.'],
-  ['Findings','Enter only the Committee’s actual findings.'],
-  ['Recommendations','Record the Committee’s reasoned recommendations within the governing framework.'],
+  ['Preliminary findings and representations','Where both parties are employees, identify the Section 11(1) findings disclosed, actual opportunity, representations and Committee consideration before finalisation. Never invent a fixed statutory representation period.'],
+  ['Allegation-wise reasons','For EACH allegation: Section 2(n)/3(2) element, supporting and contrary exhibits, testimony, credibility reasons, contradictions, missing records, alternative explanations, preponderance assessment, provisional finding, representations where applicable and final finding.'],
+  ['Findings','Enter only the Committee’s actual proved, partly proved or not-proved conduct. Differentiate preliminary fact-finding from a completed statutory or disciplinary adjudication.'],
+  ['Recommendations','Apply Section 13(2)/(3), relevant service rules, proportionality, separate Section 15 factors if compensation is proposed and independent Section 14 safeguards where relevant; no automatic punishment or credibility assumption.'],
   ['Compensation review if applicable','Cite actual Section 15 considerations and reasons, where relevant.'],
   ['Separate Section 14 consideration','Record this only if applicable. Lack of proof does not establish malice.'],
   ['Annexure and exhibit index','Reconcile approved markings, attachment and disclosure.'],
@@ -70,7 +71,7 @@ const reportSections=[
   ['Confidentiality and circulation','Record the approved recipient list and redaction decisions.'],
   ['Approval and signatures','Complete only after the Committee’s actual review and authorisation.'],
   ['Delivery and implementation record','Track actual delivery and follow-up separately from findings.'],
-  ['Appeal and custody note','Record applicable route, custody and any actual directions without deciding outcomes.']
+  ['Appeal and custody note','Verify current Section 18 appeal forum, limitation and applicable repeal/savings provisions; record secure custody, actual delivery, 60-day implementation monitoring and judicial-risk release gate evidence.']
 ];
 
 const toolkit=[
@@ -108,8 +109,9 @@ function getPlanTools(plan) {
   const level=tiers[plan];
   return {
     plan, label:labels[plan], sources:{act:ACT,rules:RULES}, toolkit,
+    legalAudit:v4.publicData(),
     ...(level>=2?{readiness,reportSections,knowledge}:{}),
-    ...(level>=3?{advanced}:{})
+    ...(level>=3?{advanced:{...advanced,scenarios:[...advanced.scenarios,...v4.challenges.map(c=>[c.id,c.title,c.expected])]}}:{})
   };
 }
 module.exports={getPlanTools,tiers};
