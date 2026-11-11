@@ -47,7 +47,9 @@ test('each captured staging payment grants only its own tier to the paying accou
     assert.equal(await handler.toolsPlan({}, {},orderId),plan);
     const tools=getPlanTools(plan);
     assert.ok(tools.toolkit.length);
-    assert.equal(tools.reportSections?.length,plan==='essential'?undefined:44);
+    assert.equal(tools.reportOutline.length,13);
+    assert.equal(tools.allegationMatrixFields.length,14);
+    assert.equal(tools.reportSections?.length,plan==='essential'?undefined:13);
     assert.equal(tools.readiness?.length,plan==='essential'?undefined:3);
     assert.equal(Boolean(tools.advanced),plan==='advanced');
     account='buyer-two';

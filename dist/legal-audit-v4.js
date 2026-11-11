@@ -10,7 +10,7 @@ function mount(host,data,options={}){
  const wrap=$('section',host);wrap.className='panel v4-audit';wrap.id=options.id||'v4-audit';
  $('h2',wrap,'Judicial-defensibility review · v4.0');
  text(wrap,'84 source-linked checks, eight release gates and conditional IC/LC routes. This is a working legal-audit aid, not a completed inquiry, legal certification, or automated finding. Keep identities, allegations and originals in the institution’s restricted records.');
- const notice=$('p',wrap,'This review is held in this browser tab only. Save your coded review file before closing. Existing 43-check tick progress remains saved to the licensed account separately.');
+ const notice=$('p',wrap,'Your 84-point coded audit is kept in this browser tab. Save its JSON or editable Word working record before leaving. Do not enter personal information or case narratives.');
  notice.className='small';
  const contextPanel=$('fieldset',wrap);contextPanel.className='scope-group';$('legend',contextPanel,'Applicable legal pathway');
  const contexts=[

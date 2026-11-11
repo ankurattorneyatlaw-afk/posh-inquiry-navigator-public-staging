@@ -28,50 +28,37 @@ const readiness=[
 ];
 
 const reportSections=[
-  ['Document control','Record report type (jurisdiction, conciliation, preliminary, statutory, disciplinary, special regime or referral), operative law version, draft status, reviewer code and restricted distribution. Do not pass off a preliminary determination as a final Section 13 report.'],
-  ['Proceeding reference','Use the approved internal code. Keep the identity key offline.'],
-  ['Committee constitution','Cite the appointment and composition record.'],
-  ['Authority and jurisdiction','Record the Committee’s reasons and source references.'],
-  ['Members and roles','Record member codes and actual functions.'],
-  ['Conflicts and substitutions','Record checks, decisions, reasons and applicable directions.'],
-  ['Applicable procedure','Identify exact governing service-rule instrument, effective date, Section 11 route and Rule 7 applicability. For Central Government CCS matters confirm whether preliminary fact-finding and formal disciplinary inquiries are distinct.'],
-  ['Complaint and receipt','Cite the actual complaint and receipt record.'],
-  ['Limitation review','Record applicable dates and any reasoned extension decision.'],
-  ['Scope of allegations','Identify each allegation code and the scope actually notified.'],
-  ['Conciliation status','Record the actual route and relevant direction. Keep settlement material restricted.'],
-  ['Interim measures','Record the application, recommendation and response, if any.'],
-  ['Notice and service','Cite proof of actual issue, service and material supplied.'],
-  ['Reply and position','Identify the reply or actual opportunity to respond.'],
-  ['Hearing schedule','Cite the hearing diary and actual dates.'],
-  ['Attendance and quorum','Cite sitting-level records and any corrective action.'],
-  ['Absence and adjournments','Cite reasons, notices and governing procedure.'],
-  ['Participation arrangements','Record accommodation and language arrangements where applicable.'],
-  ['Aggrieved woman’s account','Cite the relevant record and material actually considered.'],
-  ['Respondent’s account','Cite the relevant record and material actually considered.'],
-  ['Witness accounts','Cite witness codes, relevant statements and opportunity to test them.'],
-  ['Evidence register','Reconcile the controlled register and original custody.'],
-  ['Electronic and documentary material','Record provenance, integrity issues and review references.'],
-  ['Disclosure and responses','Record which material was supplied, when and any direction.'],
-  ['Objections and rulings','Cite reasoned decisions on recorded objections.'],
-  ['Allegation matrix','Reconcile allegation codes and supporting and contrary evidence.'],
-  ['Applicable legal tests','Identify only governing provisions and verified authorities actually relied on.'],
-  ['Supporting material','Explain the bearing of supporting material allegation by allegation.'],
-  ['Contrary material','Explain the bearing of contrary material and alternative accounts.'],
-  ['Reliability and weight','Record the Committee’s reasons, uncertainty and limits.'],
-  ['Material not relied on','Record what was excluded or given no weight and the reasons.'],
-  ['Preliminary findings and representations','Where both parties are employees, identify the Section 11(1) findings disclosed, actual opportunity, representations and Committee consideration before finalisation. Never invent a fixed statutory representation period.'],
-  ['Allegation-wise reasons','For EACH allegation: Section 2(n)/3(2) element, supporting and contrary exhibits, testimony, credibility reasons, contradictions, missing records, alternative explanations, preponderance assessment, provisional finding, representations where applicable and final finding.'],
-  ['Findings','Enter only the Committee’s actual proved, partly proved or not-proved conduct. Differentiate preliminary fact-finding from a completed statutory or disciplinary adjudication.'],
-  ['Recommendations','Apply Section 13(2)/(3), relevant service rules, proportionality, separate Section 15 factors if compensation is proposed and independent Section 14 safeguards where relevant; no automatic punishment or credibility assumption.'],
-  ['Compensation review if applicable','Cite actual Section 15 considerations and reasons, where relevant.'],
-  ['Separate Section 14 consideration','Record this only if applicable. Lack of proof does not establish malice.'],
-  ['Annexure and exhibit index','Reconcile approved markings, attachment and disclosure.'],
-  ['Statutory and service-rule index','List sources actually relied on, with precise provision references.'],
-  ['Judgment index','List verified decisions actually relied on with citations and pinpoint references.'],
-  ['Confidentiality and circulation','Record the approved recipient list and redaction decisions.'],
-  ['Approval and signatures','Complete only after the Committee’s actual review and authorisation.'],
-  ['Delivery and implementation record','Track actual delivery and follow-up separately from findings.'],
-  ['Appeal and custody note','Verify current Section 18 appeal forum, limitation and applicable repeal/savings provisions; record secure custody, actual delivery, 60-day implementation monitoring and judicial-risk release gate evidence.']
+ ['Report identification, status and scope','Record the case reference, Committee or authority, version, date, confidentiality, and whether this is a jurisdictional, conciliation, preliminary, statutory, disciplinary, special-regime or referral document. Do not call a preliminary inquiry a final Section 13 finding.'],
+ ['Applicable law, service rules and report pathway','Identify operative POSH Act provisions, any binding service rules, procedural applicability and effective date. Distinguish Rule 7 where applicable from another governing inquiry procedure; confirm the actual appellate forum.'],
+ ['Committee constitution, independence and jurisdiction','Reference the IC/LC constitution order, member eligibility and tenure, recusal decisions, competent employer or District Officer, aggrieved woman and respondent status and workplace nexus.'],
+ ['Complaint, maintainability, limitation and notified allegations','Identify original complaint and receipt, Section 9 time-limit and reasoned extension, issue-specific allegation codes, notifications and material objections to scope. Never replace original submissions with assumptions.'],
+ ['Preliminary decisions, conciliation and interim measures','Record Section 10 route and settlement status, Section 12 written request and action, jurisdictional or limitation dispositions and competent directions only as applicable. A completed settlement requires the lawful closure route, not fabricated merits findings.'],
+ ['Inquiry chronology, disclosure and procedural fairness','Trace actual notices, service and receipt, reply opportunities, witness questioning, sittings, quorum, absences, ex parte prerequisites, objections and reasons. Use actual dates and the correct governing procedure.'],
+ ['Precisely framed issues for determination','Map each material notified allegation to the facts and statutory elements requiring determination; exclude allegations not fairly notified and legally out-of-scope questions.'],
+ ['Evidence inventory, reliability and disputed material','Reference exhibits, witness records and original custody, electronic provenance, authenticity objections, nonproduction, relevant corroboration and material contrary evidence. Keep originals and personal identities in secure institutional custody.'],
+ ['Parties’ material submissions, explanations and witness accounts','Present the complainant and respondent positions separately, admissions and denials, contested facts, relevant witness knowledge and alternative explanations without stereotyping.'],
+ ['Allegation-wise evaluation and provisional findings','For each allegation separately assess Section 2(n)/3(2), supporting and contrary exhibits, credibility reasons, material contradictions, unavailable evidence, probability, limits and precisely stated provisional findings. Cross-reference the separate 14-field allegation matrix.'],
+ ['Representations against findings and reconsideration','Where both parties are employees, record delivery of findings, meaningful opportunity and representations under the Section 11(1) second proviso and the Committee’s reasoned consideration; otherwise record the applicable service-rule position. Do not invent a fixed statutory response period.'],
+ ['Final findings and legally authorised recommendations','State the precise conduct proved, partly proved or not proved, and reasoned Sections 13(2)/(3) conclusions; assess service-rule proportionality, Section 15 compensation factors and independent Section 14 safeguards where triggered. Never conflate fact-finding with employer penalty action.'],
+ ['Authentication, restricted annexures, delivery and appeal','Record Committee authorisation, signatures, verified completion and dispatch dates, Section 13(1) delivery, Section 13(4) implementation follow-up, confidentiality, Section 18 current appeal forum and indexed secure annexures. Validate all eight legal release gates.']
+];
+const reportTypeChapters={
+ jurisdiction:[0,1,2,3,4,12],
+ conciliation:[0,1,2,3,4,12],
+ preliminary:[0,1,2,3,4,5,6,7,8,9,12],
+ statutory:[0,1,2,3,4,5,6,7,8,9,10,11,12],
+ disciplinary:[0,1,2,3,4,5,6,7,8,9,10,11,12],
+ special:[0,1,2,3,4,5,6,7,8,9,10,11,12],
+ referral:[0,1,2,3,4,12]
+};
+const allegationMatrixFields=[
+ 'Allegation code and exact notified scope','Section 2(n) and relevant 3(2) elements',
+ 'Complainant’s material assertions','Respondent’s admission, denial or response',
+ 'Supporting exhibit and witness references','Contrary exhibits and exculpatory material',
+ 'Electronic provenance or authenticity dispute','Credibility reasons and material inconsistencies',
+ 'Missing or inaccessible evidence and effect','Alternative explanations and their evaluation',
+ 'Preponderance-of-probabilities analysis','Provisional finding and reasons',
+ 'Applicable representations on findings','Committee-approved final allegation-wise conclusion'
 ];
 
 const toolkit=[
@@ -110,6 +97,7 @@ function getPlanTools(plan) {
   return {
     plan, label:labels[plan], sources:{act:ACT,rules:RULES}, toolkit,
     legalAudit:v4.publicData(),
+    reportOutline:reportSections,reportTypeChapters,allegationMatrixFields,
     ...(level>=2?{readiness,reportSections,knowledge}:{}),
     ...(level>=3?{advanced:{...advanced,scenarios:[...advanced.scenarios,...v4.challenges.map(c=>[c.id,c.title,c.expected])]}}:{})
   };
