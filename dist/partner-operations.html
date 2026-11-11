@@ -4,5 +4,16 @@
 <p id="operator-status" role="status">Checking operator access and application storage…</p>
 <div class="cta-line" style="margin:16px 0 24px"><button type="button" id="refresh" class="partner-button dark">Refresh applications</button><a class="partner-button secondary" href="/partner-terms.html">Read payment controls</a></div>
 <div class="operator-scroll"><table class="operator-table"><thead><tr><th>Date (IST)</th><th>Applicant</th><th>Organisation / Region</th><th>Role</th><th>Referral channel</th><th>Expected volume</th><th>Status</th></tr></thead><tbody id="operator-rows"><tr><td colspan="7">Loading…</td></tr></tbody></table></div>
+<section class="info-card" style="margin:35px 0 20px" id="pilot-admin">
+<p class="eyebrow">OPERATOR · CONTROLLED PILOT</p>
+<h2>Referral-code pilot controls</h2>
+<p>Issue a <strong>test-only</strong> referral code after reviewing an applicant’s suitability and independence. A pilot code never activates live commission, banking or legal-services referrals. Every action is recorded against the signed-in operator. Use Pause to block new claims.</p>
+<p id="pilot-operator-status" class="pilot-status" role="status">Checking pilot controls…</p>
+<button class="partner-button secondary" id="pilot-operator-refresh" type="button">Refresh pilot accounts</button>
+<div class="operator-scroll" style="margin-top:18px"><table class="operator-table">
+<thead><tr><th>Applicant</th><th>Application</th><th>Pilot state</th><th>Test code</th><th>Operator action</th></tr></thead>
+<tbody id="pilot-operator-rows"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+<p class="muted">Before activation for real money, signed agreements, KYC, tax review, dual finance controls and gateway verification are mandatory. A test code is not evidence those have been completed.</p>
+</section>
 <p class="note">No banking, PAN, buyer details or complaint information is stored in the application records. Contact applicants only for review purposes under their stated consent and keep subsequent verification in secure systems. Applications require signed agreements and tax review before any activation.</p>
-</main><script src="/partner-operations.js" defer></script></body></html>
+</main><script src="/partner-operations.js" defer></script><script src="/partner-pilot-admin.js" defer></script></body></html>
