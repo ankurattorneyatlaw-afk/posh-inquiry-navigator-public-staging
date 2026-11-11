@@ -67,3 +67,24 @@ test('licensed checklist content includes v4 only for verified holder',async()=>
  const denied=await request('other');assert.equal(denied.status,403);assert.equal(denied.body.legalAudit,undefined);
  const allowed=await request('holder');assert.equal(allowed.status,200);assert.equal(allowed.body.legalAudit.checks.length,84);
 });
+
+test('IC/LC checklist renders v4 as the primary review and keeps old 43 ticks behind a disclosure',()=>{
+ const html=fs.readFileSync('dist/inquiry-checklist.html','utf8');
+ const newIndex=html.indexOf('id="v4-inquiry-audit"'),oldIndex=html.indexOf('id="legacy-checklist"');
+ assert(newIndex>0&&oldIndex>newIndex,'The 84-point review must precede the legacy checklist.');
+ assert.match(html,/<h1>IC \/ LC Inquiry Legal Checklist — 84 Checks<\/h1>/);
+ assert.match(html,/<details id="legacy-checklist"/);
+ assert.match(html,/href="#v4-84-checks"/);
+ assert.match(html,/id="checklist-legal-status"/);
+ const code=fs.readFileSync('dist/inquiry-checklist.js','utf8');
+ assert.match(code,/function mountLegalAudit\(data\)/);
+ assert.match(code,/The current 84-point legal review is not available/);
+ assert.match(code,/84 points in eight domains/);
+ const widget=fs.readFileSync('dist/legal-audit-v4.js','utf8');
+ assert.match(widget,/controls\.id='v4-84-checks';controls\.open=true/);
+ assert.match(widget,/section\.open=group\.code==='A'/);
+ assert.match(widget,/gatePanel\.id='v4-release-gates'/);
+ const css=fs.readFileSync('dist/digital.css','utf8');
+ assert.match(css,/\.checklist-primary-intro/);
+ assert.match(css,/@media\(max-width:680px\)/);
+});
