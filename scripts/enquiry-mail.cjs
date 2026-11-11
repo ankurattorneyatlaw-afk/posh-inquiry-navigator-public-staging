@@ -19,7 +19,7 @@ function createBrevoTransport({apiKey=process.env.BREVO_API_KEY,fetchImpl=fetch}
   try{
    const response=await fetchImpl('https://api.brevo.com/v3/smtp/email',{method:'POST',headers:{'api-key':apiKey,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(10000)});
    if(response.status===201){const data=await response.json();return typeof data.messageId==='string'?{state:'accepted',messageId:data.messageId}:{state:'uncertain'};}
-   // A timeout/5xx may follow acceptance: hold for human review rather than risk duplicate mail.
+   // A timeout/5xx may follow acceptance: hold for authorised delivery verification rather than risk duplicate mail.
    if(response.status===429)return {state:'retry_later'};
    if(response.status>=500)return {state:'uncertain'};
    return {state:'rejected',status:response.status};
