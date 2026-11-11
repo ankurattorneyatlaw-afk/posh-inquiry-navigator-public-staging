@@ -1,5 +1,5 @@
 # POSH Legal Navigator Partner Programme — Release and Finance Controls
-**Policy edition:** 2026-11-11 v1.0 | **Launch status:** Staging application intake only
+**Policy edition:** 2026-11-11 v1.0 | **Launch status:** Staging applications and isolated pilot-only codes/claims; real sales and payouts disabled
 
 ## Programme decisions
 - Brand: **Become a Partner** under POSH Legal Navigator.
@@ -20,7 +20,7 @@
 - **Customer-facing brand:** The Cosmic Energizers, POSH Legal Navigator. Partner arrangement is a product marketing arrangement, never an advocate fee-share or legal services solicitation.
 
 ## Database staging structure
-`navigator_partner_applications` is the only partner table with a current server-validated write endpoint. `navigator_partner_accounts`, `navigator_partner_referrals`, `navigator_partner_commission_ledger`, and `navigator_partner_payouts` are locked down with RLS and no anon/authenticated/service_role grants. No live payment, enrollment or settlement API is deployed. Applications are reviewed via authenticated Supabase administration until a dedicated secure operator dashboard is built.
+`navigator_partner_applications` is the only partner table with a current server-validated write endpoint. `navigator_partner_accounts`, `navigator_partner_referrals`, `navigator_partner_commission_ledger`, and `navigator_partner_payouts` are locked down with RLS and no anon/authenticated/service_role grants. No live payment, real partner activation, payable referral, commission credit or settlement API is deployed. Applications are reviewed via authenticated Supabase administration until a dedicated secure operator dashboard is built.
 
 ## Mandatory release gates before financial activation
 1. Signed legal terms reviewed against BCI Rules, contract entity, consumer protection and current taxes.
