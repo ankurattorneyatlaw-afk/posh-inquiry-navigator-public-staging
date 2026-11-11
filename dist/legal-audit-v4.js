@@ -27,6 +27,8 @@ function mount(host,data,options={}){
    const select=$('select',control);select.setAttribute('aria-label',label);
    for(const [value,title] of values){const option=$('option',select,title);option.value=value;}
    fields[key]=select;
+   if(key==='report')select.value='statutory';
+   select.onchange=()=>update();
  }
  const alerts=$('div',wrap);alerts.setAttribute('role','status');
  const overview=$('p',wrap);overview.className='small';
@@ -66,7 +68,7 @@ function mount(host,data,options={}){
      const meta=$('p',row,check.classification+' · '+check.location+(check.condition==='general'?'':' · conditional: '+check.condition));meta.className='small';
      const select=statusSelect(row,'Status for check '+check.number);
      const reference=field(row,'Evidence or legal basis code for check '+check.number);
-     checks.set(check.id,{select,reference});
+     checks.set(check.id,{select,reference,note:meta});
      select.onchange=()=>update();reference.oninput=()=>update();
    }
  }
@@ -103,6 +105,16 @@ function mount(host,data,options={}){
    return notes;
  }
  function update(){
+   const context=currentContext();
+   for(const control of data.checks){
+     const row=checks.get(control.id);if(!row)continue;
+     const condition=control.condition;
+     let cue='';
+     if(condition==='rule7')cue=context.procedure==='prescribed'?'Rule 7 route selected — verify actual applicability.':'Rule 7 conditional — verify service-rule applicability; do not mark N/A by assumption.';
+     else if(condition==='both-employees')cue=context.bothEmployees==='yes'?'Both parties employees — Section 11(1) representations require review.':context.bothEmployees==='no'?'Not both employees — check corresponding service-rule rights; reason any N/A.':'Confirm both parties’ employment status first.';
+     else if(condition!=='general')cue='Depends on actual findings or a distinct statutory determination; never pre-judge.';
+     row.note.textContent=control.classification+' · '+control.location+(cue?' · '+cue:'');
+   }
    const p=problems(),items=[...gateRows,...checks],reviewed=items.filter(([,r])=>r.select.value==='pass'||r.select.value==='not-applicable').length;
    overview.textContent='Review status: '+reviewed+' / '+items.length+' checked as pass or reasoned N/A; '+p.unverified.length+' open; '+p.blocked.length+' fundamental; '+p.invalid.length+' missing/invalid references.';
    alerts.replaceChildren();for(const warning of warnings())text(alerts,warning);
