@@ -32,7 +32,7 @@ function mount(host,data,options={}){
  }
  const alerts=$('div',wrap);alerts.setAttribute('role','status');
  const overview=$('p',wrap);overview.className='small';
- const gatePanel=$('details',wrap);gatePanel.open=true;
+ const gatePanel=$('details',wrap);gatePanel.id='v4-release-gates';gatePanel.open=false;
  $('summary',gatePanel,'Eight independent release gates');
  text(gatePanel,'A gate is not passed merely because an item is ticked. Evidence code and competent reviewer confirmation are required; unresolved fundamental defects block release.');
  const gateRows=new Map();
@@ -56,11 +56,11 @@ function mount(host,data,options={}){
    select.onchange=()=>update();
    reference.oninput=()=>update();
  }
- const controls=$('details',wrap);
- $('summary',controls,'84 detailed IC/LC legal checks');
+ const controls=$('details',wrap);controls.id='v4-84-checks';controls.open=true;
+ $('summary',controls,'84 current IC/LC legal checks — expand or collapse');
  text(controls,'Assess legal applicability to the actual case. M = statute/rule when applicable; J = judicial safeguard; E = enhanced design. R = report; F = confidential inquiry file. No check is automatically certified.');
  for(const group of data.sections){
-   const section=$('details',controls);section.className='v4-domain';
+   const section=$('details',controls);section.className='v4-domain';section.open=group.code==='A';
    $('summary',section,group.code+' · '+group.title+' ('+group.count+')');
    for(const check of data.checks.filter(item=>item.domain===group.code)){
      const row=$('div',section);row.className='v4-item';
