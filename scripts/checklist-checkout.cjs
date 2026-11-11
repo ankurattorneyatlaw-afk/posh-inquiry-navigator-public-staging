@@ -132,7 +132,7 @@ function createChecklistCheckout({identify,origin,store,gateway,readTemplate,ren
         const checked=entitlement.checked??[];
         if(action==='progress')return send(res,200,{checked});
         const {stages,sources}=online.read(entitlement.edition);
-        return send(res,200,{orderId:entitlement.id,organisation:entitlement.organisation,edition:entitlement.edition,accessUntil:entitlement.accessUntil,checked,stages,sources});
+        return send(res,200,{orderId:entitlement.id,organisation:entitlement.organisation,edition:entitlement.edition,accessUntil:entitlement.accessUntil,checked,stages,sources,legalAudit:require('./defensibility-v4.cjs').publicData()});
       }
       if (online&&action==='download') return send(res,410,{error:'This checklist is now online. Open it from your workspace.'});
       if (!available) return send(res,503,{error:'Checklist test checkout is not configured.'});
