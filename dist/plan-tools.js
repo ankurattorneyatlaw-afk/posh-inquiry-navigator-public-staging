@@ -176,7 +176,12 @@ function professionalTools(data){
     {type:'table',rows:[['Allegation','Annexure','Supporting relevance','Contrary or qualifying relevance','Question, response and reasoning'],...(rows().length?rows():[[code.value.trim(),'',support.value.trim(),contrary.value.trim(),question.textContent]])]}
   ]);
   const report=section('44-section draft inquiry report');
-  el('p','Complete only relevant sections. Enter short review notes or references in this tab and complete the full narrative offline.',report);
+  el('p','Select the legally appropriate report classification before drafting. The Committee—not software—determines findings, credibility, authority and final sign-off. Keep case material offline.',report);
+  const reportType=select(report,'Legally applicable report type',data.legalAudit.reports.map(r=>[r.id,r.label]));
+  const reportTypeNote=el('p','',report);reportTypeNote.className='small';
+  function updateReportType(){reportTypeNote.textContent=data.legalAudit.reports.find(r=>r.id===reportType.value)?.note||'Check governing service rules.';}
+  reportType.onchange=updateReportType;updateReportType();
+  const gateNote=el('p','Eight final release gates must be documented in the separate v4 legal audit. A download never certifies compliance.',report);gateNote.className='small';
   const sections=data.reportSections.map(([title,prompt],i)=>{
     const block=el('details','',report);
     el('summary',(i+1)+'. '+title,block);
@@ -195,7 +200,13 @@ function professionalTools(data){
     if(marks.length)issues.push('Check marking, disclosure or participation for '+marks.join(', ')+'.');
     checkStatus.textContent=issues.join(' ')||'No gap flagged by this limited reference check. Review the full record, reasons and applicable requirements independently.';
   };
-  exportButton(report,'Download editable report draft','Section-13-working-report',data.plan,()=>[
+  exportButton(report,'Download editable report draft','Committee-report-working-draft',data.plan,()=>[
+    heading('Report classification and governing legal route'),
+    paragraph('Selected draft type: '+reportType.selectedOptions[0].textContent+'. This selection is not a legal conclusion. Verify forum, service rules and competent authority.'),
+    paragraph(reportTypeNote.textContent),
+    heading('Judicial-defensibility release gates'),
+    {type:'table',rows:[['Gate','Source / reviewer reference','Verified status'],...data.legalAudit.gates.map(g=>[g.id+' '+g.title,'[record code]','[review required]'])]},
+    heading('Professional report working sections'),
     ...data.reportSections.flatMap(([title,prompt],i)=>[heading((i+1)+'. '+title),paragraph(sections[i].value.trim()||'[Review and complete if applicable] '+prompt)]),
     ...filtered().map(row=>paragraph(row.annexure+' · '+row.issueRefs+(row.active?'':' · withdrawn')))
   ]);
@@ -429,6 +440,11 @@ access().then(data=>{
   $('tools-start').hidden=false;
   $('tools-optional').hidden=false;
   standardTools(data.plan);
+  if(data.legalAudit&&window.NavigatorDefensibilityV4){
+    const legal=section('IC/LC legal defensibility — Version 4.0');
+    const target=el('div','',legal);
+    window.NavigatorDefensibilityV4.mount(target,data.legalAudit,{id:'v4-plan-audit'});
+  }
   const toolkit=section('POSH Readiness Toolkit');
   const toolkitItems=reviewList(toolkit,data.toolkit,true);
   exportButton(toolkit,'Download the readiness toolkit','POSH-Readiness-Toolkit',data.plan,toolkitItems);

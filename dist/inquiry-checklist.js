@@ -125,11 +125,13 @@
       link.rel='noopener noreferrer';
     }
     sourcePanel.hidden=!list.children.length;
+    if(data.legalAudit&&window.NavigatorDefensibilityV4)window.NavigatorDefensibilityV4.mount($('v4-inquiry-audit'),data.legalAudit,{id:'v4-inquiry-review'});
     showCount();
   }
   function lock(message){
     clearTimeout(expiryTimer);
     content.hidden=true;
+    $('v4-inquiry-audit').replaceChildren();
     actions.hidden=false;
     status.textContent=message;
     if(order){
