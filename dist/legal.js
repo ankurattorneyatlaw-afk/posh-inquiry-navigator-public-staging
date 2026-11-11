@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const act='https://www.indiacode.nic.in/bitstream/123456789/19302/1/sexual_harrassment_of_women_at_workplace_act_2013.pdf';
+const act='https://aud.delhi.gov.in/sites/default/files/posh-act-2013-2.pdf';
 const rules='https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf';
 const terms={
  'Fair opportunity':{text:'Natural justice calls for impartial consideration, adequate notice and a meaningful opportunity to answer relevant allegations and material before a decision. Apply this through the governing procedure, with confidentiality and appropriate safeguards. Central Rule 7(4) expressly requires natural justice where that procedure applies.',basis:'Principles of natural justice; Central POSH Rules, Rule 7(4); verify applicable service rules'},
@@ -75,19 +75,19 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const verifiedCases=typeof module==='object'&&module.exports?require('./library.js').cases:root.NavigatorLibrary.getCases();
 const checkedCases=Object.fromEntries(verifiedCases.filter(c=>c.verificationLevel==='primary-verified').map(c=>[c.id,{title:c.title,citation:[c.caseNumber,c.citation].join('; '),pinpoint:c.pinpoint,url:c.url,status:c.status}]));
 const directCases={'ic-contact-disclosure':['C05'],'ic-information-online':['C05'],'annual-awareness-planning':['C05'],'awareness-training-mandatory':['C05']};
-function citationHTML(x){const ids=new Set([...(x.cases||[]),...(directCases[x.id]||[]),...(x.members||[]).flatMap(m=>m.cases||[])]);const checked=[...ids].filter(id=>checkedCases[id]);return checked.length?`<div class="finder-citations"><strong>Verified judgment references</strong>${checked.map(id=>{const c=checkedCases[id];return `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.title)} — ${esc(c.citation)}; ${esc(c.pinpoint)}</a><small>${esc(c.status)}</small>`}).join('')}</div>`:'';}
+function citationHTML(x){if(x.approvedFaq)return '';const ids=new Set([...(x.cases||[]),...(directCases[x.id]||[]),...(x.members||[]).flatMap(m=>m.cases||[])]);const checked=[...ids].filter(id=>checkedCases[id]);return checked.length?`<div class="finder-citations"><strong>Verified judgment references</strong>${checked.map(id=>{const c=checkedCases[id];return `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.title)} — ${esc(c.citation)}; ${esc(c.pinpoint)}</a><small>${esc(c.status)}</small>`}).join('')}</div>`:'';}
 function basisHTML(x){
  const b=String(x.basis||'');
  const mixed=mixedLawBasis.test(b);
- const hasAct=mixed?/\bPOSH (?:Act|Sections?)\b|^Act Sections?\b/i.test(b):/Sections?|§|\bAct\b/i.test(b);
- const hasRules=mixed?/\bCentral (?:POSH )?Rules?\b/i.test(b):/\bRules?\b|\bR\d/i.test(b);
+ const hasAct=x.links?.some(link=>link.url===act)?false:mixed?/\bPOSH (?:Act|Sections?)\b|^Act Sections?\b/i.test(b):/Sections?|§|\bAct\b/i.test(b);
+ const hasRules=x.links?.some(link=>link.url===rules)?false:mixed?/\bCentral (?:POSH )?Rules?\b/i.test(b):/\bRules?\b|\bR\d/i.test(b);
 return `<p class="faq-basis"><strong>Legal basis / context:</strong> ${referenceHTML(b.replace(/§§/g,'Sections ').replace(/§/g,'Section ').replace(/\bR(\d+)/g,'Central Rule $1'))}${hasAct?` · <a href="${act}" target="_blank" rel="noopener noreferrer">POSH Act</a>`:''}${hasRules?` · <a href="${rules}" target="_blank" rel="noopener noreferrer">Central Rules</a>`:''}</p>`;}
 function answerLink(link,faq){
   if(!/^\/?#faq\/case-[a-z0-9]+$/i.test(link.url))return link.url;
   const hash=link.url.slice(link.url.indexOf('#'));
   return hash+'?from='+encodeURIComponent(faq.id);
 }
-function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Related tools">${x.links.map(link=>`<a href="${esc(answerLink(link,x))}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
+function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Sources and related FAQs">${x.links.map(link=>`<a href="${esc(answerLink(link,x))}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
 if(typeof module==='object'&&module.exports){module.exports={terms,provisions,referenceHTML,checkedCases,fullAnswer,basisHTML,citationHTML};return;}
 root.NavigatorLegal={terms,provisions,referenceHTML,fullAnswer,basisHTML,citationHTML};
 let referenceActive=null,referencePinned=false,ignoreReferenceFocus=false,referenceHoverBlocked=false,referencePointer=null;

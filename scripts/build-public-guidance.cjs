@@ -19,7 +19,7 @@ const pages = ['index', 'about', 'contact', 'digital-delivery', 'help', 'individ
 const assets = ['styles.css', 'digital.css', 'library.js', 'faq.js', 'cases.js', 'legal.js', 'finder.js',
   'engine.js', 'docx.js', 'guidance-context.js', 'checklist-sample.pdf', 'essential-sample-invoice.pdf', 'social-preview.png'];
 const { records } = require('../dist/finder.js');
-assert.equal(records.length, 444);
+assert.equal(records.length, 488);
 assert.equal(fs.readFileSync(path.join(root, 'dist/checklist-sample.pdf')).subarray(0, 4).toString(), '%PDF');
 assert([...assets, ...pages.map(name => name + '.html')].every(name => !PROTECTED.has(name)));
 
@@ -75,6 +75,10 @@ function publicHtml(name) {
     .replace(/<section class="panel"><h2>Staging checkout reminders<\/h2>[\s\S]*?<\/section>/, '');
   const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   if (json) html = html.replace(/'sha256-[^']+'/g, "'sha256-" + createHash('sha256').update(json).digest('base64') + "'");
+  if (name === 'index') html = html.replace(/src="\/?(finder|legal|library)\.js"/g, (_, asset) => {
+    const version = createHash('sha256').update(source(asset + '.js')).digest('hex').slice(0, 12);
+    return 'src="/' + asset + '.js?v=' + version + '"';
+  });
   return html.replace(/<meta name="robots" content="noindex,nofollow,noarchive"\s*\/>/g, '');
 }
 
