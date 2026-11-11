@@ -50,7 +50,7 @@ test('legal audit client script and changed report editor parse and retain human
   new Script(fs.readFileSync(path,'utf8'),{filename:path});
  const widget=fs.readFileSync('dist/legal-audit-v4.js','utf8');
  assert.match(widget,/This review is held in this browser tab only/);
- assert.match(widget,/The Committee/);
+ assert.match(widget,/Committee route/);
  const report=fs.readFileSync('dist/workflow-documents.js','utf8');
  assert.match(report,/Eight independent release gates/);
  assert.match(report,/Legal report type and exclusions/);
