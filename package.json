@@ -6,7 +6,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "build": "node scripts/verify.cjs && node --test scripts/software.test.cjs scripts/account-access.test.cjs scripts/session-review.test.cjs scripts/payment-assignment.test.cjs scripts/guidance-context.test.cjs scripts/shop-api.test.cjs scripts/personal-documents.test.cjs scripts/evidence.test.cjs scripts/checklist-checkout.test.cjs scripts/plan-tools.test.cjs scripts/checkout-recovery.test.cjs scripts/compliance-assessment.test.cjs scripts/online-checklist.test.cjs scripts/guest-checkout.test.cjs scripts/defensibility-v4.test.cjs",
+    "build": "node scripts/verify.cjs && node --test scripts/knowledge-analytics.test.cjs scripts/software.test.cjs scripts/account-access.test.cjs scripts/session-review.test.cjs scripts/payment-assignment.test.cjs scripts/guidance-context.test.cjs scripts/shop-api.test.cjs scripts/personal-documents.test.cjs scripts/evidence.test.cjs scripts/checklist-checkout.test.cjs scripts/plan-tools.test.cjs scripts/checkout-recovery.test.cjs scripts/compliance-assessment.test.cjs scripts/online-checklist.test.cjs scripts/guest-checkout.test.cjs scripts/defensibility-v4.test.cjs",
     "start": "node scripts/serve.cjs"
   }
 }
