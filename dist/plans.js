@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
-const version='3.1.0-2026-11-01';
-const source='Architecture v3.0 plus 1 November 2026 questioning and template distinctions';
+const version='4.0.0-2026-11-11';
+const source='Version 4.0 legal-defensibility audit, current report-type routing and existing plan distinctions';
 const catalogue=[
  {id:'free',name:'Free Guidance',subtitle:'Rights & Responsibilities',category:'PUBLIC · AVAILABLE',displayPrice:'₹0',months:0,users:null,includes:['Aggrieved-woman and respondent guidance','Answer-dependent next steps and editable Word drafts','Searchable legal FAQs and case-reference library','Anonymous community planned; currently unavailable'],scope:'Educational access needs no account or purchase. The wider 13-stakeholder interactive journey is planned; the two individual journeys are available now.',href:'#journeys',action:'Start free guidance'},
  {id:'demo',name:'Free Inquiry Demo',subtitle:'A separate free experience',category:'PUBLIC · AVAILABLE',displayPrice:'₹0',months:0,users:null,includes:['Nine basic inquiry stages','Relevant sections and indicative timelines','Witness examination and appreciation of evidence overview','No real case details, uploads or professional execution tools'],scope:'High-level educational overview only. Detailed notices, hearing records, findings and the Section 13 report builder are paid-workspace plans, unavailable in this public demo.',href:'#demo',action:'View the nine stages'},
@@ -12,6 +12,7 @@ const catalogue=[
  {id:'enterprise',name:'Government / Enterprise',category:'CONTRACTUAL · PLANNED',displayPrice:'Custom quotation',months:12,users:null,readOnlyMonths:3,caseLimit:1,includes:['Contractually scoped deployment and governance','Required shared procedural safeguards','Report/readiness and complex-case capabilities as agreed','Custom service-rule profiles and authorised integrations','Contractual users, onboarding, configuration and support'],scope:'Up to 12 months per term, followed by three months read-only. Users and implementation are contractual. Licences remain case-bound; any wider authorisation must be expressly agreed and does not imply unlimited unrelated inquiries.',href:'mailto:training@thecosmicenergizers.com?subject=Government%20Enterprise%20enquiry',action:'Request quotation'}
 ];
 const features=[
+ ['84-check IC/LC legal audit and eight release gates','Working review','Working review','Working review','Configured','As agreed'],
  ['Basic findings and report template','Included','Included','Included','Included','As agreed'],
  ['Neutral role-based question prompts','Included','Included','Included','Included','As agreed'],
  ['Allegation-specific and evidence-linked question planning','Not included','Included','Included','Included','As agreed'],
@@ -24,7 +25,7 @@ const features=[
  ['Hearings, quorum, attendance and absence safeguards','Included','Included','Included','Included','As agreed'],
  ['Witness/evidence registers and standard procedural exports','Included','Included','Included','Included','As agreed'],
  ['Confidentiality and controlled export','Included','Included','Included','Included','Included'],
- ['44-section draft report builder','Not included','Included','Included','Included','As agreed'],
+ ['44-section draft report builder with seven lawful report-type pathways','Not included','Included','Included','Included','As agreed'],
  ['Allegation-wise evidence matrix','Basic','Full','Full','Full','As agreed'],
  ['Complete annexure cross-referencing','Not included','Included','Included','Included','As agreed'],
  ['Judgment and statutory authority indexes','Guidance','Included','Included','Included','As agreed'],
@@ -42,9 +43,9 @@ const comparisonFeatures=features.filter(row=>!sharedFeatures.includes(row));
 const parents={professional:'essential',advanced:'professional',institutional:'advanced'};
 function expandedIncludes(id){const p=catalogue.find(p=>p.id===id);if(!p)return [];return [...new Set([...(parents[id]?expandedIncludes(parents[id]):[]),...p.includes.filter(x=>!/^Everything in /.test(x))])];}
 const stagingFeatures={
- essential:['Guided IC/LC workflow with contextual Word drafts, deadline review and local recovery','Neutral role-based question prompts and basic findings template','POSH Readiness Toolkit'],
- professional:['Allegation-linked evidence and question planning','44-section editable report draft and limited reference checks','Three readiness reviews and Expert Knowledge reference notes'],
- advanced:['Coded question and continuity drafts for complex proceedings','Procedural challenge scenarios and service-rule profiles']
+ essential:['Guided IC/LC workflow with contextual Word drafts, deadline review and local recovery','84-point coded legal audit and eight release gates (local working export)','Neutral role-based question prompts and basic findings template','POSH Readiness Toolkit'],
+ professional:['Allegation-linked evidence and question planning','44-section editable report draft with seven report classifications and release-gate placeholders','Three readiness reviews and Expert Knowledge reference notes'],
+ advanced:['Coded question and continuity drafts for complex proceedings','22 procedural scenario prompts (including 18 v4 challenges) and service-rule profiles']
 };
 const checkoutPlans=Object.fromEntries(catalogue.filter(p=>Object.hasOwn(stagingFeatures,p.id)).map(p=>[p.id,{
  name:p.name,amount:p.amount,months:p.months,users:p.users,readOnlyMonths:p.readOnlyMonths,caseLimit:p.caseLimit,
