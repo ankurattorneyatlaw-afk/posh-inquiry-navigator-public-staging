@@ -1,22 +1,11 @@
-# Protected digital editions
+# Protected digital products and current IC/LC online checklist
 
-Only encrypted product packages are committed to this public repository. Public samples and catalogue descriptions are in `dist`. Plaintext paid editions, authoring sources and the encryption key must stay outside the repository.
+The current IC/LC Inquiry Legal Checklist is **v4.0**, with 84 legally classified controls and eight release gates. It is served from `scripts/defensibility-v4.cjs` through an authenticated or guest-verified licence; no encrypted Word checklist is used for this product. The retired public sample and encrypted previous-edition checklist packages are not distributed.
 
-Runtime delivery uses `NAVIGATOR_PRODUCT_ASSET_KEY`, a 32-byte key encoded as 64 lowercase hexadecimal characters, configured privately on the Navigator service. The package layout is `NVP1`, 12-byte IV, 16-byte authentication tag, then AES-256-GCM ciphertext. The exact original asset filename is authenticated as additional data. Wrong keys, altered content and missing configuration fail closed.
+The separate **organisation POSH Compliance Assessment** remains an online answer-dependent management checklist and is not a Section 13 inquiry adjudication.
 
-Keep an independently protected backup of the authoring sources and key. Rotating the key requires re-encrypting both packages and updating the service configuration in the same release. Never print the key in logs, checks or receipts.
+Individual advanced guides use a separately encrypted product package. Only encrypted packages are committed; authoring material, the original plaintext and the encryption key remain outside Git. `NAVIGATOR_PRODUCT_ASSET_KEY` is a 32-byte key represented as 64 lower-case hex characters. The `NVP1` AES-256-GCM package includes authenticated filename information. Wrong keys or altered data fail closed.
 
-This release creates only temporary, account-bound test product access. It never grants Committee roles. Production purchases, durable entitlements, invoicing and refund handling are not enabled.
+The online checklist never accepts names, witness statements, complaint narratives or source evidence. The current legal-review statuses and source codes stay in the browser until exported as a coded JSON or editable Word working record. An export is not a statutory report, a determination of merits or proof that a proceeding was lawfully conducted.
 
-## Compliance Checklist delivery
-
-The separate Compliance Checklist uses the `compliance-checklist` product ID and
-a personalised Word test file on staging while the final document is pending.
-
-For the final file, prepare a protected Word parts package compatible with
-`scripts/buyer-checklist.cjs` and encrypt it as
-`products/compliance-checklist-template.json.enc` with the checklist asset key.
-Use `compliance-checklist-template.json` as the package's authenticated filename
-and register its SHA-256 in `dist/release.json`. Update the product's edition and
-description in `dist/products.js` for the final file. Staging uses the separate
-package when present. The original checklist uses its own package and orders.
+No real payment, invoice, legal representation or deployment of a customer case is activated by the staging test checkout. The purchase-verification and account-access boundaries are separate from the review content.
