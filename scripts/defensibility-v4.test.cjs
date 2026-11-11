@@ -7,26 +7,23 @@ const v4=require('./defensibility-v4.cjs');
 const {getPlanTools}=require('./plan-tools.cjs');
 const {createChecklistCheckout}=require('./checklist-checkout.cjs');
 const {Readable}=require('node:stream');
-test('v4 source inventory has 84 distinct source-classified controls across eight domains',()=>{
+
+test('v4 legal design contains exactly 84 distinct controls across eight domains',()=>{
  assert.equal(v4.checks.length,84);
  assert.deepEqual(v4.sections.map(x=>x.count),[10,9,20,12,13,4,8,8]);
  assert.equal(new Set(v4.checks.map(x=>x.id)).size,84);
  assert.ok(v4.checks.every(x=>['M','J','E'].includes(x.classification)&&['R','F','R+F'].includes(x.location)));
- assert.equal(v4.gates.length,8);
- assert.equal(v4.challenges.length,18);
- assert.equal(v4.reports.length,7);
- assert.equal(v4.statuses.length,6);
+ assert.equal(v4.gates.length,8);assert.equal(v4.reports.length,7);assert.equal(v4.challenges.length,18);
 });
-test('v4 profile does not silently exclude mandatory representation or Rule 7',()=>{
- const rule=v4.checks.find(x=>x.number===23);
- const representation=v4.checks.find(x=>x.number===65);
+test('Rule 7 and Section 11(1) findings representations remain conditional on applicable law',()=>{
+ const rule=v4.checks.find(x=>x.number===23),representation=v4.checks.find(x=>x.number===65);
  assert.equal(v4.applicability(rule,{procedure:'prescribed'}).applies,true);
  assert.equal(v4.applicability(rule,{procedure:'unknown'}).applies,null);
  assert.equal(v4.applicability(representation,{bothEmployees:'yes'}).applies,true);
  assert.equal(v4.applicability(representation,{bothEmployees:'no'}).applies,false);
  assert.equal(v4.applicability(representation,{bothEmployees:'unknown'}).applies,null);
 });
-test('v4 lawful dispositions and specialist branches flag competence before merits',()=>{
+test('special routes do not force an invalid inquiry or presume a disciplinary conclusion',()=>{
  assert.equal(v4.route({conciliation:'completed',report:'statutory'}).report,'conciliation');
  assert.match(v4.route({forum:'unknown'}).flags.join(' '),/forum unresolved/);
  assert.match(v4.route({workers:35,icValid:false}).flags.join(' '),/no automatic LC substitution/);
@@ -34,29 +31,29 @@ test('v4 lawful dispositions and specialist branches flag competence before meri
  assert.match(v4.route({minor:true,hei:true}).flags.join(' '),/POCSO/);
  assert.match(v4.route({appealForum:'unknown'}).flags.join(' '),/Section 18/);
 });
-test('each plan exposes baseline v4 review but professional report editor remains tier gated',()=>{
+test('every plan exposes current report structure and current 84-point audit; advanced sections remain tier-gated',()=>{
  for(const plan of ['essential','professional','advanced']){
-  const t=getPlanTools(plan);
-  assert.equal(t.legalAudit.checks.length,84);
-  assert.equal(t.legalAudit.gates.length,8);
-  assert.equal(t.legalAudit.challenges.length,18);
-  assert.equal(t.reportSections?.length,plan==='essential'?undefined:44);
+  const tools=getPlanTools(plan);
+  assert.equal(tools.legalAudit.checks.length,84);
+  assert.equal(tools.reportOutline.length,13);
+  assert.equal(tools.allegationMatrixFields.length,14);
+  assert.equal(Object.keys(tools.reportTypeChapters).length,7);
+  assert.ok(Object.values(tools.reportTypeChapters).every(indices=>indices.length>0&&indices.every(i=>i>=0&&i<13)));
+  assert.equal(tools.reportSections?.length,plan==='essential'?undefined:13);
  }
  assert.ok(getPlanTools('advanced').advanced.scenarios.length>=18);
  assert.equal(getPlanTools('unknown'),null);
 });
-test('legal audit client script and changed report editor parse and retain human-only decisions',()=>{
- for(const path of ['dist/legal-audit-v4.js','dist/inquiry-checklist.js','dist/plan-tools.js','dist/workflow-documents.js'])
+test('current client components and Committee document templates parse, with no obsolete product copy',()=>{
+ for(const path of ['dist/legal-audit-v4.js','dist/inquiry-checklist.js','dist/plan-tools.js','dist/workflow-documents.js','dist/main.js'])
   new Script(fs.readFileSync(path,'utf8'),{filename:path});
- const widget=fs.readFileSync('dist/legal-audit-v4.js','utf8');
- assert.match(widget,/This review is held in this browser tab only/);
- assert.match(widget,/Committee route/);
+ assert.match(fs.readFileSync('dist/legal-audit-v4.js','utf8'),/Your 84-point coded audit is kept in this browser tab/);
  const report=fs.readFileSync('dist/workflow-documents.js','utf8');
  assert.match(report,/Eight independent release gates/);
  assert.match(report,/Legal report type and exclusions/);
 });
-test('licensed checklist content includes v4 only for verified holder',async()=>{
- const fake={access:async(buyer,id)=>buyer.id==='holder'?{id:'order_Test',organisation:'Test',edition:'2.0',active:true,accessUntil:'2027-03-01T00:00:00Z',checked:[]}:null,read:()=>({stages:[{title:'A',items:[]}],sources:[]})};
+test('licensed 84-point content is accessible only to the verified active purchaser',async()=>{
+ const fake={access:async(buyer,id)=>buyer.id==='holder'?{id:'order_Test',organisation:'Test',active:true,accessUntil:'2027-03-01T00:00:00Z'}:null,read:()=>({legalAudit:v4.publicData()})};
  const handler=createChecklistCheckout({origin:'https://navigator.invalid',identify:async req=>req.user?{id:req.user}:null,online:fake});
  async function request(user){
   const req=Readable.from([]);req.method='GET';req.headers={};req.user=user;
@@ -65,26 +62,24 @@ test('licensed checklist content includes v4 only for verified holder',async()=>
   return {status,body};
  }
  const denied=await request('other');assert.equal(denied.status,403);assert.equal(denied.body.legalAudit,undefined);
- const allowed=await request('holder');assert.equal(allowed.status,200);assert.equal(allowed.body.legalAudit.checks.length,84);
+ const allowed=await request('holder');assert.equal(allowed.status,200);
+ assert.equal(allowed.body.legalAudit.checks.length,84);assert.equal(allowed.body.edition,'4.0');
+ assert.equal(allowed.body.checked,undefined);assert.equal(allowed.body.stages,undefined);
 });
-
-test('IC/LC checklist renders v4 as the primary review and keeps old 43 ticks behind a disclosure',()=>{
+test('only the v4 checklist is rendered and it explicitly offers eight report gates',()=>{
  const html=fs.readFileSync('dist/inquiry-checklist.html','utf8');
- const newIndex=html.indexOf('id="v4-inquiry-audit"'),oldIndex=html.indexOf('id="legacy-checklist"');
- assert(newIndex>0&&oldIndex>newIndex,'The 84-point review must precede the legacy checklist.');
- assert.match(html,/<h1>IC \/ LC Inquiry Legal Checklist — 84 Checks<\/h1>/);
- assert.match(html,/<details id="legacy-checklist"/);
+ assert.match(html,/84-Point IC\/LC Legal Checklist/);
+ assert.match(html,/id="v4-inquiry-audit"/);
  assert.match(html,/href="#v4-84-checks"/);
- assert.match(html,/id="checklist-legal-status"/);
- const code=fs.readFileSync('dist/inquiry-checklist.js','utf8');
- assert.match(code,/function mountLegalAudit\(data\)/);
- assert.match(code,/The current 84-point legal review is not available/);
- assert.match(code,/84 points in eight domains/);
+ assert.match(html,/href="#v4-release-gates"/);
+ assert.doesNotMatch(html,/legacy-checklist|checklist-stages|checklist-progress|checklist-sample/);
+ const client=fs.readFileSync('dist/inquiry-checklist.js','utf8');
+ assert.match(client,/NavigatorDefensibilityV4\.mount/);
+ assert.match(client,/84-point legal checklist ready/);
+ assert.doesNotMatch(client,/legacy|43-point|43 checked|importBrowserTicks/);
  const widget=fs.readFileSync('dist/legal-audit-v4.js','utf8');
  assert.match(widget,/controls\.id='v4-84-checks';controls\.open=true/);
- assert.match(widget,/section\.open=group\.code==='A'/);
  assert.match(widget,/gatePanel\.id='v4-release-gates'/);
  const css=fs.readFileSync('dist/digital.css','utf8');
  assert.match(css,/\.checklist-primary-intro/);
- assert.match(css,/@media\(max-width:680px\)/);
 });
