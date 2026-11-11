@@ -37,7 +37,7 @@ Individual support lifecycle: case-free enquiry → secure conflict check → wr
 
 Automated unit/security checks and desktop/mobile browser journeys cover oral intake, six conciliation statuses and respondent notice through report/implementation. Five new blank Word templates were rendered and visually inspected page by page. This is tested software, not a guarantee of lawful results in every factual or service-rule situation. No case information is stored by Navigator. Dates and session history are tab-local until explicitly exported; refresh/close loses unexported state. No background email escalation is sent.
 
-Sources: POSH Act sections 9–16 and Central Rules 6–7; official Rules: https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf. Detailed applicability remains for competent human review.
+Sources: POSH Act sections 9–16 and Central Rules 6–7; official Rules: https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf. Detailed applicability remains for verification by the legally competent IC/LC or authority.
 
 
 ## 5.4.0 follow-through — session and membership experience
