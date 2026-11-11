@@ -14,7 +14,8 @@ function eligibleOrder(o){return !!(o&&eligibleProducts.has(o.product)&&o.curren
  o.notGovernmentProcurement===true&&o.netExclusiveTaxPaise>0);
 }
 function payoutReady(p){return !!(p&&p.partnerActive===true&&p.agreementSigned===true&&p.kycVerified===true&&
- p.bankVerified===true&&p.taxReviewed===true&&p.invoiceReviewed===true&&p.financeApproverOne===true&&
- p.financeApproverTwo===true&&p.financeApproverOne!==p.financeApproverTwo&&
+ p.bankVerified===true&&p.taxReviewed===true&&p.invoiceReviewed===true&&typeof p.financeApproverOne==='string'&&p.financeApproverOne.trim().length>0&&
+ typeof p.financeApproverTwo==='string'&&p.financeApproverTwo.trim().length>0&&
+ p.financeApproverOne!==p.financeApproverTwo&&
  p.noFraudHold===true&&p.saleMaturityVerified===true&&paise(p.availablePaise)>=MIN_PAYOUT);}
 module.exports={tier,annualCommission,reconciliation,eligibleOrder,payoutReady,MIN_PAYOUT,eligibleProducts};
