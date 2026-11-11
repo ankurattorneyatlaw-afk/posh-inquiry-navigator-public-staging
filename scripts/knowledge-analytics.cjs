@@ -4,6 +4,7 @@ const {clientNetwork}=require('./request-guards.cjs');
 const finder=require('../dist/finder.js');
 const topics=new Set(finder.topics);
 const questions=new Set(finder.records.map(x=>x.id));
+const questionTitles=new Map(finder.records.map(x=>[x.id,x.question]));
 const actions=new Set(['checklist','compliance','inquiry','training','consultation']);
 const events=new Set(['library_open','question_open','search_topic','search_no_results','topic_select','action_click']);
 const countries=new Set(['IN','US','GB','CA','AU','AE','SG','NZ','DE','FR','IE','ZA','ZZ']);
@@ -66,7 +67,7 @@ function createKnowledgeAnalytics({enabled=process.env.KNOWLEDGE_ANALYTICS_ENABL
     const rows=await r.json();
     const summarize=(event)=>Object.entries(rows.filter(x=>x.event===event).reduce((a,x)=>(a[x.item]=(a[x.item]||0)+Number(x.hits),a),{})).sort((a,b)=>b[1]-a[1]).slice(0,30).map(([item,hits])=>({item,hits}));
     const country=Object.entries(rows.reduce((a,x)=>(a[x.country]=(a[x.country]||0)+Number(x.hits),a),{})).sort((a,b)=>b[1]-a[1]).map(([item,hits])=>({item,hits}));
-    send(res,200,{days:Number(since),totals:rows.reduce((a,x)=>(a[x.event]=(a[x.event]||0)+Number(x.hits),a),{}),questions:summarize('question_open'),searchedTopics:summarize('search_topic'),topics:summarize('topic_select'),actions:summarize('action_click'),countries:country,from:cutoff,note:'Anonymous event counts, not unique visitors; country inferred from browser time zone and may be unknown. Raw search queries are never stored.'});
+    send(res,200,{days:Number(since),totals:rows.reduce((a,x)=>(a[x.event]=(a[x.event]||0)+Number(x.hits),a),{}),questions:summarize('question_open').map(x=>({...x,title:questionTitles.get(x.item)||x.item})),searchedTopics:summarize('search_topic'),topics:summarize('topic_select'),actions:summarize('action_click'),countries:country,from:cutoff,note:'Anonymous event counts, not unique visitors; country inferred from browser time zone and may be unknown. Raw search queries are never stored.'});
    }catch{send(res,503,{error:'Analytics data unavailable'})}
    return true;
   }
