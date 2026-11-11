@@ -38,7 +38,19 @@ function createPartnerHandler({origin=process.env.RENDER_EXTERNAL_URL||'http://1
   const n=(counts.get(fingerprint)||0)+1;counts.set(fingerprint,n);
   return n>3;
  }
- return {configured,async handle(req,res,parsed){
+ return {configured,
+ async summary(req,res){
+   if(req.method!=='GET'){reply(res,405,{error:'GET required'});return}
+   if(!configured()){reply(res,503,{error:'Partner application store unavailable'});return}
+   try{const response=await fetchImpl(url+'/rest/v1/rpc/navigator_list_partner_applications',{
+     method:'POST',headers:{apikey:key,'Content-Type':'application/json'},
+     body:JSON.stringify({p_token:token}),signal:AbortSignal.timeout(7000)});
+     if(!response.ok)throw Error('Storage unavailable');
+     const rows=await response.json();
+     reply(res,200,{applications:Array.isArray(rows)?rows:[]});
+   }catch{reply(res,503,{error:'Application list unavailable'})}
+ },
+ async handle(req,res,parsed){
   if(!parsed.pathname.startsWith('/api/partners/'))return false;
   if(parsed.pathname==='/api/partners/config'&&req.method==='GET'){
    if(!configured()){reply(res,200,{enabled:false});return true}
