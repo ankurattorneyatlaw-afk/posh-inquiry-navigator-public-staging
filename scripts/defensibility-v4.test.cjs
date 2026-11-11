@@ -56,12 +56,12 @@ test('legal audit client script and changed report editor parse and retain human
  assert.match(report,/Legal report type and exclusions/);
 });
 test('licensed checklist content includes v4 only for verified holder',async()=>{
- const fake={access:async(buyer,id)=>buyer.id==='holder'?{id:'order_one',organisation:'Test',edition:'2.0',active:true,accessUntil:'2027-03-01T00:00:00Z',checked:[]}:null,read:()=>({stages:[{title:'A',items:[]}],sources:[]})};
+ const fake={access:async(buyer,id)=>buyer.id==='holder'?{id:'order_Test',organisation:'Test',edition:'2.0',active:true,accessUntil:'2027-03-01T00:00:00Z',checked:[]}:null,read:()=>({stages:[{title:'A',items:[]}],sources:[]})};
  const handler=createChecklistCheckout({origin:'https://navigator.invalid',identify:async req=>req.user?{id:req.user}:null,online:fake});
  async function request(user){
   const req=Readable.from([]);req.method='GET';req.headers={};req.user=user;
   let status,body;const res={writeHead(s){status=s;},end(s){body=JSON.parse(s);}};
-  await handler(req,res,new URL('/api/checklist/content?order=order_one','https://navigator.invalid'));
+  await handler(req,res,new URL('/api/checklist/content?order=order_Test','https://navigator.invalid'));
   return {status,body};
  }
  const denied=await request('other');assert.equal(denied.status,403);assert.equal(denied.body.legalAudit,undefined);
