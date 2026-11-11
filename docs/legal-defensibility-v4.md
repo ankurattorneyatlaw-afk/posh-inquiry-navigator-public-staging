@@ -1,42 +1,36 @@
-# POSH Navigator v4.0 — IC/LC inquiry and paid-plan report architecture
-11 November 2026 · Staging review · not a legal certification.
+# POSH Legal Navigator — Current IC/LC Checklist and Inquiry Report Architecture
 
-## What has changed
-- The licensed IC/LC checklist retains its original **43 stored preparation ticks** and adds a **separate 84-point judicial-defensibility review** across eight domains.
-- The v4 review is served only after active order verification. It includes eight release gates, coded source references, status classifications, seven legally distinct report types, legal-context selectors, and local export/import of coded JSON.
-- Essential, Professional and Advanced plan tools all include the legal-audit baseline. Professional and Advanced retain their 44-section editable report draft, now with a report-type selector and release-gate table. Advanced adds eighteen adversarial case scenarios to the four existing ones.
-- Guided Word inquiry report and findings drafts now distinguish preliminary, statutory, formal disciplinary, special-regime and referral cases, address contrary evidence and representations, and require reasoned gate review.
-- Plan descriptions updated. No paid checkout, pricing, entitlement or identity-record storage mechanism changed.
+**Release target:** v4.1, 11 November 2026. **Staging:** `inquiry-timeline-staging`. This documentation describes design and verification controls; it is not a certification of any case.
 
-## Confidentiality and current limitations
-Staging users must enter only neutral reference codes. Do not enter real names, case narratives, testimony or exhibits. The new 84-item audit is held in **browser-tab memory only**; unlike the existing 43-tick progress, it is **not** synchronised to the buyer account. Export the coded JSON or Word review before closing. The paid organisational compliance assessment and its management PDF remain separate and are not a final Section 13 inquiry report.
+## Single current IC/LC checklist
+- Exactly **84** legally classified checkpoints across **eight** judicial-defensibility domains, with **eight** independent finalisation gates and reasoned verification statuses.
+- One licensed product with 120 days of access from verified test capture. No prior checkbox edition, saved tick counter, free sample or Word checkbox package is shown.
+- The legal audit remains locally in the browser tab. Export its coded status-and-source record as JSON or editable Word; there is no shared case-data store and no cross-device automatic syncing of audit responses.
+- Current route hints address IC/LC competence, governing service rules, UGC and POCSO circumstances, the Section 11(1) representation stage, evidentiary reliability and current-law appeal verification.
+- Where applicable, the competent Committee records its determinations; selecting PASS does not independently establish legal compliance.
 
-Completing a form does not certify legal compliance or decide guilt. The Committee remains responsible for actual findings, reasons and authorised signatures. Eight release gates are enhanced professional controls rather than a prescribed statutory form.
+## Current report architecture in all plans
+- Inquiry Essential supplies the **current case-adaptive report outline** and allegation-wise working matrix.
+- Inquiry Professional and Advanced supply the current detailed report editor, with **thirteen substantive report chapters** and **seven distinct lawful report/document pathways**. Irrelevant chapters are excluded according to report type. A fourteen-field allegation analysis matrix and eight release gates are integrated.
+- Guided IC/LC inquiry Word drafts use the same thirteen-chapter architecture for full statutory inquiry reporting, subject to the proper governing service rules and a different lawful document where the matter is a conciliation closure, jurisdictional determination or other exception.
+- No software output adjudicates credibility, misconduct, liability, service or statutory completion. Committee findings, authenticated approval and institutional record custody remain authoritative.
+- The distinct employer POSH Compliance Assessment is a management assessment, not an IC/LC merits inquiry report.
 
-## Legal regime controls
-- Do not use a Section 13 merits report for a completed Section 10 settlement, a jurisdictional dismissal or a preliminary fact-finding stage.
-- Apply POSH Rule 7 only where it is legally the governing inquiry procedure.
-- Where both parties are employees, separately provide the statutory opportunity for representations against findings under the second proviso to Section 11(1).
-- Confirm the actual current Section 18 appellate forum, including repeal, savings and transitional instruments.
-- Identify UGC-related higher education and POCSO-related child-reporting obligations independently, when relevant.
+## User language
+- Use '84-point IC/LC Legal Checklist', 'current legally adaptive inquiry report', 'Committee determination', 'authorised Committee verification' and 'Committee approval'.
+- Do not use obsolete checklist counts or old fixed report-builder labels in public content or generated templates.
+- Avoid generic language suggesting an unnamed external reviewer, while preserving real statutory responsibilities of the IC/LC and competent authorities.
 
-## Release and test gates
-1. Run node scripts/verify.cjs for signed asset hashes and existing staging invariants.
-2. Run node --test scripts/defensibility-v4.test.cjs scripts/plan-tools.test.cjs scripts/online-checklist.test.cjs scripts/workflow-documents.test.cjs.
-3. The complete npm run build must pass before deploying staging.
-4. Use fictional accounts to walk through Essential, Professional, Advanced and checklist holder access; test expiry, imports, Word export, keyboard navigation and all 84 control statuses.
-5. Commission legal-editorial review for pinpoint judicial citations, state-specific service rules, sector regulations and the operative appellate forum before describing those sources as independently verified.
+## Source architecture
+- `scripts/defensibility-v4.cjs` — 84 controls, eight gates, seven report routes and 18 challenge cases.
+- `dist/legal-audit-v4.js` — restricted browser-tab review, status/source controls and local exports.
+- `scripts/online-checklist.cjs` and `scripts/checklist-checkout.cjs` — verified current edition, without previous checkbox progress endpoints.
+- `scripts/plan-tools.cjs` and `dist/plan-tools.js` — current report chapters, applicable report-type filtering and allegation matrix.
+- `dist/workflow-documents.js` — current guided inquiry report working document.
+- `dist/products.js`, `dist/shop.js`, homepage, institution page, FAQ, resources and purchase terms — current product descriptions.
 
-## Remaining roadmap
-- Cross-device persistence of the 84 responses requires a separate least-privilege, privacy-reviewed database migration; it is not silently mixed into the legacy 43-item SQL progress.
-- The organisational compliance assessment PDF and the case-specific IC/LC audit remain distinct products to avoid misleading customers.
-- Manual accessibility and browser workflow checks are required; static syntax checks alone are insufficient.
-- A legal source register is a versioned reference index, not an automatic certification of paragraph-level judicial authority.
+## Release gates
+The build must verify the release manifest, current catalogue, account/guest access boundaries, retrospective 120-day entitlement calculation, retired progress endpoint behaviour, report-type mapping, source-specific legal caution and regression tests. Run the full staging build before deployment, then inspect the deployed version and actual staging service status.
 
-## Files
-Source catalogue: scripts/defensibility-v4.cjs
-Private in-browser legal audit: dist/legal-audit-v4.js
-Plan integration: scripts/plan-tools.cjs and dist/plan-tools.js
-Checklist order access: scripts/checklist-checkout.cjs and dist/inquiry-checklist.js
-Guided Word drafts: dist/workflow-documents.js
-Validation tests: scripts/defensibility-v4.test.cjs
+## Known limitations
+Coded working records are local until exported; they are not silently synced. Case-specific service rules, legal-source pinpoints and current appellate forum remain subject to the Committee or qualified authority's verification. The report format supports stronger judicial defensibility but does not guarantee any judicial outcome. The staging checkout cannot charge real money.
