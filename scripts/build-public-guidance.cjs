@@ -15,7 +15,7 @@ const save = (name, data) => fs.writeFileSync(path.join(output, name), data);
 const email = 'mailto:training@thecosmicenergizers.com';
 const walkthrough = email + '?subject=Navigator%20Committee%20walkthrough';
 const pages = ['index', 'about', 'contact', 'digital-delivery', 'help', 'individual-support', 'institutions',
-  'preview', 'pricing', 'privacy', 'product-terms', 'purchase-terms', 'refund-policy', 'resources'];
+  'preview', 'pricing', 'privacy', 'product-terms', 'purchase-terms', 'refund-policy', 'resources', 'products-services'];
 const assets = ['styles.css', 'digital.css', 'library.js', 'faq.js', 'cases.js', 'legal.js', 'finder.js',
   'engine.js', 'docx.js', 'guidance-context.js', 'checklist-sample.pdf', 'essential-sample-invoice.pdf', 'social-preview.png'];
 const { records } = require('../dist/finder.js');
@@ -135,7 +135,7 @@ save('community.js', `window.NavigatorCommunity = { render(app) {
   app.innerHTML = '<section class="app-heading"><div class="wrap"><div><a class="app-back" href="#home">← Home</a><h1>Community</h1><p>Public submissions are currently closed.</p><p><a href="#faq">Browse the FAQs</a> or <a href="${email}?subject=Suggest%20a%20POSH%20FAQ">email a general FAQ suggestion</a>.</p></div></div></section>';
 } };\n`);
 save('robots.txt', 'User-agent: *\nAllow: /\nSitemap: ' + origin + '/sitemap.xml\n');
-const urls = ['/', '/institutions/', '/preview/', '/resources.html', '/pricing.html', '/about.html', '/contact.html'];
+const urls = ['/', '/institutions/', '/preview/', '/resources.html', '/products-services.html', '/pricing.html', '/about.html', '/contact.html'];
 save('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
   urls.map(url => '<url><loc>' + origin + url + '</loc></url>').join('') + '</urlset>\n');
 
