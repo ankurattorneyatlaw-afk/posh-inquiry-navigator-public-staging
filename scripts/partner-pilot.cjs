@@ -19,6 +19,11 @@ function validateAdmin(raw){
  if(raw.action!=='list'&&!validUuid(raw.applicationId))throw Error('Invalid application reference');
  return {p_action:raw.action,p_application_id:raw.action==='list'?null:raw.applicationId};
 }
+function validateOrderLink(raw){
+ if(!raw||typeof raw!=='object'||Array.isArray(raw)||Object.keys(raw).some(k=>!['source','orderId'].includes(k)))throw Error('Invalid test order link');
+ if(!['plan','checklist'].includes(raw.source)||typeof raw.orderId!=='string'||!/^order_[A-Za-z0-9]{1,70}$/.test(raw.orderId)||raw.orderId.length>80)throw Error('Enter a valid completed test order reference');
+ return {p_source:raw.source,p_order_id:raw.orderId};
+}
 function createPartnerPilot({
  accounts,origin=process.env.RENDER_EXTERNAL_URL||'http://127.0.0.1:4173',
  enabled=process.env.PARTNER_REFERRAL_PILOT_ENABLED==='true',
@@ -41,7 +46,7 @@ function createPartnerPilot({
   const name=parsed.pathname.slice('/api/partners/pilot/'.length);
   if(name==='config'&&req.method==='GET'){json(res,200,{pilotEnabled:configured(),realCommissionsEnabled:false,bankPayoutsEnabled:false});return true}
   if(!configured()){json(res,503,{error:'Referral pilot unavailable'});return true}
-  if(!['status','claim','admin'].includes(name)){json(res,404,{error:'Unknown referral action'});return true}
+  if(!['status','claim','admin','link-order'].includes(name)){json(res,404,{error:'Unknown referral action'});return true}
   if((name==='status'&&req.method!=='GET')||(name!=='status'&&req.method!=='POST')){json(res,405,{error:'Incorrect method'});return true}
   if(name!=='status'&&(req.headers.origin!==origin||!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||''))){
    json(res,403,{error:'Not permitted'});return true;
@@ -54,13 +59,13 @@ function createPartnerPilot({
   if(name!=='status'){
    let n=0,chunks=[];
    for await(const b of req){n+=b.length;if(n>512){json(res,413,{error:'Request too long'});return true}chunks.push(b)}
-   try{const raw=JSON.parse(Buffer.concat(chunks).toString('utf8'));payload=name==='claim'?validateClaim(raw):validateAdmin(raw)}
+   try{const raw=JSON.parse(Buffer.concat(chunks).toString('utf8'));payload=name==='claim'?validateClaim(raw):name==='link-order'?validateOrderLink(raw):validateAdmin(raw)}
    catch(e){json(res,400,{error:e.message||'Invalid request'});return true}
   }
   try{
-   const result=await rpc(identity,name==='status'?'navigator_partner_pilot_my_status':name==='claim'?'navigator_partner_pilot_claim':'navigator_partner_pilot_admin',payload);
+   const result=await rpc(identity,name==='status'?'navigator_partner_pilot_my_status':name==='claim'?'navigator_partner_pilot_claim':name==='link-order'?'navigator_partner_pilot_link_order':'navigator_partner_pilot_admin',payload);
    json(res,200,result);return true;
   }catch(e){json(res,e.status||503,{error:e.status===403?'Not permitted':'Pilot service temporarily unavailable'});return true}
  }};
 }
-module.exports={createPartnerPilot,validateClaim,validateAdmin};
+module.exports={createPartnerPilot,validateClaim,validateAdmin,validateOrderLink};

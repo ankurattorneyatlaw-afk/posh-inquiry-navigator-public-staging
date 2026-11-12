@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {Readable}=require('node:stream');
-const {createPartnerPilot,validateClaim,validateAdmin}=require('./partner-pilot.cjs');
+const {createPartnerPilot,validateClaim,validateAdmin,validateOrderLink}=require('./partner-pilot.cjs');
 const {stagingOrigin}=require('./plan-store.cjs');
 const USER_ID='11111111-2222-3333-4444-555555555555';
 function res(){return{status:0,body:null,headers:{},writeHead(code,headers){this.status=code;Object.assign(this.headers,headers||{})},setHeader(name,value){this.headers[name]=value},end(data){this.body=data?JSON.parse(data):null}}}
@@ -61,4 +61,33 @@ test('pilot disabled on non-staging origin and never enables bank payouts',async
  assert.equal(out.status,200);assert.equal(out.body.realCommissionsEnabled,false);assert.equal(out.body.bankPayoutsEnabled,false);
  const separate=createPartnerPilot({accounts:{checkoutIdentity:async()=>null,isOperator:async()=>false},enabled:true,origin:'https://production.example',url:'https://sample.supabase.co',key:'test'});
  assert.equal(separate.configured(),false);
+});
+
+test('completed test order link accepts only allowed sources and order reference',()=>{
+ assert.deepEqual(validateOrderLink({source:'plan',orderId:'order_TEST123456'}),{p_source:'plan',p_order_id:'order_TEST123456'});
+ assert.deepEqual(validateOrderLink({source:'checklist',orderId:'order_ABC987654'}),{p_source:'checklist',p_order_id:'order_ABC987654'});
+ for(const bad of [
+  {source:'live',orderId:'order_TEST123456'},
+  {source:'plan',orderId:'pay_TEST123456'},
+  {source:'plan',orderId:'order_ABC123',customerId:USER_ID},
+  {source:'plan',orderId:'order_TEST123456',paymentStatus:'captured',netRevenue:99900},
+  {source:'guide',orderId:'order_TEST123456'}
+ ])assert.throws(()=>validateOrderLink(bad));
+});
+test('buyer-owned test order is linked only through private verifying RPC',async()=>{
+ const {pilot,calls}=make({response:{linked:true,testOnly:true,commissionCreated:false}});
+ const out=res();await pilot.handle(req('POST',{source:'checklist',orderId:'order_TEST123456'}),out,new URL(stagingOrigin+'/api/partners/pilot/link-order'));
+ assert.equal(out.status,200);assert.equal(out.body.linked,true);
+ assert.equal(out.body.commissionCreated,false);assert.equal(calls.length,1);
+ assert.match(calls[0].path,/rpc\/navigator_partner_pilot_link_order$/);
+ assert.deepEqual(JSON.parse(calls[0].opts.body),{p_source:'checklist',p_order_id:'order_TEST123456'});
+ assert.equal(calls[0].opts.headers.Authorization,'Bearer test-buyer-jwt');
+});
+test('no unauthenticated or cross-origin test order linking',async()=>{
+ const noBuyer=make({accounts:{checkoutIdentity:async()=>null}}),out=res();
+ await noBuyer.pilot.handle(req('POST',{source:'plan',orderId:'order_TEST123456'}),out,new URL(stagingOrigin+'/api/partners/pilot/link-order'));
+ assert.equal(out.status,401);assert.equal(noBuyer.calls.length,0);
+ const cross=make(),blocked=res();
+ await cross.pilot.handle(req('POST',{source:'plan',orderId:'order_TEST123456'},'https://attacker.invalid'),blocked,new URL(stagingOrigin+'/api/partners/pilot/link-order'));
+ assert.equal(blocked.status,403);assert.equal(cross.calls.length,0);
 });
