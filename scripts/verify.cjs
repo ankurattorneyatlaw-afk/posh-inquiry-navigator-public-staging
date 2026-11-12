@@ -35,6 +35,19 @@ require('./test-guided.cjs');
 const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,37);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
+// Pilot order matching is separate from all real commission and payout data.
+const pilotRef=fs.readFileSync('dist/partner-referral.html','utf8');
+const pilotClient=fs.readFileSync('dist/partner-referral.js','utf8');
+const shopClient=fs.readFileSync('dist/shop.js','utf8');
+const checkoutClient=fs.readFileSync('dist/checkout.js','utf8');
+const pilotServer=fs.readFileSync('scripts/partner-pilot.cjs','utf8');
+assert(pilotRef.includes('pilot-test-order-form'),'Missing explicit test-order linking form');
+assert(pilotClient.includes("get('link-order'"),'Missing pilot buyer order verification action');
+assert(shopClient.includes("source=checklist"),'Checklist receipt does not link to voluntary test-order verification');
+assert(checkoutClient.includes("source=plan"),'Plan receipt does not link to voluntary test-order verification');
+assert(pilotServer.includes('navigator_partner_pilot_link_order'),'Unverified pilot order link route');
+const financeApi=fs.readFileSync('scripts/partner-finance-api.cjs','utf8');
+assert(financeApi.includes('bankPayoutsEnabled:false'),'Real payouts must remain disabled');
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,488,'The free Knowledge Library must retain all 488 approved answers');
 assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1),'Default Knowledge Library display must be numbered 001 through 488 in strict order');
 assert.equal(finder.search('FAQ 488')[0].number,'488');

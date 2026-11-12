@@ -24,6 +24,16 @@ This is **not** a live partner programme. The only supported flow is test-only p
 - Production origin fails closed even if `PARTNER_REFERRAL_PILOT_ENABLED` is mistakenly set true.
 - Existing checkout remains test-only; no real receipts, gateway payments or commissions arise.
 
+## Test checkout linkage milestone (2026-11-12)
+
+- Buyers may voluntarily link a completed Razorpay **test** order only after accepting an issued pilot code, using `POST /api/partners/pilot/link-order` with `{source:'plan'|'checklist',orderId}`.
+- The browser submits only order source and reference. The Node server validates an account's verified sign-in and same-origin JSON POST. The database independently checks `auth.uid()`, accepted pilot claim, unexpired 90-day window, pilot partner status, ownership of the test order, recorded Razorpay **test** provider, and captured/fulfilled test state. A test order must have been created and completed after referral registration and within its validity window.
+- Only eligible `plan_test_orders` and non-guest, signed-in `checklist_orders` with `gateway='razorpay-test'` qualify. Simulated payments, guest orders, older orders, unconfirmed orders, guide tests and real payments are rejected.
+- Links are stored only in `navigator_private.partner_pilot_order_links`, distinct from any real referrals, `navigator_partner_commission_ledger`, and payout tables. They contain no money value or confidential case details.
+- Unique `(source,order_id)` prevents duplicate credit. Existing valid links return idempotent success; another buyer cannot claim an already linked test order.
+- The buyer can see their own linked test product categories. The partner sees only an aggregate count of verified test checkout links, never buyer identities or specific orders.
+- No live payments, tax invoices, commissions, refund processing, or bank payouts are enabled by this milestone.
+
 ## Operator checklist
 1. Review applicant independence, role, conflicts and marketing practices.
 2. Issue **pilot code** only, without contractual or payout promises.

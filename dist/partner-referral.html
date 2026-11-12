@@ -26,8 +26,27 @@
 <p class="pilot-actions"><a class="partner-button secondary" href="/account?return=partner-referral">Sign in or create account</a><a href="/shop.html">Explore digital products</a></p><p class="muted">A pilot claim is for functionality testing only. It is not a discount, order, legal advice request or completed commission referral. Your code must be registered before any future live order.</p></section>
 <section class="info-card" aria-labelledby="dashboard-title"><p class="eyebrow">FOR APPLICANTS AND PARTNERS</p><h2 id="dashboard-title">Your pilot partner status</h2><p>Sign in using the same verified email as your partner application to see any issued test-only code. Real partner activation requires an executed agreement and all applicable verification.</p>
 <p id="pilot-my-status" class="pilot-status" role="status">Checking account…</p>
-<div id="pilot-sharing" hidden><p class="muted">Your issued pilot referral code:</p><p id="pilot-code-display" class="pilot-code"></p><div class="pilot-actions"><button id="pilot-copy" class="partner-button secondary" type="button">Copy test referral link</button><a href="/partner-terms.html">Review terms</a></div><p id="pilot-copy-status" role="status"></p><p class="muted">Number of registered pilot referrals: <strong id="pilot-count">0</strong>. This is a test count, not earned revenue.</p></div>
+<div id="pilot-sharing" hidden><p class="muted">Your issued pilot referral code:</p><p id="pilot-code-display" class="pilot-code"></p><div class="pilot-actions"><button id="pilot-copy" class="partner-button secondary" type="button">Copy test referral link</button><a href="/partner-terms.html">Review terms</a></div><p id="pilot-copy-status" role="status"></p><p class="muted">Number of registered pilot referrals: <strong id="pilot-count">0</strong>. This is a test count, not earned revenue.</p><p class="muted">Verified test checkouts linked: <strong id="pilot-verified-test-count">0</strong>. No real commission or payout.</p></div>
 <p><a href="/become-a-partner#apply">Apply to join the programme</a> · <a href="/partner-terms.html">Commercial and payment policy</a></p></section></div>
+<section class="info-card" id="pilot-order-link" style="margin-top:28px">
+ <p class="eyebrow">NEXT MILESTONE · TEST CHECKOUT VERIFICATION</p>
+ <h2>Connect a completed test order</h2>
+ <p>Once you have registered a pilot referral code, complete a new Razorpay <strong>test</strong> checkout while signed in to the same account. Enter the test order reference below. Navigator verifies that you own the order, that it was captured in test mode, and that your referral was registered before the order.</p>
+ <form id="pilot-test-order-form" class="pilot-form" hidden>
+  <label for="pilot-test-source">Test product type</label>
+  <select id="pilot-test-source" name="source" required style="display:block;padding:12px;margin:10px 0 18px;border-radius:9px;border:1px solid #9ab5c1;width:100%;max-width:420px">
+   <option value="plan">Inquiry plan — Razorpay test checkout</option>
+   <option value="checklist">Inquiry or Compliance Checklist — Razorpay test checkout</option>
+  </select>
+  <label for="pilot-test-order-id">Completed test order reference</label>
+  <input id="pilot-test-order-id" name="orderId" type="text" required autocomplete="off" maxlength="80" placeholder="order_..." pattern="order_[A-Za-z0-9]{1,70}" style="text-transform:none;letter-spacing:0">
+  <label class="check"><input id="pilot-test-confirm" type="checkbox" required><span>I understand this is a demonstration only, and it creates no real sale, commission, invoice or payout.</span></label>
+  <button type="submit" class="partner-button dark" id="pilot-test-order-submit">Verify and link test order</button>
+ </form>
+ <p id="pilot-test-order-status" class="pilot-status" role="status" aria-live="polite">Sign in and register a pilot referral before linking a test order.</p>
+ <div id="pilot-test-order-list" hidden><h3>Your verified test-order links</h3><ul id="pilot-test-order-items"></ul></div>
+ <p class="muted">Only eligible test orders created <strong>after</strong> the pilot referral, and within its 90-day window, may be linked. Guest checkout and simulated guide purchases are not included. This pilot cannot create earnings.</p>
+ </section>
 <section class="note" style="margin-top:34px"><strong>Privacy and safety.</strong> Buyers must confirm attribution themselves. We store the account-to-code relationship with its expiry, never complaint evidence, names of parties, or raw case searches. Partner contacts do not get a list of customer identities. Public-sector and conflicted procurement remain excluded from commission. <a href="/privacy.html">Read the privacy notice.</a></section>
 </main>
 <footer class="partner-foot"><div class="partner-wrap partner-foot-inner"><p>POSH Legal Navigator · The Cosmic Energizers</p><p><a href="/#faq">Knowledge Library</a> · <a href="/become-a-partner">Partner Programme</a> · <a href="/privacy.html">Privacy</a></p></div></footer>

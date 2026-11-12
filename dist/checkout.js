@@ -44,6 +44,7 @@ async function verify(){
     link.className='btn btn-dark';
     link.textContent=result.tools?'Open my plan':'Open my workspace';
     status.after(link);
+    const attribution=document.createElement('a');attribution.href='/partner-referral?source=plan&orderId='+encodeURIComponent(proof.orderId);attribution.className='btn btn-light';attribution.style.marginLeft='10px';attribution.textContent='Link this verified TEST order to my earlier pilot referral';link.after(attribution);
     link.focus();
   }catch(error){
     status.textContent=error.message+' Check My workspace or retry verification for order '+proof.orderId+'.';
