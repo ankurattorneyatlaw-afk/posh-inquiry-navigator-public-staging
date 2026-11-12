@@ -136,4 +136,14 @@ save('robots.txt', 'User-agent: *\nAllow: /\nSitemap: ' + origin + '/sitemap.xml
 const urls = ['/', '/institutions/', '/preview/', '/resources.html', '/products-services.html', '/pricing.html', '/about.html', '/contact.html'];
 save('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
   urls.map(url => '<url><loc>' + origin + url + '</loc></url>').join('') + '</urlset>\n');
+// Marketing and generated public assets must use the current legal products.
+const formerDescriptions = /44[\\s-]*section|43[\\s-]*(?:point|check|tick)(?:s|able)?|human[\\s-]+review|checklist-sample\\.pdf/i;
+for (const name of [...pages.map(page=>page+'.html'), 'main.js', 'plans.js', 'shop.html', 'finder.js', 'faq.js']) {
+  const generated=fs.readFileSync(path.join(output,name),'utf8');
+  assert(!formerDescriptions.test(generated),'Retired product wording in generated public asset: '+name);
+}
+assert(fs.readFileSync(path.join(output,'index.html'),'utf8').includes('84-Point IC/LC Legal Checklist'));
+assert(fs.readFileSync(path.join(output,'products-services.html'),'utf8').includes('84 legal checkpoints'));
+assert(fs.readFileSync(path.join(output,'shop.html'),'utf8').includes('84-Point IC/LC Legal Checklist'));
+
 
