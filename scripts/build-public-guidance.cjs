@@ -146,4 +146,13 @@ assert(fs.readFileSync(path.join(output,'index.html'),'utf8').includes('84-Point
 assert(fs.readFileSync(path.join(output,'products-services.html'),'utf8').includes('84 legal checkpoints'));
 assert(fs.readFileSync(path.join(output,'shop.html'),'utf8').includes('84-Point IC/LC Legal Checklist'));
 
+// The static release cannot publish obsolete report or checklist logic.
+require('node:child_process').execFileSync(process.execPath,[
+  '--test',
+  'scripts/defensibility-v4.test.cjs',
+  'scripts/plan-tools.test.cjs',
+  'scripts/online-checklist.test.cjs',
+  'scripts/workflow-documents.test.cjs'
+],{cwd:root,stdio:'inherit',timeout:45000});
+
 
