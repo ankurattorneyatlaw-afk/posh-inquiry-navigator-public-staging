@@ -25,11 +25,11 @@ function evaluateStatement({orders=[],refunds=[],asOf='2026-11-12T00:00:00Z',fin
  if(!Number.isSafeInteger(year)||year<2026||year>2100)throw Error('Invalid financial year');
  const credited=money(priorCreditedPaise,'previous credits');
  const seenEvents=new Map(),seenOrders=new Set(),indexed=new Map();
- function unique(id,description){if(typeof id!=='string'||!/^[_A-Za-z0-9:-]{6,120}$/.test(id))throw Error('Invalid '+description);if(seenEvents.has(id))return false;seenEvents.set(id,description);return true}
+ function unique(id,description,body){if(typeof id!=='string'||!/^[_A-Za-z0-9:-]{6,120}$/.test(id))throw Error('Invalid '+description);const signature=JSON.stringify(body);if(seenEvents.has(id)){if(seenEvents.get(id)!==description+':'+signature)throw Error('Conflicting duplicate event');return false;}seenEvents.set(id,description+':'+signature);return true}
  let blocked=0,held=0n,matured=0n,refundTotal=0n,eligibleOrderCount=0,heldOrderCount=0;
  for(const o of orders){
   if(!o||typeof o!=='object'||Array.isArray(o))throw Error('Invalid order');
-  if(!unique(o.eventId,'order event'))continue;
+  if(!unique(o.eventId,'order event',o))continue;
   if(typeof o.orderId!=='string'||!/^[_A-Za-z0-9:-]{6,120}$/.test(o.orderId)||seenOrders.has(o.orderId))throw Error('Duplicate or invalid order');
   seenOrders.add(o.orderId);
   const amount=money(o.netExclusiveTaxPaise,'tax-exclusive sale');
@@ -39,7 +39,7 @@ function evaluateStatement({orders=[],refunds=[],asOf='2026-11-12T00:00:00Z',fin
  }
  for(const r of refunds){
   if(!r||typeof r!=='object'||Array.isArray(r))throw Error('Invalid refund');
-  if(!unique(r.eventId,'refund event'))continue;
+  if(!unique(r.eventId,'refund event',r))continue;
   if(!indexed.has(r.orderId))throw Error('Refund lacks a matched sale');
   const record=indexed.get(r.orderId);
   if(r.gatewayRefundVerified!==true)throw Error('Unverified refund event');
@@ -108,7 +108,7 @@ const scenarios={
  refund_downgrade:()=>({orders:[sampleOrder('refunded',600000,date)],refunds:[{eventId:'evt_refund_001',orderId:'order_demo_refunded',netRefundExclusiveTaxPaise:20000000,refundedAt:'2026-08-01T10:00:00Z',gatewayRefundVerified:true}],priorCreditedPaise:15000000}),
  on_hold:()=>({orders:[sampleOrder('recent',200000,'2026-11-02T10:00:00Z')]}),
  fraud_blocked:()=>({orders:[sampleOrder('conflicted',300000,date, date,date,{noConflict:false})]}),
- fiscal_year:()=>({orders:[sampleOrder('march',300000,'2027-03-31T20:00:00Z'),sampleOrder('april',300000,'2027-04-01T20:00:00Z')],asOf:'2027-08-01T00:00:00Z',financialYear:2027})
+ fiscal_year:()=>({orders:[sampleOrder('march',300000,'2027-03-31T10:00:00Z'),sampleOrder('april',300000,'2027-04-01T20:00:00Z')],asOf:'2027-08-01T00:00:00Z',financialYear:2027})
 };
 function demo(name){if(typeof name!=='string'||!Object.hasOwn(scenarios,name))throw Error('Unknown demonstration scenario');
  return {scenario:name,...evaluateStatement({asOf,...scenarios[name]()})};
