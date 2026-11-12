@@ -40,7 +40,11 @@ assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:488
 assert.equal(finder.search('FAQ 488')[0].number,'488');
 assert(fs.readFileSync('dist/main.js','utf8').includes('POSH Knowledge Library'));
 assert(fs.readFileSync('dist/main.js','utf8').includes('Knowledge for Everyone. Compliance Made Practical.'));
-assert(fs.readFileSync('dist/index.html','utf8').includes('488 questions'));
+for (const name of ['index.html', 'main.js', 'finder.js']) {
+  const copy = fs.readFileSync('dist/' + name, 'utf8');
+  assert(copy.includes('488 Expert-Curated Questions. Statutory References. Judicial Insights. Practical Guidance.'), name + ' is missing the promotional headline');
+  assert(copy.includes('No subscription. No payment. No compulsory registration for essential legal information.'), name + ' is missing the access message');
+}
 
 for(const id of ["who-is-protected","online-inquiry-checklist-access","choose-compliance-checklist","walkthrough-request-next-step","outside-presiding-officer-all-men-workforce","preliminary-notes-and-inquiry-report"]){const published=finder.records.find(f=>f.id===id);assert(published,'Approved FAQ missing: '+id);assert.equal(finder.search("FAQ "+published.number)[0].id,id);}
 
