@@ -1,0 +1,32 @@
+name: Public Knowledge Library 488 regression checks
+on:
+  pull_request:
+    branches: [public-guidance-launch-2026-11-09]
+  push:
+    branches: [public-knowledge-library-488-2026-11-12]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node scripts/build-public-guidance.cjs
+      - name: Inspect generated homepage and library
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          for(const file of ['index.html','finder.js','main.js']){
+            const src=fs.readFileSync('public-guidance-build/'+file,'utf8');
+            assert(src.includes('POSH Knowledge Library'),file+' missing brand');
+            assert(src.includes('Knowledge for Everyone. Compliance Made Practical.'),file+' missing tagline');
+          }
+          const f=require('./dist/finder.js');
+          assert.equal(f.records.length,488);
+          assert.deepEqual(f.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1));
+          console.log('Public 488 numbered Knowledge Library questions and brand verified');
+          NODE
