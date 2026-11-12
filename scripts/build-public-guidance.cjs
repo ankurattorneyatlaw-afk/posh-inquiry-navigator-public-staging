@@ -53,12 +53,12 @@ const copyEdits = new Map([
   ['Help with sign-in and recovery', 'Help and recovery guidance'],
 ]);
 
-function publicCopy(content) {
+function publicCopy(content, { preservePlanCheckout = false } = {}) {
   for (const [before, after] of copyEdits) content = content.replaceAll(before, after);
   return content
     .replaceAll('https://posh-inquiry-navigator-staging.onrender.com', origin)
     .replace(/<a\b[^>]*href="\/(?:account|workspace|admin)(?:\.html)?(?:[?#][^"]*)?"[^>]*>[\s\S]*?<\/a>/gi, '')
-    .replace(/\/checkout\.html\?plan=([a-z-]+)/g, '/#enquire?plan=$1')
+    .replace(/\/checkout\.html\?plan=([a-z-]+)/g, (link, plan) => preservePlanCheckout ? link : '/#enquire?plan=' + plan)
     .replace(/href="\/guided(?:#[^"]*)?"/g, 'href="/preview"')
     .replaceAll('#community/suggest-faq', email + '?subject=Suggest%20a%20POSH%20FAQ')
     .replace(/href="(styles\.css)"|src="([a-z-]+\.js)"/g, (_, css, script) =>
@@ -66,7 +66,7 @@ function publicCopy(content) {
 }
 
 function publicHtml(name) {
-  let html = publicCopy(source(name + '.html'))
+  let html = publicCopy(source(name + '.html'), { preservePlanCheckout: name === 'products-services' })
     .replace(/<a href="\/pricing\.html"(?: aria-current="page")?>Plans<\/a>/g, '<a href="/products-services.html">POSH Solutions</a>')
     .replace(/<script src="\/analytics\.js"[^>]*><\/script>/g, '')
     .replace(/<form\b[^>]*id="home-walkthrough-form"[^>]*>[\s\S]*?<\/form>/g,
