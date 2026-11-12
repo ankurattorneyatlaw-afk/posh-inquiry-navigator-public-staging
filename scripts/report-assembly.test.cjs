@@ -81,3 +81,10 @@ test('each workspace plan exposes the same report routes with the existing tier 
     assert.equal(data.legalAudit.gates.length,8);
   }
 });
+
+test('entered sentence punctuation is preserved at report sentence boundaries',()=>{
+  const text=report({authority:'The order is in IC-01.',limitation:'See the written reasons.',allegations:[{...allegation,complainant:'I asked for it to stop.',respondent:'What was said?',reasons:'Determination R1.'}]});
+  assert.match(text,/IC-01\./);
+  assert.match(text,/What was said\?/);
+  assert.doesNotMatch(text,/\.\.|\?\./);
+});

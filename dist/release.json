@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.36-partner-order-links-rebased-staging",
+  "version": "6.35.38-case-specific-report-staging",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -76,7 +76,7 @@
     "refund-policy.html": "773038da898fe5d8310d4535580ece57b458110af4d812bd6c6de0dd40341f43",
     "report-assembly-ui.js": "8acf13010aaf39fd1812b45897e44b803950ad47aeb8028093c58746e9c2bfff",
     "report-assembly.css": "b9df7970b03185b99ef50c064e8bbc3a7fdd9428bb1e670c3ef806c55962fc38",
-    "report-assembly.js": "01922390b9e4630401121e92aa1b4a00c4789b34e780691dba24f8769d24ca78",
+    "report-assembly.js": "23e9a2f89d988293c846aa78e47ac0a359adc1e93a390bcca1c2cc6016f7f774",
     "resources.html": "60c7bb0fc4cad896c6c4023a6f48c897374b3f3c719d50af1543a6f6778cbc17",
     "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "session-experience.js": "183af009571011541418b5640907c45a678f4d56cfcdcb3286b0d7367cb6557b",
