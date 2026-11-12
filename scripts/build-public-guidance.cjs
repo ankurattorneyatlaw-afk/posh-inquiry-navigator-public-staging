@@ -25,6 +25,8 @@ assert.deepEqual(search().map(item => Number(item.number)), Array.from({length:4
 for(const sourceName of ['index.html','main.js','finder.js']){
   assert(source(sourceName).includes('POSH Knowledge Library'), sourceName + ' is missing the locked Library name');
   assert(source(sourceName).includes('Knowledge for Everyone. Compliance Made Practical.'), sourceName + ' is missing the agreed tagline');
+  assert(source(sourceName).includes('488 Expert-Curated Questions. Statutory References. Judicial Insights. Practical Guidance.'), sourceName + ' is missing the promotional headline');
+  assert(source(sourceName).includes('No subscription. No payment. No compulsory registration for essential legal information.'), sourceName + ' is missing the access message');
 }
 assert([...assets, ...pages.map(name => name + '.html')].every(name => !PROTECTED.has(name)));
 
