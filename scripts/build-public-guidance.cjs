@@ -17,19 +17,18 @@ const walkthrough = email + '?subject=Navigator%20Committee%20walkthrough';
 const pages = ['index', 'about', 'contact', 'digital-delivery', 'help', 'individual-support', 'institutions',
   'preview', 'pricing', 'privacy', 'product-terms', 'purchase-terms', 'refund-policy', 'resources', 'products-services'];
 const assets = ['styles.css', 'digital.css', 'library.js', 'faq.js', 'cases.js', 'legal.js', 'finder.js',
-  'engine.js', 'docx.js', 'guidance-context.js', 'checklist-sample.pdf', 'essential-sample-invoice.pdf', 'social-preview.png'];
+  'engine.js', 'docx.js', 'guidance-context.js', 'essential-sample-invoice.pdf', 'social-preview.png'];
 const { records } = require('../dist/finder.js');
 assert.equal(records.length, 488);
-assert.equal(fs.readFileSync(path.join(root, 'dist/checklist-sample.pdf')).subarray(0, 4).toString(), '%PDF');
 assert([...assets, ...pages.map(name => name + '.html')].every(name => !PROTECTED.has(name)));
 
 const copyEdits = new Map([
   ['Navigator staging · Free guidance and FAQs · Inquiry access for approved accounts', 'Public release · Free guidance, FAQs and samples · Sign-in and checkout closed'],
   ['STAGING · Free guidance and product enquiries · No complaint filing, case uploads or paid workspace.', 'Public release · Free guidance and product enquiries · Sign-in and checkout closed'],
   ['Test checkout is open at ₹0; real payments remain disabled.', 'Online checkout is currently closed.'],
-  ['Both checklists are available for test checkout. Real payments are disabled.', 'Explore both checklists and view the free Inquiry Checklist sample. Online checkout is currently closed.'],
+  ['Both checklists are available for test checkout. Real payments are disabled.', 'Explore the current 84-point IC/LC Legal Checklist and the separate employer compliance assessment. Online checkout is currently closed.'],
   ['Test checkout only', 'Online checkout closed'],
-  ['Test checkout and test delivery are available; no payment or real purchase is created.', 'Explore the product details and free samples. Online checkout is closed.'],
+  ['Test checkout and test delivery are available; no payment or real purchase is created.', 'Explore current product details. Online checkout is closed.'],
   ['Staging checkout only.', 'Online checkout closed.'],
   ['On staging, you’ll sign in, complete a test checkout, and open your plan. No money is charged.', 'Contact the team to discuss availability, access and fees.'],
   ['DIGITAL PRODUCTS · TEST CHECKOUT OPEN · REAL PAYMENTS DISABLED', 'DIGITAL PRODUCTS · ONLINE CHECKOUT CLOSED'],
@@ -40,7 +39,7 @@ const copyEdits = new Map([
   ['Compare staging features', 'Compare plan features'],
   ['Compare the tools available in staging.', 'Compare the tools shown in the plan previews.'],
   ['The comparison above shows the staging tools.', 'The comparison above describes the planned access scope.'],
-  ['Staging is for testing with fictional information. Live purchases are closed. The ₹999 Word checklist is a separate download for checking the broad steps.', 'Online purchases are closed. The separate ₹999 Online Inquiry Checklist has a free PDF sample.'],
+  ['Staging is for testing with fictional information. Live purchases are closed. The ₹999 Word checklist is a separate download for checking the broad steps.', 'Online purchases are closed. The current ₹999 IC/LC Legal Checklist contains 84 legal checkpoints and eight finalisation gates.'],
   ['Sign in when your access is approved.', 'Sign-in is currently closed.'],
   ['Use your approved email to sign in. Your active access determines which tools you can open.', 'Sign-in is currently closed. Contact the team for access updates.'],
   ['Sign in to your authorised workspace.', 'When account access opens, use your authorised workspace.'],
@@ -88,7 +87,6 @@ function productPage() {
     <h2>${esc(product.name)}</h2><p>${esc(product.scope)}</p>
     <p><strong>${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(product.amount / 100)}</strong> listed price</p>
     <h3>What it includes</h3><ul>${product.includes.map(item => '<li>' + esc(item) + '</li>').join('')}</ul>
-    ${product.sample ? '<p><a href="' + esc(product.sample) + '">Open the free PDF sample</a></p>' : ''}
   </section>`).join('');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Product previews | POSH Inquiry Navigator</title><link rel="stylesheet" href="/digital.css"><script defer src="/product-preview-public.js"></script></head>
