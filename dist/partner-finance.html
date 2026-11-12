@@ -1,0 +1,64 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Finance Reconciliation Lab | POSH Legal Navigator</title><link rel="stylesheet" href="/partner.css"><style>
+.finance-header{background:linear-gradient(125deg,#10283b,#214c5a);color:white;padding:55px 0}
+.finance-header h1{max-width:22ch}.finance-header p{color:#d8e8eb}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:24px;margin:28px 0}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.metric{background:#f2f7f7;border:1px solid #d0e2e4;border-radius:10px;padding:15px}
+.metric strong{display:block;font-size:24px;color:#173c4e}.metric small{color:#526879}
+.warning{border-left:4px solid #b37e36;background:#fff8eb;padding:16px 20px;border-radius:0 8px 8px 0}
+.finance-select{width:100%;max-width:370px;padding:12px;background:#fff;border:1px solid #8cabba;border-radius:8px}
+.finance-status{font-weight:600;overflow-wrap:anywhere}
+table.fin-table{width:100%;border-collapse:collapse;font-size:14px}
+.fin-table th,.fin-table td{padding:12px;border-bottom:1px solid #d4e0e6;text-align:left;vertical-align:top}
+.fin-table th{background:#edf4f6}
+.fin-table button{min-height:36px;margin:3px;padding:8px 10px;font-size:13px}
+.fin-scroll{overflow-x:auto;background:white;border:1px solid #d4e0e6;border-radius:12px}
+@media(max-width:950px){.lab-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.metric-grid{grid-template-columns:1fr}}
+</style></head><body><a class="skip" href="#main">Skip to finance controls</a>
+<header class="partner-header"><nav class="partner-nav" aria-label="Administrative navigation">
+<a href="/" class="partner-mark">POSH Legal Navigator<small>THE COSMIC ENERGIZERS · PRIVATE ADMIN</small></a>
+<div class="partner-links"><a href="/admin">Administration</a><a href="/partner-operations">Partner applications</a><a href="/become-a-partner">Partner programme</a></div>
+</nav></header>
+<section class="finance-header"><div class="partner-wrap"><p class="eyebrow">STAGING · FINANCIAL CONTROL REHEARSAL</p>
+<h1>Partner Finance Reconciliation Lab</h1>
+<p>Test commission tiers, refunds, payment holds and approval segregation without using an actual sale, customer identity, bank account, or payable commission.</p></div></section>
+<main class="partner-wrap section" id="main">
+<p class="warning"><strong>Not an active payment service.</strong> Calculations use predefined fictional financial events. Review approvals apply only to training drafts. No commission ledger or payout can be created here. Live gateway webhooks, bank disbursements and customer billing remain disabled.</p>
+<p id="finance-status" role="status" class="finance-status">Checking verified operator access…</p>
+<div id="finance-workspace" hidden>
+<div class="metric-grid" aria-label="Live financial ledger status">
+<div class="metric"><small>Real commission events</small><strong id="real-commission-count">—</strong></div>
+<div class="metric"><small>Real payout records</small><strong id="real-payout-count">—</strong></div>
+<div class="metric"><small>Bank transfers</small><strong>Disabled</strong></div></div>
+<div class="lab-grid">
+<section class="info-card"><p class="eyebrow">SCENARIO VALIDATION</p><h2>Explore the commission rules</h2>
+<label for="finance-scenario"><strong>Choose a synthetic test case</strong></label>
+<select class="finance-select" id="finance-scenario">
+<option value="starter">20% Starter — ₹3 lakh annual sales</option>
+<option value="growth">25% Growth — ₹5 lakh, retroactive upgrade</option>
+<option value="elite">30% Elite — ₹10 lakh, retroactive upgrade</option>
+<option value="refund_downgrade">Refund brings annual sales below threshold</option>
+<option value="on_hold">45-day settlement / delivery hold</option>
+<option value="fraud_blocked">Conflict and ineligible sale blocked</option>
+<option value="fiscal_year">April 1 financial-year boundary (IST)</option>
+</select>
+<div class="cta-line"><button type="button" class="partner-button dark" id="finance-run">Preview scenario</button><button type="button" class="partner-button secondary" id="finance-prepare">Create review draft</button></div>
+<div class="metric-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+<div class="metric"><small>Qualified annual net sales</small><strong id="finance-net">—</strong></div>
+<div class="metric"><small>Current tier</small><strong id="finance-tier">—</strong></div>
+<div class="metric"><small>Target annual commission</small><strong id="finance-target">—</strong></div>
+<div class="metric"><small>Retroactive adjustment</small><strong id="finance-adjustment">—</strong></div>
+<div class="metric"><small>Held net revenue</small><strong id="finance-held">—</strong></div>
+<div class="metric"><small>Verified net refunds</small><strong id="finance-refunds">—</strong></div></div>
+<p id="finance-example-description" class="muted">Select a scenario and preview the verified rules.</p></section>
+<section class="info-card"><p class="eyebrow">BEFORE ANY REAL PAYMENT</p><h2>Controls that must be satisfied</h2>
+<ol><li>Partner agreement and product eligibility verified</li><li>Buyer explicitly accepts pre-purchase attribution</li><li>Payment signature, capture, settlement and delivery verified independently</li><li>Refund/chargeback adjustment and minimum 45-day hold</li><li>Accurate annual tier calculation and negative reconciliation</li><li>Independent KYC, verified bank owner, tax/GST/TDS sign-off and invoice</li><li>Separate preparer and two distinct finance approvers</li><li>Manual bank reconciliation and immutable payout reference</li></ol>
+<p class="muted">The sandbox intentionally checks logic and staff separation. It does not satisfy KYC, tax, bank or gateway verification in the live business.</p>
+<p><a href="/partner-terms.html">Read the published commercial and payout terms</a></p></section></div>
+<section class="info-card"><div class="pilot-actions" style="display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap"><div><p class="eyebrow">AUDITABLE SEPARATION OF DUTIES</p><h2>Test finance review drafts</h2></div><button type="button" class="partner-button secondary" id="finance-refresh">Refresh review queue</button></div>
+<p>Drafts contain the scenario ID and authenticated operator IDs only. A preparer cannot sign either approval; the second reviewer must be different from both the preparer and first reviewer. Completed approval remains a simulation and never permits payout.</p>
+<div class="fin-scroll"><table class="fin-table"><thead><tr><th>Created (IST)</th><th>Scenario</th><th>State</th><th>Preparer</th><th>First reviewer</th><th>Second reviewer</th><th>Available action</th></tr></thead><tbody id="finance-rows"><tr><td colspan="7">Loading…</td></tr></tbody></table></div>
+</section></div></main>
+<footer class="partner-foot"><div class="partner-wrap partner-foot-inner"><p>POSH Legal Navigator · Test-only finance controls</p><p><a href="/admin">Administration</a> · <a href="/partner-operations">Partner Applications</a> · <a href="/privacy.html">Privacy</a></p></div></footer>
+<script src="/partner-finance.js" defer></script></body></html>
