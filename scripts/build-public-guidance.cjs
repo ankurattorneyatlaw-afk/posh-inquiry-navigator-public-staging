@@ -67,6 +67,7 @@ function publicCopy(content) {
 
 function publicHtml(name) {
   let html = publicCopy(source(name + '.html'))
+    .replace(/<a href="\/pricing\.html"(?: aria-current="page")?>Plans<\/a>/g, '<a href="/products-services.html">POSH Solutions</a>')
     .replace(/<script src="\/analytics\.js"[^>]*><\/script>/g, '')
     .replace(/<form\b[^>]*id="home-walkthrough-form"[^>]*>[\s\S]*?<\/form>/g,
       '<p>Email the team to arrange a walkthrough. Share your organisation and preferred times.</p>');
