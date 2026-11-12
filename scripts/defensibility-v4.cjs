@@ -181,7 +181,12 @@ function route(context={}){
  if(context.bothEmployees==='unknown')flags.push('Employment status unresolved: verify Section 11(1) representation rights.');
  if(context.hei)flags.push('Higher-education institution: check applicable UGC framework and student composition.');
  if(context.minor)flags.push('Child involved: separately assess immediate POCSO Section 19 reporting.');
- if(context.crossEmployer)flags.push('Cross-employer matter: verify jurisdiction and enforceable recommendation pathway.');
+ if(context.crossEmployer||context.employmentRelationship==='different')flags.push('Cross-employer matter: verify jurisdiction, respondent rules and enforceable recommendations. Assess the Section 11(1) second proviso by employment status.');
+ if(context.inquiryPath==='domestic'&&context.conciliation!=='completed'){
+  if(!['jurisdiction','referral'].includes(report))report='referral';
+  flags.push('Domestic-worker pathway: verify Local Committee authority and the prima facie police-referral decision under Section 11(1). Section 11(2) addresses compensation after conviction.');
+ }
+ if(context.inquiryPath==='third-party'&&context.conciliation!=='completed'&&!['jurisdiction','referral'].includes(report))report='referral';
  if(context.conciliation==='completed'&&context.report==='statutory')flags.push('Completed Section 10 settlement: avoid continuing merits inquiry unless breach route arises.');
  if(context.procedure==='ccs'&&context.report==='statutory')flags.push('Assess distinct preliminary and disciplinary stages under applicable CCS (CCA) rules.');
  if(context.appealForum==='unknown')flags.push('Determine current Section 18 forum, including legal transition and savings; never infer forum from repealed citation.');

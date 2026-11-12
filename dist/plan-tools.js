@@ -89,7 +89,7 @@ function reviewList(parent,groups,interactive=false){
   }
   return ()=>items.flatMap(read=>read());
 }
-function standardTools(data){
+function standardTools(data,audit){
   const plan=data.plan;
   const panel=section('Neutral question planning');
   const role=select(panel,'Role',[['complainant','Aggrieved woman'],['respondent','Respondent'],['witness','Witness']]);
@@ -106,25 +106,9 @@ function standardTools(data){
     heading(role.selectedOptions[0].textContent),paragraph(output.textContent),
     {type:'table',rows:[['Question as put','Answer or record reference','Follow-up and reviewer'],['','','']]}
   ]);
-  const basic=section('Current report structure and allegation record');
-  el('p','The current legal report architecture is used in every plan. Select the relevant report type; the outline changes accordingly. Committee approval remains essential.',basic);
-  const basicType=select(basic,'Legally appropriate report type',data.legalAudit.reports.map(r=>[r.id,r.label]));
-  basicType.value='statutory';
-  const basicNote=el('p','',basic);basicNote.className='small';
-  const basicChapters=()=>data.reportTypeChapters[basicType.value]||data.reportTypeChapters.statutory;
-  function showBasic(){basicNote.textContent=(data.legalAudit.reports.find(r=>r.id===basicType.value)?.note||'Verify the governing service rules.')+' Current format: '+basicChapters().length+' relevant chapters.';}
-  basicType.onchange=showBasic;showBasic();
-  exportButton(basic,'Download current report outline and findings matrix','Current-report-structure-and-findings-record',plan,()=>[
-    heading('Legal pathway'),paragraph('Selected: '+basicType.selectedOptions[0].textContent+'. Verify competent forum and governing service rules.'),
-    ...basicChapters().flatMap(i=>[heading((i+1)+'. '+data.reportOutline[i][0]),paragraph('[Committee record reference or legally reasoned explanation] '+data.reportOutline[i][1])]),
-    heading('Allegation-wise analysis'),{type:'table',rows:[['Required analytical field','Committee-approved entry or controlled source reference'],...data.allegationMatrixFields.map(x=>[x,'[enter appropriate code / reasons]'])]},
-    paragraph('Working document only. No conclusion, authentication, service or statutory compliance is established by download.')
-  ]);
-  const consistency=el('p','',basic);
-  consistency.setAttribute('role','status');
-  const checks=el('button','Review basic consistency checks',basic);
-  checks.type='button';
-  checks.onclick=()=>{consistency.textContent='Confirm that every allegation has its own reasoned finding, the material and responses match the record, and the actual report recipients and dates are correct.';};
+  const basic=section('Case-specific inquiry and review reports');
+  const notes=Object.fromEntries(data.legalAudit.reports.map(r=>[r.id,r.note]));
+  window.PoshReportAssemblyUI.mount(basic,{notes,audit});
   const pdf=el('button','Print or save the tools as PDF',basic);
   pdf.type='button';
   pdf.onclick=()=>window.print();
@@ -182,51 +166,6 @@ function professionalTools(data){
   const rows=()=>filtered().map(row=>[code.value.trim()||row.issueRefs,row.annexure+(row.active?'':' (withdrawn)'),support.value.trim(),contrary.value.trim(),question.textContent]);
   exportButton(panel,'Download evidence matrix and question plan','Evidence-matrix-and-question-plan',data.plan,()=>[
     {type:'table',rows:[['Allegation','Annexure','Supporting relevance','Contrary or qualifying relevance','Question, response and reasoning'],...(rows().length?rows():[[code.value.trim(),'',support.value.trim(),contrary.value.trim(),question.textContent]])]}
-  ]);
-  const report=section('Current legally adaptive inquiry report builder');
-  el('p','Select the legally appropriate report classification before drafting. The Committee—not software—determines findings, credibility, authority and final sign-off. Keep case material offline.',report);
-  const reportType=select(report,'Legally applicable report type',data.legalAudit.reports.map(r=>[r.id,r.label]));
-  const reportTypeNote=el('p','',report);reportTypeNote.className='small';
-  function updateReportType(){reportTypeNote.textContent=data.legalAudit.reports.find(r=>r.id===reportType.value)?.note||'Check governing service rules.';}
-  const relevantSections=()=>data.reportTypeChapters[reportType.value]||data.reportTypeChapters.statutory;
-  reportType.value='statutory';
-  reportType.onchange=()=>{updateReportType();renderReportChapters();};updateReportType();
-  const gateNote=el('p','Eight final release gates must be documented in the separate v4 legal audit. A download never certifies compliance.',report);gateNote.className='small';
-  const sectionRows=data.reportSections.map(([title,prompt],i)=>{
-    const block=el('details','',report);
-    el('summary',(i+1)+'. '+title,block);
-    el('p',prompt,block);
-    return {block,field:field(block,'Working note or reference',320)};
-  });
-  function renderReportChapters(){
-    const relevant=new Set(relevantSections());
-    sectionRows.forEach((item,i)=>{item.block.hidden=!relevant.has(i);});
-    reportTypeNote.textContent=(data.legalAudit.reports.find(r=>r.id===reportType.value)?.note||'Verify governing service rules.')+' · '+relevant.size+' relevant report chapters.';
-  }
-  renderReportChapters();
-  const checkStatus=el('p','',report);
-  checkStatus.setAttribute('role','status');
-  const check=el('button','Check draft references',report);
-  check.type='button';
-  check.onclick=()=>{
-    const missing=relevantSections().filter(i=>!sectionRows[i].field.value.trim()).map(i=>data.reportSections[i][0]);
-    const marks=filtered().filter(row=>row.active&&(!row.markApproved||row.disclosure==='pending'||row.opportunity==='pending')).map(row=>row.annexure);
-    const issues=[];
-    if(missing.length)issues.push('Review empty references for '+missing.join(', ')+'.');
-    if(marks.length)issues.push('Check marking, disclosure or participation for '+marks.join(', ')+'.');
-    checkStatus.textContent=issues.join(' ')||'No gap flagged by this limited reference check. Review the full record, reasons and applicable requirements independently.';
-  };
-  exportButton(report,'Download editable report draft','Committee-report-working-draft',data.plan,()=>[
-    heading('Report classification and governing legal route'),
-    paragraph('Selected draft type: '+reportType.selectedOptions[0].textContent+'. This selection is not a legal conclusion. Verify forum, service rules and competent authority.'),
-    paragraph(reportTypeNote.textContent),
-    heading('Judicial-defensibility release gates'),
-    {type:'table',rows:[['Gate','Source / reviewer reference','Verified status'],...data.legalAudit.gates.map(g=>[g.id+' '+g.title,'[record code]','[review required]'])]},
-    heading('Professional report working sections'),
-    ...relevantSections().flatMap(i=>[heading((i+1)+'. '+data.reportSections[i][0]),paragraph(sectionRows[i].field.value.trim()||'[Committee record reference / reasons required] '+data.reportSections[i][1])]),
-    heading('Allegation-wise findings and evidence matrix'),
-    {type:'table',rows:[['Analytical element','Verified controlled source or Committee determination'],...data.allegationMatrixFields.map(title=>[title,'[code / reason]'])]},
-    ...filtered().map(row=>paragraph(row.annexure+' · '+row.issueRefs+(row.active?'':' · withdrawn')))
   ]);
   const reviews=section('Three readiness reviews');
   const reviewItems=reviewList(reviews,data.readiness,true);
@@ -457,16 +396,23 @@ access().then(data=>{
   $('tools-resume-guided').href=guidedHref+'#resume-inquiry';
   $('tools-start').hidden=false;
   $('tools-optional').hidden=false;
-  standardTools(data);
+  let review;
+  standardTools(data,()=>{
+    const snapshot=review?.snapshot();
+    if(!snapshot)return undefined;
+    const completed=Object.values(snapshot.checks).filter(check=>check.ref&&['pass','not-applicable'].includes(check.status)).length;
+    const gates=data.legalAudit.gates.map(gate=>[gate.title,snapshot.gates[gate.id].status,snapshot.gates[gate.id].ref||'[Gate record reference]']);
+    return {completed,gates};
+  });
   if(data.legalAudit&&window.NavigatorDefensibilityV4){
     const legal=section('IC/LC legal defensibility — Version 4.0');
     const target=el('div','',legal);
-    window.NavigatorDefensibilityV4.mount(target,data.legalAudit,{id:'v4-plan-audit'});
+    review=window.NavigatorDefensibilityV4.mount(target,data.legalAudit,{id:'v4-plan-audit'});
   }
   const toolkit=section('POSH Readiness Toolkit');
   const toolkitItems=reviewList(toolkit,data.toolkit,true);
   exportButton(toolkit,'Download the readiness toolkit','POSH-Readiness-Toolkit',data.plan,toolkitItems);
-  if(data.reportSections)professionalTools(data);
+  if(data.readiness)professionalTools(data);
   if(data.advanced)advancedTools(data);
   showSeats(data);
   const index=$('tools-index');

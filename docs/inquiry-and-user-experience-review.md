@@ -28,7 +28,7 @@ Individual support lifecycle: case-free enquiry → secure conflict check → wr
 ## Next product priorities
 
 1. Validate the complete journey with real IC and LC practitioners using synthetic scenarios; prioritise comprehension, exception recovery and export/restore discovery.
-2. Publish an owner operating procedure for provisioning, expiry reminders, support response and renewal. Do not advertise automated seats, collaboration, read-only retention or 44-section automation until implemented and tested.
+2. Publish an owner operating procedure for provisioning, expiry reminders, support response and renewal. Do not advertise automated seats, collaboration, read-only retention until implemented and tested.
 3. Build a role-specific welcome and first-session checklist around the current step, next action and required export; retain no case data on the server.
 4. Measure package demand before committing a price list. Verify provider capacity, professional obligations and secure handling outside the app before accepting an engagement.
 5. Independent accessibility/security review and a documented service continuity plan before promising production availability. Free hosting may cold-start; this release adds no paid hosting.

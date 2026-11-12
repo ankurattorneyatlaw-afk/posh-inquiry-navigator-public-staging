@@ -16,9 +16,11 @@ function mount(host,data,options={}){
  const contexts=[
  ['forum','Committee route',[['unknown','Forum to verify'],['IC','Internal Committee'],['LC','Local Committee']]],
  ['procedure','Applicable procedure',[['unknown','Verify service rules'],['prescribed','Prescribed POSH Rules'],['service','Other applicable service rules'],['ccs','CCS (CCA) / Central Government'],['ugc','UGC or special sector rules']]],
+ ['employmentRelationship','Employer relationship',[['unknown','Relationship to verify'],['same','Same employer'],['different','Separate employers'],['not-applicable','Not both employees']]],
+ ['inquiryPath','Section 11 pathway',[['unknown','Pathway to verify'],['employee','Employee respondent'],['domestic','Domestic-worker complaint'],['third-party','Third-party respondent']]],
  ['bothEmployees','Both parties employees?', [['unknown','Not confirmed'],['yes','Yes'],['no','No']]],
  ['report','Intended report',[...data.reports.map(r=>[r.id,r.label])]],
- ['conciliation','Section 10 outcome',[['none','No completed settlement'],['completed','Completed settlement']]],
+ ['conciliation','Section 10 outcome',[['none','No completed settlement'],['completed','Completed settlement'],['breach','Settlement breach reported']]],
  ['appealForum','Appeal authority',[['unknown','Not yet legally verified'],['verified','Verified against current law']]]
  ];
  const fields={},results={};
@@ -95,12 +97,16 @@ function mount(host,data,options={}){
  function warnings(){
    const c=currentContext(),notes=[];
    if(c.forum==='unknown')notes.push('Resolve whether the IC or LC is competent before a merits report.');
-   if(c.procedure==='unknown')notes.push('Verify which service rules govern; Rule 7 cannot be assumed automatically.');
+   if(c.inquiryPath==='unknown')notes.push('Record the employee, domestic-worker or third-party pathway.');
+   if(c.inquiryPath==='employee'&&c.procedure==='unknown')notes.push('Verify which service rules govern; Rule 7 cannot be assumed automatically.');
    if(c.procedure==='ccs')notes.push('Confirm preliminary versus formal disciplinary stage under the actual CCS (CCA) framework.');
    if(c.procedure==='ugc')notes.push('Verify current UGC/special-regime provisions and Committee composition.');
    if(c.bothEmployees==='unknown')notes.push('Determine whether Section 11(1) findings representations apply.');
    if(c.conciliation==='completed'&&c.report==='statutory')notes.push('A completed Section 10 settlement usually ends the merits inquiry; check breach route separately.');
-   if(c.appealForum==='unknown')notes.push('Verify the competent Section 18 appeal forum under current law and transitional provisions.');
+   if(['same','different'].includes(c.employmentRelationship)&&c.bothEmployees!=='yes')notes.push('Reconcile the employer relationship with the parties’ employee status.');
+   if(c.inquiryPath==='third-party'&&c.bothEmployees==='yes')notes.push('Reconcile third-party status with the both-employee selection.');
+   if(c.inquiryPath==='domestic'&&(c.forum!=='LC'||!['jurisdiction','referral','conciliation'].includes(c.report)))notes.push('Verify the Local Committee pathway and prima facie police-referral decision under Section 11(1). Section 11(2) concerns court compensation after conviction.');
+   if(c.appealForum==='unknown'&&['statutory','disciplinary','special'].includes(c.report))notes.push('Verify the competent Section 18 appeal forum under current law and transitional provisions.');
    if(c.report==='preliminary')notes.push('No prejudgment or unauthorised penalty in a preliminary report.');
    return notes;
  }
@@ -118,6 +124,7 @@ function mount(host,data,options={}){
    const p=problems(),items=[...gateRows,...checks],reviewed=items.filter(([,r])=>r.select.value==='pass'||r.select.value==='not-applicable').length;
    overview.textContent='Review status: '+reviewed+' / '+items.length+' checked as pass or reasoned N/A; '+p.unverified.length+' open; '+p.blocked.length+' fundamental; '+p.invalid.length+' missing/invalid references.';
    alerts.replaceChildren();for(const warning of warnings())text(alerts,warning);
+   if(context.employmentRelationship==='different')text(alerts,'Verify forum competence, respondent service rules and authorised coordination. The second proviso to Section 11(1) turns on employee status.');
    const eligible=!p.blocked.length&&!p.unverified.length&&!p.invalid.length&&!warnings().length;
    outcome.textContent=eligible?'All selected controls recorded. A competent independent reviewer must still validate the evidence and sign off; this page does not certify statutory compliance.':'Not ready for final release. Resolve applicable open issues, verify each record reference and obtain competent legal review.';
  }

@@ -1,0 +1,29 @@
+.posh-report-assembly .posh-report-field {
+  display: grid;
+  gap: .35rem;
+  margin: .65rem 0;
+}
+.posh-report-assembly [hidden] {
+  display: none;
+}
+.posh-report-assembly fieldset {
+  min-inline-size: 0;
+  margin-block: 1rem;
+}
+.posh-report-assembly textarea,
+.posh-report-assembly select,
+.posh-report-assembly input {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  font: inherit;
+}
+.posh-report-assembly textarea {
+  inline-size: 100%;
+  resize: vertical;
+}
+.posh-report-assembly details {
+  margin-block: .55rem;
+}
+.posh-report-assembly button {
+  margin-block: .35rem;
+}

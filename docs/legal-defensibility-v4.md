@@ -10,10 +10,9 @@
 - Where applicable, the competent Committee records its determinations; selecting PASS does not independently establish legal compliance.
 
 ## Current report architecture in all plans
-- Inquiry Essential supplies the **current case-adaptive report outline** and allegation-wise working matrix.
-- Inquiry Professional and Advanced supply the current detailed report editor, with **thirteen substantive report chapters** and **seven distinct lawful report/document pathways**. Irrelevant chapters are excluded according to report type. A fourteen-field allegation analysis matrix and eight release gates are integrated.
-- Guided IC/LC inquiry Word drafts use the same thirteen-chapter architecture for full statutory inquiry reporting, subject to the proper governing service rules and a different lawful document where the matter is a conciliation closure, jurisdictional determination or other exception.
-- No software output adjudicates credibility, misconduct, liability, service or statutory completion. Committee findings, authenticated approval and institutional record custody remain authoritative.
+- Essential, Professional and Advanced use one deterministic report builder with seven report pathways, allegation-level reasons, evidence and witness annexures, and optional coded gate results. Institutional and contractual access follows the configured workspace scope.
+- Guided IC/LC inquiry uses the same Section 13 assembler and can reuse dates and the coded evidence index from the current session.
+- Committee findings, approval and institutional record custody remain authoritative.
 - The distinct employer POSH Compliance Assessment is a management assessment, not an IC/LC merits inquiry report.
 
 ## User language
@@ -25,8 +24,9 @@
 - `scripts/defensibility-v4.cjs` — 84 controls, eight gates, seven report routes and 18 challenge cases.
 - `dist/legal-audit-v4.js` — restricted browser-tab review, status/source controls and local exports.
 - `scripts/online-checklist.cjs` and `scripts/checklist-checkout.cjs` — verified current edition, without previous checkbox progress endpoints.
-- `scripts/plan-tools.cjs` and `dist/plan-tools.js` — current report chapters, applicable report-type filtering and allegation matrix.
-- `dist/workflow-documents.js` — current guided inquiry report working document.
+- `scripts/plan-tools.cjs` and `dist/plan-tools.js` — plan access, report pathway guidance and browser entry point.
+- `dist/report-assembly.js` and `dist/report-assembly-ui.js` — deterministic report assembly, case input and validation.
+- `dist/workflow-documents.js` — guided Section 13 report entry point.
 - `dist/products.js`, `dist/shop.js`, homepage, institution page, FAQ, resources and purchase terms — current product descriptions.
 
 ## Release gates
