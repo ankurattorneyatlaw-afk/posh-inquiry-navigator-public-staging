@@ -18,8 +18,14 @@ const pages = ['index', 'about', 'contact', 'digital-delivery', 'help', 'individ
   'preview', 'pricing', 'privacy', 'product-terms', 'purchase-terms', 'refund-policy', 'resources', 'products-services'];
 const assets = ['styles.css', 'digital.css', 'library.js', 'faq.js', 'cases.js', 'legal.js', 'finder.js',
   'engine.js', 'docx.js', 'guidance-context.js', 'checklist-sample.pdf', 'essential-sample-invoice.pdf', 'social-preview.png'];
-const { records } = require('../dist/finder.js');
-assert.equal(records.length, 488);
+const { records, search } = require('../dist/finder.js');
+assert.equal(records.length, 488, 'All 488 approved Knowledge Library questions must exist');
+assert.deepEqual(search().map(item => Number(item.number)), Array.from({length:488}, (_, i)=>i+1),
+  'Public Knowledge Library must display questions 001–488 in the correct numerical order');
+for(const sourceName of ['index.html','main.js','finder.js']){
+  assert(source(sourceName).includes('POSH Knowledge Library'), sourceName + ' is missing the locked Library name');
+  assert(source(sourceName).includes('Knowledge for Everyone. Compliance Made Practical.'), sourceName + ' is missing the agreed tagline');
+}
 assert.equal(fs.readFileSync(path.join(root, 'dist/checklist-sample.pdf')).subarray(0, 4).toString(), '%PDF');
 assert([...assets, ...pages.map(name => name + '.html')].every(name => !PROTECTED.has(name)));
 
@@ -92,9 +98,9 @@ function productPage() {
     ${product.sample ? '<p><a href="' + esc(product.sample) + '">Open the free PDF sample</a></p>' : ''}
   </section>`).join('');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Product previews | POSH Inquiry Navigator</title><link rel="stylesheet" href="/digital.css"><script defer src="/product-preview-public.js"></script></head>
+    <title>Product previews | POSH Legal Navigator</title><link rel="stylesheet" href="/digital.css"><script defer src="/product-preview-public.js"></script></head>
     <body><a class="skip" href="#main">Skip to content</a><header class="digital-header"><a class="wordmark" href="/">POSH <span>Inquiry Navigator</span></a>
-    <nav aria-label="Site navigation"><a href="/#faq">FAQs</a><a href="/resources.html">Resources</a><a href="/contact.html">Contact</a></nav></header>
+    <nav aria-label="Site navigation"><a href="/#faq">Knowledge Library</a><a href="/resources.html">Resources</a><a href="/contact.html">Contact</a></nav></header>
     <main id="main" class="digital-main"><h1>Product previews</h1><p>Explore the products below. Sign-in and online checkout are currently closed.</p>
     ${catalogue}<p><a href="/contact.html">Contact the team about availability</a></p></main></body></html>`;
 }
