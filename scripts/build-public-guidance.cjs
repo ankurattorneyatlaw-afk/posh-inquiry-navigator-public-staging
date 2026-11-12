@@ -82,7 +82,7 @@ function publicHtml(name) {
     .replace(/<section class="panel"><h2>Staging checkout reminders<\/h2>[\s\S]*?<\/section>/, '');
   const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   if (json) html = html.replace(/'sha256-[^']+'/g, "'sha256-" + createHash('sha256').update(json).digest('base64') + "'");
-  if (name === 'index') html = html.replace(/src="\/?(finder|legal|library)\.js"/g, (_, asset) => {
+  if (name === 'index') html = html.replace(/src="\/?(finder|legal|library|main)\.js"/g, (_, asset) => {
     const version = createHash('sha256').update(source(asset + '.js')).digest('hex').slice(0, 12);
     return 'src="/' + asset + '.js?v=' + version + '"';
   });
