@@ -35,8 +35,13 @@ require('./test-guided.cjs');
 const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,37);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
-const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert(finder.records.length>=444,'Finder must not lose previously published answers');
-assert.deepEqual(finder.search().map(x=>Number(x.number)).sort((a,b)=>a-b),Array.from({length:finder.records.length},(_,i)=>i+1));
+const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,488,'The free Knowledge Library must retain all 488 approved answers');
+assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1),'Default Knowledge Library display must be numbered 001 through 488 in strict order');
+assert.equal(finder.search('FAQ 488')[0].number,'488');
+assert(fs.readFileSync('dist/main.js','utf8').includes('POSH Knowledge Library'));
+assert(fs.readFileSync('dist/main.js','utf8').includes('Knowledge for Everyone. Compliance Made Practical.'));
+assert(fs.readFileSync('dist/index.html','utf8').includes('488 questions'));
+
 for(const id of ["who-is-protected","online-inquiry-checklist-access","choose-compliance-checklist","walkthrough-request-next-step","outside-presiding-officer-all-men-workforce","preliminary-notes-and-inquiry-report"]){const published=finder.records.find(f=>f.id===id);assert(published,'Approved FAQ missing: '+id);assert.equal(finder.search("FAQ "+published.number)[0].id,id);}
 
 // Check current approved FAQ link integrity independently of historical question numbers.

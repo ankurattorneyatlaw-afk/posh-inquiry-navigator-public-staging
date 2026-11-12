@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.32-referral-pilot-rebased-staging",
+  "version": "6.35.33-knowledge-488-display-fix",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -31,7 +31,7 @@
     "evidence-ui.js": "4c0dd4cf035a637fe7c538c42406e49ea6cabe565803bb86f342f371837934b3",
     "evidence.js": "86c1fab32d62ebc669f1726d4736bee2e4595ab58ac5117b34592bd9424d9718",
     "faq.js": "cdcb919392b7e1ec0d8c4436b13f3d39d9de70bc8186b32a1b24d22145a03fec",
-    "finder.js": "1b63cd03d3686ab394d652edd5a4952b289c2b426327a91dc338060091872b96",
+    "finder.js": "7e03e47b2371e6614fa5418c8a2dbfed0a6f29718bf271d7b169e4fde0f8449c",
     "guidance-context.js": "5b3fa9f587ce7c8d0ef6b5655adaa247f761223f53313bc0705e6ca23ba8e587",
     "guided-continuation.js": "b16343b50aa02d80ebee75afd4759f177a43878263b7c79cabe9c8266f57901d",
     "guided.html": "7a39550e90ce962fe5c92aed6385ba27d52227623953a294a7a31e5064e0da62",
@@ -50,7 +50,7 @@
     "legal-audit-v4.js": "3fc819fe8c140da5b7456ba4a8637b486b83b9d7514cb982dfd0b0452a940861",
     "legal.js": "059fdd02b1be6a9542f5c27ba223d2e246145e48678e82980a38ddce88c98d2e",
     "library.js": "05102638b9e5d15e6dd4f4b5333e33f57928dfc4f681aa56c86163e0717059ce",
-    "main.js": "d508d1f28ab9d162d671a4a6fb6548c18e11ab096d9b8e82c5e90cc53bd57adf",
+    "main.js": "3481075376e6ba3fa5303e8a63f12e6fbd41f1872d6a4a44533c6b1661b38033",
     "partner-operations.html": "66552ab0402d781d202ad4d21d677358b3f3f4892e700e0fc896885cccd766fb",
     "partner-operations.js": "68eb160d18806be7e9a348ff41d1b89a0ae23617f4f3f469106bc265841d846f",
     "partner-pilot-admin.js": "180966b0e1d2d0b85118355c24601a40fe7200799e0263ef17bd0c1eef452cc8",
