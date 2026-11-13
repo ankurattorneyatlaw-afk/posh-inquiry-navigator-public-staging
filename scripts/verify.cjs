@@ -100,11 +100,16 @@ assert(library.cases.some(c=>c.id==='SC029'),'Published case SC029 must remain a
 assert.equal(caseDirectory.filter('Judgment 064').length,0);
 assert.equal(caseDirectory.filter('Judgment 075').length,0);
 assert.equal(caseDirectory.filter('Judgment 076').length,0);
-for (const id of ['HC079','HC080','HC081']) {
-  const decision=caseDirectory.data.find(c=>c.id===id);
-  assert(caseDirectory.checked(decision)&&decision.sourceWithheld);
-  assert(!decision.url&&!decision.citation&&!decision.caseNumber&&!decision.sourceArchive&&!decision.linkedOrders.length);
+for (const decision of caseDirectory.data) {
+  assert(decision.url || decision.redactedSource, decision.id);
+  if (decision.sourceWithheld) {
+    assert(caseDirectory.checked(decision));
+    assert(!decision.url && !decision.citation && !decision.caseNumber && !decision.sourceArchive && !decision.linkedOrders.length);
+    const [file, fragment]=decision.redactedSource.split('#');
+    assert(fs.readFileSync('dist'+file,'utf8').includes('id="'+fragment+'"'));
+  }
 }
+assert(!caseDirectory.data.find(c=>c.id==='C67').laterSource);
 assert(caseDirectory.filter('Nipun Saxena').some(c=>c.id==='SC082'&&caseDirectory.checked(c)&&c.url));
 assert(!caseDirectory.filter('Anup Vikal').length);
 const publishedCaseIds=new Set(library.cases.map(c=>c.id));
