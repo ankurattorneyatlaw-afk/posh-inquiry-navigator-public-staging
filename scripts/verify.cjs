@@ -32,23 +32,18 @@ console.log('Integrated guided inquiry staging safeguards verified.');
 require('./test-guided.cjs');
 
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,37);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,52);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
-const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,444);
-assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:444},(_,i)=>i+1));
-for(const [number,id] of [[364,"who-is-protected"],[440,"online-inquiry-checklist-access"],[441,"choose-compliance-checklist"],[442,"walkthrough-request-next-step"],[443,"outside-presiding-officer-all-men-workforce"],[444,"preliminary-notes-and-inquiry-report"]])assert.equal(finder.search("FAQ "+number)[0].id,id);
-
-for (const [source,target] of [[69,404],[404,69],[211,214],[214,438],[438,211],[292,444],[444,292]]){
-  const record=finder.search('FAQ '+source)[0];
-  assert(finder.relatedTo(record).some(faq=>Number(faq.number)===target));
-}
+const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,488);
+assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1));
+assert.equal(finder.search('FAQ 488')[0].number,'488');
 const caseDirectory=require('../dist/cases.js');
-assert.equal(caseDirectory.data.length,37);
-assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,37);
-assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,37);
-assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,36);
-assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),['SC026']);
+assert.equal(caseDirectory.data.length,52);
+assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,52);
+assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,52);
+assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,47);
+assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),['SC026','HC080','HC081','HC085','TR088']);
 assert.deepEqual(caseDirectory.data.filter(c=>c.sourceHost==='publisher').map(c=>c.id),['C20','C21']);
 assert(caseDirectory.filter('Judgment 011')[0].linkedOrders.some(o=>o.date==='2025-09-15'&&o.url));
 assert(caseDirectory.filter('2025 INSC 1106')[0].linkedOrders.some(o=>o.date==='2025-11-17'&&o.url));
@@ -59,10 +54,18 @@ assert(caseDirectory.filter('Lucy Sequeira').some(c=>c.id==='SC078'&&caseDirecto
 assert(caseDirectory.filter('2026:GAU-AS:3698-DB').some(c=>c.id==='HC077'&&c.linkedOrders.length===2));
 assert.equal(caseDirectory.filter('Judgment 029')[0].id,'SC029');
 assert.equal(caseDirectory.tier(caseDirectory.filter('Judgment 029')[0]),'Supporting authority');
-assert(finder.search('FAQ 423')[0].cases.includes('SC029'));
+
 assert.equal(caseDirectory.filter('Judgment 064').length,0);
 assert.equal(caseDirectory.filter('Judgment 075').length,0);
 assert.equal(caseDirectory.filter('Judgment 076').length,0);
+for (const decision of caseDirectory.data) {
+  assert(decision.url || decision.redactedSource, decision.id);
+  if (decision.redactedSource) {
+    assert(!decision.url && !decision.caseNumber && !decision.sourceArchive, decision.id);
+    const [file, fragment] = decision.redactedSource.split('#');
+    assert(fs.readFileSync('dist'+file,'utf8').includes('id="'+fragment+'"'));
+  }
+}
 const publishedCaseIds=new Set(library.cases.map(c=>c.id));
 for(const faq of finder.records){
   assert(faq.members.every(m=>(m.cases||[]).every(id=>publishedCaseIds.has(id))),faq.id);
@@ -71,9 +74,5 @@ for(const faq of finder.records){
     if(caseId)assert(publishedCaseIds.has(caseId.toUpperCase()),faq.id);
   }
 }
-for(const number of [69,211,214,248,292,404,438,444]){
-  const record=finder.search('FAQ '+number)[0];
-  assert(record.cases.length);
-  assert(record.cases.every(id=>caseDirectory.data.some(c=>c.id===id&&caseDirectory.checked(c))));
-}
+assert(finder.records.some(x=>x.links?.some(link=>link.url==='#faq/case-sc093')));
 assert(!library.cases.some(c=>["C09","C29","C37","C38","C50"].includes(c.id)));

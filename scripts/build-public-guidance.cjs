@@ -15,7 +15,7 @@ const save = (name, data) => fs.writeFileSync(path.join(output, name), data);
 const email = 'mailto:training@thecosmicenergizers.com';
 const walkthrough = email + '?subject=Navigator%20Committee%20walkthrough';
 const pages = ['index', 'about', 'contact', 'digital-delivery', 'help', 'individual-support', 'institutions',
-  'preview', 'pricing', 'privacy', 'product-terms', 'purchase-terms', 'refund-policy', 'resources', 'products-services'];
+  'preview', 'pricing', 'privacy', 'product-terms', 'purchase-terms', 'refund-policy', 'resources', 'products-services', 'judgment-extracts'];
 const assets = ['styles.css', 'digital.css', 'library.js', 'faq.js', 'cases.js', 'legal.js', 'finder.js',
   'engine.js', 'docx.js', 'guidance-context.js', 'essential-sample-invoice.pdf', 'social-preview.png'];
 const { records, search } = require('../dist/finder.js');
