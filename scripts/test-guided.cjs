@@ -163,7 +163,7 @@ for(const q of registry.Q)for(const opt of q.opts){const r=registry.REV[opt.next
  c.click({id:'g-route-reassess'});assert(c.body.innerHTML.includes('Has this issue been resolved now?'));
  openRoutes++;
 }}
-for(const value of ['different_organisation','outsider']){const c=launch('external_respondent');c.answer(value);assert(c.body.innerHTML.includes('Special jurisdiction and duties'));c.resolution('yes');c.action('conditions_verified');c.check();c.click({id:'g-proceed'});assert(c.body.innerHTML.includes('Which forum is being considered?'));}
+for(const value of ['different_organisation','outsider']){const c=launch('external_respondent');c.answer(value);assert(c.body.innerHTML.includes('Special jurisdiction and duties'));c.resolution('yes');c.action('conditions_verified');c.check();c.click({id:'g-proceed'});assert(c.body.innerHTML.includes('Which Committee has jurisdiction over this complaint?'));}
 assert(openRoutes>5);console.log('All '+openRoutes+' exceptional route destinations offer guidance, owned follow-up and reassessment; external respondent routes continue after verified competence.');
 
 const catalog=require('../dist/workflow-documents.js');const contextual=new Set(registry.Q.flatMap(q=>q.opts.flatMap(o=>catalog.phasesForStage(q.id,o.value).flatMap(p=>p.ids))));for(const e of catalog.entries)assert(contextual.has(e.id),'Draft not offered at a relevant stage: '+e.id);console.log('All '+catalog.entries.length+' drafts have contextual access.');

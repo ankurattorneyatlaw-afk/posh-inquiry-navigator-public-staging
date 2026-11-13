@@ -133,3 +133,12 @@ test('other representation rights and domestic jurisdiction decisions carry thro
   assert.match(report({employment:'one',representations:'Response under applicable rule R-1'}),/Other applicable participation and representation rights.*Response under applicable rule R-1/s);
   assert.match(report({route:'jurisdiction',forum:'LC',path:'domestic',employment:'one',routeDecision:'District decision JD-1'}),/District decision JD-1/);
 });
+
+test('committee reporting and domestic prima facie branches follow the recorded route',()=>{
+  assert.match(report({forum:'IC'}),/provide the report to the employer within ten days/);
+  assert.match(report({forum:'LC'}),/provide the report to the District Officer within ten days/);
+  const domestic={route:'referral',path:'domestic',forum:'LC',employment:'one'};
+  assert.match(report({...domestic,primaFacie:'yes',referral:'Police receipt D-01'}),/within seven days.*Police receipt D-01/);
+  assert.doesNotMatch(report({...domestic,primaFacie:'no',referral:'Stale police reference'}),/within seven days|Stale police reference|Report delivery, implementation and appeal/);
+  assert.match(report({...domestic,primaFacie:'pending'}),/prima facie decision is pending/);
+});

@@ -9,9 +9,11 @@ const fields={
   employment:['Employment relationship',options({same:'Both employees · same employer',different:'Both employees · separate employers',one:'Only one party is an employee',neither:'Neither party is an employee'})],
   path:['Section 11 pathway',options({employee:'Employee respondent',domestic:'Domestic-worker complaint', 'third-party':'Third-party respondent'})],
   procedure:['Governing procedure',options({service:'Respondent’s service rules',prescribed:'Prescribed procedure',special:'Special service or sector rules'})],
+  forumBasis:'Workplace and Committee jurisdiction basis',
   authority:'Constitution, member eligibility, recusal, workplace nexus and forum competence',
   complainantEmployer:'Aggrieved woman employer code', respondentEmployer:'Respondent or common employer code', coordination:'Inter-employer authority, limited disclosure and implementation',
   statusReasons:'Party status and independent procedural rights', rules:'Controlling instrument, clauses and applicability', domesticBasis:'Domestic work, remuneration, and dwelling basis',
+  primaFacie:['Prima facie decision',options({yes:'Prima facie case exists',no:'No prima facie case found',pending:'Decision pending'})],
   referralDecision:'Prima facie determination and reasons', referral:'Referral, receipt, governing provisions and reasons',
   incident:['Incident or last incident date','date'],received:['Complaint receipt date','date'], limitation:'Limitation, notified scope and any extension',
   settlement:['Section 10 status',options({none:'No completed settlement',completed:'Settlement reached',breach:'Settlement breach reported'})],
@@ -68,10 +70,11 @@ function mount(host,config={}){
     const meritsRoute=merits.has(state.route), final=meritsRoute&&state.route!=='preliminary';
     const proved=state.allegations.some(a=>['proved','partial'].includes(a.outcome));
     const visible={
+      forumBasis:!!state.forum,
       procedure:state.path==='employee',rules:!['domestic','third-party'].includes(state.path),
       complainantEmployer:state.employment==='different',respondentEmployer:['same','different'].includes(state.employment),
       coordination:state.employment==='different',statusReasons:!['same','different'].includes(state.employment),
-      domesticBasis:state.path==='domestic',referralDecision:state.path==='domestic',referral:['domestic','third-party'].includes(state.path),
+      domesticBasis:state.path==='domestic',primaFacie:state.path==='domestic',referralDecision:state.path==='domestic',referral:state.path==='third-party'||(state.path==='domestic'&&state.primaFacie!=='no'&&state.primaFacie!=='pending'),
       settlementRecord:['completed','breach'].includes(state.settlement),settlementDelivery:state.settlement==='completed',
       routeDecision:state.route==='jurisdiction'||(state.route==='referral'&&!['domestic','third-party'].includes(state.path)),
       commenced:meritsRoute,completed:final,fairness:meritsRoute,absence:meritsRoute,absenceRecord:meritsRoute&&state.absence==='yes',
