@@ -10,6 +10,24 @@ const choices = {
 };
 const merits = new Set(['statutory','preliminary','disciplinary','special']);
 const disposition = new Set(['statutory','disciplinary','special']);
+const planDepth={essential:1,professional:2,advanced:3,institutional:4,enterprise:5};
+const caseDetail=[
+  [2,'procedureRecord','Procedural decisions and response opportunities','Record notice, disclosure, response opportunities, objections and the Committee’s reasons.',c=>merits.has(c.route)],
+  [3,'fairnessImpact','Procedural departures and their effect','Record each departure, governing rule, affected party, corrective step and remaining impact on participation.',c=>merits.has(c.route)],
+  [3,'authorityAnalysis','Applicable authorities and case distinctions','Record controlling provisions and decisions with court, citation, paragraph, applicable proposition and material distinction.',()=>true],
+  [4,'constitutionRecord','Committee constitution and independence','Record appointment orders, eligibility, tenure, external-member independence, recusals and replacement decisions.',()=>true],
+  [4,'implementationRecord','Implementation authority and monitoring','Record the responsible authority, legal power, recommendation limits, implementation owner and follow-up evidence.',c=>c.route!=='preliminary'],
+  [5,'reviewRecord','Issues for review and record map','For each material issue, record the decision, operative reason, exact folio or exhibit, contrary submission and remaining limitation.',()=>true],
+  [5,'recordIntegrity','Version and preservation record','Record the signed version, restricted annexure index, custody, amendments, service proofs and outstanding gaps.',()=>true]
+];
+const allegationDetail=[
+  [2,'materialConflict','Material conflict and resolution','Identify the competing accounts or exhibits and why the Committee preferred or qualified the material relied on.'],
+  [3,'elementRecord','Elements and supporting record','For each material element, identify the fact found, exact exhibit or witness reference and the inference drawn.'],
+  [3,'alternativeAccount','Alternative explanation','Record the material alternative explanation and the reasons it was accepted, rejected or left unresolved.'],
+  [4,'responseImpact','Effect of objections or representations','Identify the material submission, the Committee’s response and any change to the finding or reasons.'],
+  [5,'residualLimit','Limits of the finding','Identify what the evidence leaves unresolved and how that limits the finding or recommendation.']
+];
+const depthFor=plan=>Object.hasOwn(planDepth,plan)?planDepth[plan]:1;
 const get = (value,label) => String(value ?? '').trim() || '['+label+']';
 const sentence = value => /[.!?…]$/.test(value) ? value : value+'.';
 const recordId = /^[A-Z][A-Z0-9-]{0,23}$/;
@@ -73,6 +91,7 @@ function assemble(c){
   const title=choices.route[c.route];
   const forum={IC:'Internal Committee',LC:'Local Committee'}[c.forum]||'[Competent Committee]';
   const both=['same','different'].includes(c.employment);
+  const depth=depthFor(c.plan);
   items.push({type:'title',text:title},{type:'notice',text:'Confidential under Section 16 · Editable working document for Committee approval'});
   add('Case and authority',forum+' of '+f('institution','Institution or district')+' records this matter as '+sentence(f('reference','Case reference'))+' The parties are '+f('complainant','Aggrieved woman name or record code')+' and '+sentence(f('respondent','Respondent name or record code'))+' The constitution order, membership, conflicts, workplace nexus and reasons for forum competence are recorded as follows: '+sentence(f('authority','Constitution and jurisdiction reasons')));
   if(c.employment==='different'){
@@ -102,11 +121,11 @@ function assemble(c){
   }else if(c.settlement==='none'){
     add('Conciliation','No completed Section 10 settlement is recorded.');
   }
-  if(!merits.has(c.route)&&c.route!=='conciliation'&&c.path!=='domestic'&&c.path!=='third-party')
+  if(c.route==='jurisdiction'||(c.route==='referral'&&!['domestic','third-party'].includes(c.path)))
     add('Decision and onward action',f('routeDecision','Reasoned determination, competent authority and communication'));
   if(merits.has(c.route)){
     const beyond=(from,to,days)=>from&&to&&Date.parse(to)-Date.parse(from)>days*86400000;
-    if(beyond(c.commenced,c.completed,90)||beyond(c.completed,c.issued,10))
+    if((c.route!=='preliminary'&&beyond(c.commenced,c.completed,90))||((c.route==='statutory'||c.section13==='included')&&beyond(c.completed,c.issued,10)))
       add('Recorded timing exception','The dates exceed one or more statutory periods measured from the recorded triggers. Record the calculation, any disputed trigger and the competent Committee’s response: '+sentence(f('timingReasons','Timing exception and reasons')));
     add('Inquiry chronology and participation','Commencement is recorded on '+f('commenced','Inquiry commencement date')+(c.route==='preliminary'?'.':', and completion on '+sentence(f('completed','Inquiry completion date')))+' Section 11(4) provides a 90-day completion period. The actual service, response, sittings, quorum, disclosure, questioning and objections are recorded at '+sentence(f('fairness','Procedural record and reasons for directions')));
     if(c.procedure==='prescribed'){
@@ -116,11 +135,14 @@ function assemble(c){
     if(c.interim==='yes')add('Interim measures','The Section 12 written request, Committee recommendation, and the employer’s action and implementation report are '+sentence(f('interimRecord','Interim request, recommendation and implementation')));
     if(both)add('Opportunity to respond to findings','The second proviso to Section 11(1) requires an opportunity to be heard and availability of a copy of the findings to both parties so they may make representations before the Committee. '+(c.route==='preliminary'?'Communication and response arrangements: ':'Delivery, representations and the Committee’s reasoned consideration: ')+sentence(f('representations','Findings communication and representation record')));
     else if(!c.employment)add('Opportunity to respond to findings',f('representations','Verify the second proviso trigger and other governing representation rights'));
+    else if(c.representations)add('Other applicable participation and representation rights',sentence(c.representations));
     for(const a of c.allegations){
       add(a.id+' · '+get(a.title,'Notified allegation'), 'The notified particulars are '+sentence(get(a.scope,'Conduct, date, place and notice reference'))+' Aggrieved woman’s account: '+sentence(get(a.complainant,'Material assertions'))+' Respondent’s position: '+sentence(get(a.respondent,'Admissions, denials and alternative account')));
       add('Statutory issues for '+a.id,'Section 2(n) issue: '+(a.conduct?'clause ('+a.conduct+'), '+choices.conduct[a.conduct]:'[Identify applicable conduct clause(s)]')+'. The Committee addresses the alleged conduct, its sexual nature as applicable, and whether it was unwelcome: '+sentence(get(a.elements,'Element-wise reasons')));
       if(a.circumstance)add('Connected circumstance under Section 3(2)','The allegation also raises '+choices.circumstance[a.circumstance]+(a.circumstance==='other'?'':' under clause ('+a.circumstance+')')+'. Committee reasoning on the circumstance and its connection to the alleged conduct: '+sentence(get(a.nexus,'Circumstance and connection reasons')));
       add('Assessment and finding for '+a.id,'Supporting record: '+sentence(get(a.support,'Supporting exhibit/witness codes, or none'))+' Contrary record: '+sentence(get(a.contrary,'Contrary exhibit/witness codes, or none'))+' Assessment of weight, inconsistencies, missing evidence and competing explanations: '+sentence(get(a.weight,'Reasoned assessment on the applicable standard'))+' '+(c.route==='preliminary'?'Provisional':'Committee-recorded')+' finding: '+(choices.outcome[a.outcome]||'[Committee finding]')+'. Reasons and precise scope: '+sentence(get(a.reasons,'Finding reasons and precise facts determined')));
+      for(const [level,key,label,prompt] of allegationDetail)
+        if(depth>=level)add(a.id+' · '+label,sentence(get(a[key],prompt)));
     }
   }
   if(disposition.has(c.route)){
@@ -151,6 +173,8 @@ function assemble(c){
       add(w.id+' · '+get(w.name,'Witness name or code'),'Called by: '+choices.source[w.source]+'. Examination date and setting: '+sentence(get(w.hearing,'Hearing date and mode'))+' Statement: '+sentence(get(w.statement,'Witness’s account in their own words, including firsthand and reported information'))+' Questions, answers and clarifications: '+sentence(get(w.questions,'Questions put, responses and corrections'))+' Authentication: '+sentence(get(w.confirmation,'Witness confirmation or signature, date and file reference')));
     }
   }
+  for(const [level,key,label,prompt,applies] of caseDetail)
+    if(depth>=level&&applies(c))add(label,sentence(f(key,prompt)));
   if(c.audit?.gates?.length){
     add('84-point review and release gates','The coded review reports '+c.audit.completed+' of 84 checks recorded as verified or reasoned inapplicable. Gate entries below are copied from the working review.');
     items.push(table([['Gate','Status','Record reference'],...c.audit.gates]));
@@ -158,6 +182,6 @@ function assemble(c){
   add('Authorisation and restricted custody','Committee sign-off and date: '+sentence(f('signoff','Participating members, signatures and date'))+' Keep the complaint, identities, witness accounts, proceedings and recommendations restricted under Sections 16–17, with lawful access and delivery recorded at '+sentence(f('custody','Restricted repository and access record')));
   return items;
 }
-const api={choices,merits,assemble,validate};
+const api={choices,merits,assemble,validate,depthFor,caseDetail,allegationDetail};
 if(typeof module!=='undefined')module.exports=api;else root.PoshReportAssembly=api;
 })(typeof window==='undefined'?globalThis:window);

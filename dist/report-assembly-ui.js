@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const {choices,merits,assemble}=root.PoshReportAssembly;
+const {choices,merits,assemble,depthFor,caseDetail,allegationDetail}=root.PoshReportAssembly;
 const options=entries=>[['','Select if known'],...Object.entries(entries)];
 const yesNo=options({yes:'Yes',no:'No'});
 const fields={
@@ -38,6 +38,7 @@ const schemas={
   witnesses:{name:'Witness code',source:['Called by',Object.entries(choices.source).filter(([key])=>key!=='other')],hearing:'Examination date and mode',statement:'Statement including firsthand and reported knowledge',questions:'Questions, answers and corrections',confirmation:'Confirmation, signature date and statement file reference'}
 };
 function mount(host,config={}){
+  const depth=depthFor(config.plan);
   host.classList.add('posh-report-assembly');
   const state=config.state||{route:'statutory',allegations:[],evidence:[],witnesses:[]};
   const el=(tag,parent,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;parent.append(node);return node;};
@@ -72,9 +73,9 @@ function mount(host,config={}){
       coordination:state.employment==='different',statusReasons:!['same','different'].includes(state.employment),
       domesticBasis:state.path==='domestic',referralDecision:state.path==='domestic',referral:['domestic','third-party'].includes(state.path),
       settlementRecord:['completed','breach'].includes(state.settlement),settlementDelivery:state.settlement==='completed',
-      routeDecision:!meritsRoute&&state.route!=='conciliation'&&!['domestic','third-party'].includes(state.path),
+      routeDecision:state.route==='jurisdiction'||(state.route==='referral'&&!['domestic','third-party'].includes(state.path)),
       commenced:meritsRoute,completed:final,fairness:meritsRoute,absence:meritsRoute,absenceRecord:meritsRoute&&state.absence==='yes',
-      interim:meritsRoute,interimRecord:meritsRoute&&state.interim==='yes',representations:meritsRoute&&!['one','neither'].includes(state.employment),
+      interim:meritsRoute,interimRecord:meritsRoute&&state.interim==='yes',representations:meritsRoute,
       specialAuthority:final&&state.route!=='statutory',section13:final&&state.route!=='statutory',
       separateDisposition:final&&state.route!=='statutory'&&state.section13==='separate',
       noEvidence:!state.evidence.length,noWitnesses:!state.witnesses.length,timingReasons:final,
@@ -82,13 +83,15 @@ function mount(host,config={}){
       recipient:final&&state.section13!=='separate',issued:final&&state.section13!=='separate',recipientReceipt:final&&state.section13!=='separate',partyService:final&&state.section13!=='separate',appeal:final&&state.section13!=='separate'
     };
     for(const [key,row] of Object.entries(controls))row.hidden=visible[key]===false;
+    for(const [level,key,,,applies] of caseDetail)if(depth>=level)controls[key].hidden=!applies(state);
     registers.allegations.hidden=!meritsRoute;
     reportNote.textContent=config.notes?.[state.route]||'';
   };
   control(host,'route',['Report pathway',routes],state,refresh);
   const details=el('details',host);
   el('summary',details,'Case particulars and procedure');
-  const controls=Object.fromEntries(Object.entries(fields).map(([key,spec])=>[key,control(details,key,spec,state,refresh)]));
+  const caseFields={...fields,...Object.fromEntries(caseDetail.filter(([level])=>depth>=level).map(([,key,label,prompt])=>[key,label+' — '+prompt]))};
+  const controls=Object.fromEntries(Object.entries(caseFields).map(([key,spec])=>[key,control(details,key,spec,state,refresh)]));
   const registers={};
   for(const [key,label,prefix] of [['allegations','Notified allegations','A'],['evidence','Evidence items','E'],['witnesses','Witnesses','W']]){
     const box=el('fieldset',host);
@@ -103,7 +106,9 @@ function mount(host,config={}){
     const render=row=>{
       const entry=el('details',rows);
       el('summary',entry,row.id);
-      const local=Object.fromEntries(Object.entries(schemas[key]).map(([field,spec])=>[field,control(entry,field,spec,row,()=>{relevance();refresh();})]));
+      const schema={...schemas[key]};
+      if(key==='allegations')for(const [level,field,label,prompt] of allegationDetail)if(depth>=level)schema[field]=label+' — '+prompt;
+      const local=Object.fromEntries(Object.entries(schema).map(([field,spec])=>[field,control(entry,field,spec,row,()=>{relevance();refresh();})]));
       function relevance(){
         if(key==='allegations')local.nexus.hidden=!row.circumstance;
         if(key==='evidence'){
@@ -136,6 +141,7 @@ function mount(host,config={}){
   download.onclick=()=>{
     try{
       const report={...state,...Object.fromEntries(Object.entries(config.dates?.()||{}).filter(([key,value])=>value&&!state[key]))};
+      report.plan=config.plan;
       if(report.route==='statutory')report.section13='included';
       report.audit=config.audit?.();
       report.indexedReferences=config.indexedReferences?.();

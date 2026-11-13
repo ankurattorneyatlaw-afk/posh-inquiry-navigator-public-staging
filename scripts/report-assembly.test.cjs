@@ -105,3 +105,31 @@ test('report pagination uses compact, readable spacing without affecting other W
   assert.ok(compact.includes(Buffer.from('w:after="90" w:line="288"')));
   assert.ok(standard.includes(Buffer.from('w:after="120" w:line="324"')));
 });
+
+test('all five plans preserve core safeguards and add cumulative record-linked depth',()=>{
+  const plans=['essential','professional','advanced','institutional','enterprise'];
+  const markers=['Procedural decisions and response opportunities','Elements and supporting record','Committee constitution and independence','Issues for review and record map'];
+  for(const [index,plan] of plans.entries()){
+    const doc=report({plan,reviewRecord:'Folio JR-4 addresses objection O-2.',allegations:[{...allegation,elementRecord:'Exact folio 18 supports this element.'}]});
+    assert.match(doc,/Opportunity to respond to findings/);
+    assert.match(doc,/Authorisation and restricted custody/);
+    for(const [i,marker] of markers.entries())assert.equal(doc.includes(marker),index>i,plan+' '+marker);
+    assert.equal(doc.includes('Exact folio 18'),index>=2);
+    assert.equal(doc.includes('Folio JR-4'),index===4);
+  }
+});
+test('all seven pathways remain distinct at each plan depth',()=>{
+  for(const plan of ['essential','professional','advanced','institutional','enterprise']){
+    for(const route of Object.keys(choices.route)){
+      const doc=report({plan,route,settlement:route==='conciliation'?'completed':'none',routeDecision:'Reasoned onward decision R-2'});
+      assert.ok(doc.startsWith(choices.route[route]),plan+' '+route);
+      assert.equal(doc.includes('Assessment and finding for A-001'),['statutory','preliminary','disciplinary','special'].includes(route));
+      assert.equal(doc.includes('Report delivery, implementation and appeal'),route==='statutory');
+      assert.equal(doc.includes('Reasoned onward decision R-2'),['jurisdiction','referral'].includes(route));
+    }
+  }
+});
+test('other representation rights and domestic jurisdiction decisions carry through',()=>{
+  assert.match(report({employment:'one',representations:'Response under applicable rule R-1'}),/Other applicable participation and representation rights.*Response under applicable rule R-1/s);
+  assert.match(report({route:'jurisdiction',forum:'LC',path:'domestic',employment:'one',routeDecision:'District decision JD-1'}),/District decision JD-1/);
+});

@@ -25,3 +25,17 @@ After initial plan access, report preparation and Word export run in the browser
 | Invalid date, inverted chronology, duplicate ID, dangling reference, incompatible route | Export stops and identifies the record to correct. |
 | Editable Word export and coded audit | The exported document contains supplied facts and gate references in editable Word text and tables. |
 
+
+## Report depth by plan
+
+Every plan uses the same core statutory pathways, findings, annexures and safeguards. Higher plans add cumulative fields tied to the Committee's own record.
+
+| Plan | Additional report detail |
+| --- | --- |
+| Essential | Core report with case facts, process, findings and annexures |
+| Professional | Procedural decisions and material conflict analysis for each allegation |
+| Advanced | Element-to-record reasoning, alternative explanations, procedural departures and applicable authorities |
+| Institutional Plus | Committee constitution and independence, response to material objections, implementation authority and follow-up |
+| Enterprise | Review issue-to-folio map, limits of each finding and preservation of the signed record |
+
+The Committee enters authorities actually relied on, including the court, citation, paragraph and case-specific application. For procedural fairness and the context of departures under the CCS rules, see [Aureliano Fernandes v. State of Goa](https://api.sci.gov.in/supremecourt/2012/21189/21189_2012_17_1501_44461_Judgement_12-May-2023.pdf). For external-member independence, see paragraph 22 of [Punjab and Sind Bank v. Durgesh Kuwar](https://api.sci.gov.in/supremecourt/2019/16068/16068_2019_8_2_20978_Order_25-Feb-2020.pdf). A recorded authority or folio supports traceability. The Committee remains responsible for applicability, accuracy, reasons and approval.

@@ -110,7 +110,7 @@ function standardTools(data,audit){
   ]);
   const basic=section('Case-specific inquiry and review reports');
   const notes=Object.fromEntries(data.legalAudit.reports.map(r=>[r.id,r.note]));
-  window.PoshReportAssemblyUI.mount(basic,{notes,audit});
+  window.PoshReportAssemblyUI.mount(basic,{notes,audit,plan:data.plan});
   const pdf=el('button','Print or save the tools as PDF',basic);
   pdf.type='button';
   pdf.onclick=()=>window.print();
