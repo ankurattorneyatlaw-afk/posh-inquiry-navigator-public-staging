@@ -32,17 +32,17 @@ console.log('Integrated guided inquiry staging safeguards verified.');
 require('./test-guided.cjs');
 
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,52);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,53);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,488);
 assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1));
 assert.equal(finder.search('FAQ 488')[0].number,'488');
 const caseDirectory=require('../dist/cases.js');
-assert.equal(caseDirectory.data.length,52);
-assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,52);
-assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,52);
-assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,52);
+assert.equal(caseDirectory.data.length,53);
+assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,53);
+assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,53);
+assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,53);
 assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),[]);
 assert.deepEqual(caseDirectory.data.filter(c=>c.sourceHost==='publisher').map(c=>c.id),['C20','C21']);
 assert(caseDirectory.filter('Judgment 011')[0].linkedOrders.some(o=>o.date==='2025-09-15'&&o.url));
