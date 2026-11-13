@@ -48,6 +48,15 @@ assert(checkoutClient.includes("source=plan"),'Plan receipt does not link to vol
 assert(pilotServer.includes('navigator_partner_pilot_link_order'),'Unverified pilot order link route');
 const financeApi=fs.readFileSync('scripts/partner-finance-api.cjs','utf8');
 assert(financeApi.includes('bankPayoutsEnabled:false'),'Real payouts must remain disabled');
+// Partner onboarding staging cannot collect personal KYC/bank data or issue payouts.
+const onboardingApi=fs.readFileSync('scripts/partner-onboarding.cjs','utf8');
+const onboardingAdmin=fs.readFileSync('dist/partner-onboarding-admin.html','utf8');
+const onboardingPublic=fs.readFileSync('dist/partner-onboarding.html','utf8');
+assert(onboardingApi.includes('realActivationEnabled:false'),'Partner onboarding may not enable live activation');
+assert(onboardingApi.includes('bankPayoutEnabled:false'),'Partner onboarding must not enable payouts');
+assert(onboardingAdmin.includes('independent')&&onboardingPublic.includes('staging'),'Onboarding reviewer and partner notices are missing');
+assert(serverSource.includes("'/partner-onboarding-admin':'partner-onboarding-admin.html'"),'Admin onboarding route unavailable');
+assert(serverSource.includes('partner-onboarding-admin.js'), 'Onboarding admin assets must remain operator-protected');
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,488,'The free Knowledge Library must retain all 488 approved answers');
 assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1),'Default Knowledge Library display must be numbered 001 through 488 in strict order');
 assert.equal(finder.search('FAQ 488')[0].number,'488');
