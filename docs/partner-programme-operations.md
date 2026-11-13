@@ -42,3 +42,13 @@
 - Applications are stored privately only when enabled and configured. Repeats never create multiple records for the same email.
 - No bank, PAN, KYC, payout API, active partner-code or commission credit is available publicly.
 - Live payment enablement is a separate release, not an effect of promoting the programme page.
+
+
+## 2026-11-13: protected onboarding readiness checks
+- Seven staging gates: agreement, identity/KYC, tax/GST, bank ownership, invoice readiness, marketing ethics and conflict screening. This is a status-only control review, not a KYC document portal.
+- Private records: `navigator_private.partner_onboarding_gate_reviews` and append-only `partner_onboarding_audit`. Only reviewer UUIDs and review status; never PAN, bank accounts, scans, signed agreements or personal customer data.
+- Each check requires reviews by two different verified operator accounts. Reviewers cannot be the applicant account. A rejected check cannot be reopened through the staging UI. All actions are audited.
+- `public.navigator_partner_onboarding_admin` and `public.navigator_partner_onboarding_my_status` are invoker wrappers. The internal functions validate verified sessions and operator status. Public and direct table grants are revoked.
+- Partners can see only their own review status. The administrator screen is protected at the server and database layers.
+- Even if all seven review statuses are complete, no account activates for real money, no commission is credited and no payout is made.
+- Live onboarding still requires protected document exchange, contracting-entity approval, legal ethics clearance, tax adviser review, real gateway settlement, refund reconciliation and bank ownership checks outside this demonstration.
