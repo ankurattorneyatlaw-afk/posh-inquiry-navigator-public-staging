@@ -5,6 +5,8 @@ const status=$('tools-status');
 const endpoint=new URL('/api/plan-tools',location.origin);
 const testOrder=new URLSearchParams(location.search).get('testOrder');
 if(testOrder!==null)endpoint.searchParams.set('testOrder',testOrder);
+const requestedPlan=new URLSearchParams(location.search).get('plan');
+if(requestedPlan!==null)endpoint.searchParams.set('plan',requestedPlan);
 const guidedHref=testOrder?'/guided?testOrder='+encodeURIComponent(testOrder):'/guided';
 function el(tag,text,parent){
   const node=document.createElement(tag);

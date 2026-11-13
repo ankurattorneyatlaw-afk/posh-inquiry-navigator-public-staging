@@ -61,7 +61,7 @@ const server = http.createServer(async(req,res)=>{
         res.end(JSON.stringify({test:true,label:getPlanTools(entitlement.plan).label,entitlement}));
         return;
       }
-      const plan=test?(entitlement?.state==='active'?entitlement.plan:null):await accounts.activeToolsPlan(req,res);
+      const plan=test?(entitlement?.state==='active'?entitlement.plan:null):await accounts.activeToolsPlan(req,res,parsed.searchParams.get('plan'));
       const tools=getPlanTools(plan);
       res.writeHead(tools?200:403);
       res.end(JSON.stringify(tools?{...tools,test,entitlement}:{error:'Verified plan access is required. Open your workspace or return to your captured staging order.'}));

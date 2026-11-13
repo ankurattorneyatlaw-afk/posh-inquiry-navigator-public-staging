@@ -3,8 +3,8 @@
 const ACT='https://www.indiacode.nic.in/bitstream/123456789/2104/1/A2013-14.pdf';
 const RULES='https://spniwcd.wcd.gov.in/uploads/pdf/1719914401_2NUqe91gql.pdf';
 const v4=require('./defensibility-v4.cjs');
-const tiers={essential:1,professional:2,advanced:3};
-const labels={essential:'Inquiry Essential',professional:'Inquiry Professional',advanced:'Inquiry Advanced'};
+const tiers={essential:1,professional:2,advanced:3,institutional:4,enterprise:5};
+const labels={essential:'Inquiry Essential',professional:'Inquiry Professional',advanced:'Inquiry Advanced',institutional:'Institutional Plus',enterprise:'Enterprise'};
 
 const readiness=[
   ['Before inquiry',[

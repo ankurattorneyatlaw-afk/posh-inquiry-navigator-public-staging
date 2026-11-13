@@ -143,7 +143,7 @@ function mount(host,config={}){
       const body=assemble(report);
       const items=config.appendEvidence?.(body)||body;
       const title=items[0].text;
-      const bytes=root.NavigatorDocx.buildDocx(title,items,{workflow:true});
+      const bytes=root.NavigatorDocx.buildDocx(title,items,{workflow:true,caseReport:true});
       if(config.record?.()===false)throw Error('The download could not be recorded. Check the timeline and try again.');
       root.NavigatorDocx.download('POSH-'+report.route+'-report.docx',bytes);
       status.textContent='Editable Word report downloaded for Committee verification.';

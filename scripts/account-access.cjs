@@ -98,12 +98,13 @@ function createAccountAccess({url=process.env.NAVIGATOR_AUTH_URL,key=process.env
  if(parsed.pathname==='/api/account/mfa/verify'){if(!/^[a-f0-9-]{36}$/i.test(data.factorId||'')||!/^\d{6}$/.test(data.code||'')){send(res,400,{error:'Enter the six-digit authenticator code.'});return true}const challenge=await remote('/auth/v1/factors/'+data.factorId+'/challenge',{method:'POST',token:current.s.access,body:{}}),r=await remote('/auth/v1/factors/'+data.factorId+'/verify',{method:'POST',token:current.s.access,body:{challenge_id:challenge.id,code:data.code}});write(res,{...current.s,access:r.access_token,refresh:r.refresh_token,expires:now()+r.expires_in*1000});send(res,200,{verified:true});return true}
  send(res,404,{error:'Account action unavailable.'});return true;
  }catch(error){send(res,[400,413].includes(error.status)?error.status:503,{error:error.status===413?'Account request is too large.':error.status===400?'Invalid account request.':'The account service could not complete this action. No case information is accepted here.'});return true}}
- async function activeToolsPlan(req,res){
+ async function activeToolsPlan(req,res,requestedPlan){
    const current=await session(req,res);
    if(!current)return null;
    const operator=await remote('/rest/v1/rpc/navigator_is_operator',{method:'POST',token:current.s.access,body:{}});
-   if(operator===true)return 'advanced';
+   if(operator===true&&requestedPlan==null)return 'advanced';
    const plans=(await rights(current.s)).filter(row=>Object.hasOwn(tiers,row.plan));
+   if(requestedPlan!=null)return plans.find(row=>row.plan===requestedPlan)?.plan||null;
    return plans.sort((a,b)=>tiers[b.plan]-tiers[a.plan])[0]?.plan||null;
  }
  async function purchaseIdentity(req,res){const current=await session(req,res);return current?{id:current.user.id}:null;}

@@ -88,3 +88,20 @@ test('entered sentence punctuation is preserved at report sentence boundaries',(
   assert.match(text,/What was said\?/);
   assert.doesNotMatch(text,/\.\.|\?\./);
 });
+
+test('all contracted inquiry plans resolve the report tools without adding self-service checkout',()=>{
+  for(const [id,label] of [['institutional','Institutional Plus'],['enterprise','Enterprise']]){
+    const plan=getPlanTools(id);
+    assert.equal(plan.label,label);
+    assert.equal(plan.reportAssembly,true);
+    assert.equal(require('../dist/plans.js').checkoutPlans[id],undefined);
+  }
+  assert.equal(getPlanTools('knowledge'),null);
+});
+test('report pagination uses compact, readable spacing without affecting other Word templates',()=>{
+  const items=assemble(sample);
+  const compact=Buffer.from(docx.buildDocx(items[0].text,items,{workflow:true,caseReport:true}));
+  const standard=Buffer.from(docx.buildDocx(items[0].text,items,{workflow:true}));
+  assert.ok(compact.includes(Buffer.from('w:after="90" w:line="288"')));
+  assert.ok(standard.includes(Buffer.from('w:after="120" w:line="324"')));
+});
