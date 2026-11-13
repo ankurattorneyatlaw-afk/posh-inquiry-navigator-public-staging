@@ -95,7 +95,7 @@ function getPlanTools(plan) {
   if (!Object.hasOwn(tiers,plan)) return null;
   const level=tiers[plan];
   return {
-    plan, label:labels[plan], reportAssembly:true, sources:{act:ACT,rules:RULES}, toolkit,
+    plan, label:labels[plan], reportAssembly:plan!=='essential', sources:{act:ACT,rules:RULES}, toolkit,
     legalAudit:v4.publicData(),
     reportOutline:reportSections,reportTypeChapters,allegationMatrixFields,
     ...(level>=2?{readiness,reportSections,knowledge}:{}),

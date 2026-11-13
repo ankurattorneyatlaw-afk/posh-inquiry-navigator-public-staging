@@ -7,7 +7,7 @@ const testOrder=new URLSearchParams(location.search).get('testOrder');
 if(testOrder!==null)endpoint.searchParams.set('testOrder',testOrder);
 const requestedPlan=new URLSearchParams(location.search).get('plan');
 if(requestedPlan!==null)endpoint.searchParams.set('plan',requestedPlan);
-const guidedHref=testOrder?'/guided?testOrder='+encodeURIComponent(testOrder):'/guided';
+const guidedHref=testOrder?'/guided?testOrder='+encodeURIComponent(testOrder):'/guided'+(requestedPlan===null?'':'?plan='+encodeURIComponent(requestedPlan));
 function el(tag,text,parent){
   const node=document.createElement(tag);
   if(text)node.textContent=text;
@@ -101,13 +101,23 @@ function standardTools(data,audit){
     respondent:'What is your account of the notified incident? Which particulars do you agree with or dispute? What material or explanation should the Committee consider?',
     witness:'What did you personally observe? What did you learn later from others? What helps place your observation in context?'
   };
-  function render(){output.textContent=prompts[role.value];}
+  const followups=[
+    {complainant:'Which exhibit or witness can help place this incident in context?',respondent:'Which part of the record supports or qualifies your account?',witness:'Which detail can you identify independently from the record?'},
+    {complainant:'How do you account for any material difference between your earlier and current account?',respondent:'What alternative explanation should the Committee consider, and what supports it?',witness:'What limits your ability to recall or identify this detail?'},
+    {complainant:'Was there material you could not access or respond to, and how did that affect your account?',respondent:'Which disclosed item or procedural direction needs clarification for you to respond fully?',witness:'Was anything about how your statement was taken or corrected material to its accuracy?'},
+    {complainant:'Which exact passage or folio supports the point you ask the Committee to resolve, and what does it leave uncertain?',respondent:'Which exact passage or folio supports your explanation, and what limits should the Committee record?',witness:'Which exact part of your statement records your own observation, and what should remain qualified?'}
+  ];
+  const depth=window.PoshReportAssembly.depthFor(plan);
+  function render(){
+    output.textContent=[prompts[role.value],...followups.slice(0,depth-1).map(group=>group[role.value])].join(' ');
+  }
   role.onchange=render;
   render();
   exportButton(panel,'Download question and answer record','Neutral-question-record',plan,()=>[
     heading(role.selectedOptions[0].textContent),paragraph(output.textContent),
     {type:'table',rows:[['Question as put','Answer or record reference','Follow-up and reviewer'],['','','']]}
   ]);
+  if(!data.reportAssembly)return;
   const basic=section('Case-specific inquiry and review reports');
   const notes=Object.fromEntries(data.legalAudit.reports.map(r=>[r.id,r.note]));
   window.PoshReportAssemblyUI.mount(basic,{notes,audit,plan:data.plan});

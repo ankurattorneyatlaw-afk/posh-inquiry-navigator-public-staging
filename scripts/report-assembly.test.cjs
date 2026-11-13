@@ -75,7 +75,7 @@ test('preliminary and separate disciplinary records omit statutory finalisation 
 test('each workspace plan exposes the same report routes with the existing tier controls',()=>{
   for(const plan of ['essential','professional','advanced']){
     const data=getPlanTools(plan);
-    assert.equal(data.reportAssembly,true);
+    assert.equal(data.reportAssembly,plan!=='essential');
     assert.deepEqual(data.legalAudit.reports.map(r=>r.id).sort(),Object.keys(choices.route).sort());
     assert.equal(data.legalAudit.checks.length,84);
     assert.equal(data.legalAudit.gates.length,8);

@@ -100,8 +100,8 @@ const server = http.createServer(async(req,res)=>{
   }
   const testOrder=parsed.searchParams.get('testOrder');
   const testAsset=testOrder!==null&&testInquiryAssets.has(name);
+  let verified;
   if(testAsset){
-    let verified;
     try{verified=await payments.toolsPlan(req,res,testOrder);}catch{
       res.writeHead(503);res.end('Staging access check unavailable.');return;
     }
@@ -114,6 +114,7 @@ const server = http.createServer(async(req,res)=>{
   }
   if(release.search?.indexable&&['/','/index.html','/institutions','/institutions/','/institutions.html'].includes(parsed.pathname))res.setHeader('X-Robots-Tag','index, follow');
   if(name.endsWith('.html')){const html=fs.readFileSync(path.join(root,name),'utf8'),hashes=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m=>"'sha256-"+crypto.createHash('sha256').update(m[1]).digest('base64')+"'");if(hashes.length)res.setHeader('Content-Security-Policy',csp.replace("script-src 'self'","script-src 'self' "+hashes.join(' ')));}
+  const guidedPlan=name==='guided.html'?(verified||(accounts.enabled?await accounts.activeToolsPlan(req,res,parsed.searchParams.get('plan')).catch(()=>null):null)):null;
   res.setHeader('Content-Type',({'html':'text/html; charset=utf-8','js':'text/javascript; charset=utf-8','css':'text/css; charset=utf-8','json':'application/json','txt':'text/plain','xml':'application/xml; charset=utf-8','svg':'image/svg+xml','png':'image/png','pdf':'application/pdf'})[name.split('.').pop()]);
   // Surface the integrated workflow in the existing site without modifying the signed static release assets.
   let payload=fs.readFileSync(path.join(root,name));
@@ -125,6 +126,7 @@ const server = http.createServer(async(req,res)=>{
     ).replace(/<body(?: data-account-required)?>/,name==='guided.html'?'<body data-account-required data-test-inquiry>':'<body>');
     payload=Buffer.from(body,'utf8');
   }
+  if(name==='guided.html'&&(guidedPlan==='essential'||(accounts.enabled&&!guidedPlan)))payload=Buffer.from(payload.toString('utf8').replace(/<body\b/,'<body data-no-inquiry-report'));
   res.writeHead(200);res.end(req.method==='HEAD'?undefined:payload);
 });
 server.requestTimeout=15000;
