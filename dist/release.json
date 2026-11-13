@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.47-public-pdf-verified-judgments",
+  "version": "6.35.48-public-verified-faq-references",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -47,7 +47,7 @@
     "judgment-extracts.html": "7cd9fee0823822f2084f00477e081b5b2aba639552db4b9205bfc21994a93976",
     "legal-audit-v4.js": "3fc819fe8c140da5b7456ba4a8637b486b83b9d7514cb982dfd0b0452a940861",
     "legal.js": "45aefdce5bc5c40a037819a0c5fc54457b1f39e4c181f507fca563c47846a3f2",
-    "library.js": "324e58ae88734fcea5c28010ae7ab70b7a82e8046e9e6e0230b949c6c6b2729d",
+    "library.js": "6ff73ff96de2c75d72f2a577a427db14d5d06abca636c7bdf096a09d03131e2e",
     "main.js": "7643e02527a7f36a1e555f33b5cb29b47d8a98c6f150cf56a540288e302a4577",
     "personal-docx.js": "8cc187f9a996b855f970064b58e7bf30f0f863819cbe302ff45487cf09b2328b",
     "plan-tools.html": "dbf31930ef86c5b8735bac7737330d84e007bed753a827e8b9563287e4ffa593",
