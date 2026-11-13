@@ -32,7 +32,7 @@ console.log('Integrated guided inquiry staging safeguards verified.');
 require('./test-guided.cjs');
 
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,37);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,41);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
 // Pilot order matching is separate from all real commission and payout data.
@@ -81,10 +81,10 @@ for(const record of finder.records){
   assert(related.every(x=>x.id!==record.id&&faqIds.has(x.id)),record.id);
 }
 const caseDirectory=require('../dist/cases.js');
-assert.equal(caseDirectory.data.length,37);
-assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,37);
-assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,37);
-assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,36);
+assert.equal(caseDirectory.data.length,41);
+assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,41);
+assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,41);
+assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,40);
 assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),['SC026']);
 assert.deepEqual(caseDirectory.data.filter(c=>c.sourceHost==='publisher').map(c=>c.id),['C20','C21']);
 assert(caseDirectory.filter('Judgment 011')[0].linkedOrders.some(o=>o.date==='2025-09-15'&&o.url));
@@ -100,6 +100,13 @@ assert(library.cases.some(c=>c.id==='SC029'),'Published case SC029 must remain a
 assert.equal(caseDirectory.filter('Judgment 064').length,0);
 assert.equal(caseDirectory.filter('Judgment 075').length,0);
 assert.equal(caseDirectory.filter('Judgment 076').length,0);
+for (const id of ['HC079','HC080','HC081']) {
+  const decision=caseDirectory.data.find(c=>c.id===id);
+  assert(caseDirectory.checked(decision)&&decision.sourceWithheld);
+  assert(!decision.url&&!decision.citation&&!decision.caseNumber&&!decision.sourceArchive&&!decision.linkedOrders.length);
+}
+assert(caseDirectory.filter('Nipun Saxena').some(c=>c.id==='SC082'&&caseDirectory.checked(c)&&c.url));
+assert(!caseDirectory.filter('Anup Vikal').length);
 const publishedCaseIds=new Set(library.cases.map(c=>c.id));
 for(const faq of finder.records){
   assert(faq.members.every(m=>(m.cases||[]).every(id=>publishedCaseIds.has(id))),faq.id);
