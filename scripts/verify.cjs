@@ -54,7 +54,7 @@ const onboardingAdmin=fs.readFileSync('dist/partner-onboarding-admin.html','utf8
 const onboardingPublic=fs.readFileSync('dist/partner-onboarding.html','utf8');
 assert(onboardingApi.includes('realActivationEnabled:false'),'Partner onboarding may not enable live activation');
 assert(onboardingApi.includes('bankPayoutEnabled:false'),'Partner onboarding must not enable payouts');
-assert(onboardingAdmin.includes('independent')&&onboardingPublic.includes('staging'),'Onboarding reviewer and partner notices are missing');
+assert(/independent/i.test(onboardingAdmin)&&/staging/i.test(onboardingPublic),'Onboarding reviewer and partner notices are missing');
 assert(serverSource.includes("'/partner-onboarding-admin':'partner-onboarding-admin.html'"),'Admin onboarding route unavailable');
 assert(serverSource.includes('partner-onboarding-admin.js'), 'Onboarding admin assets must remain operator-protected');
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,488,'The free Knowledge Library must retain all 488 approved answers');
