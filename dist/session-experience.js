@@ -15,13 +15,46 @@ function resumeField(id,text){
  const node=$(id);
  if(node.textContent!==text)node.textContent=text;
 }
+function openResumeItem(destination,id){
+ if(document.querySelector('.g-shell')?.inert){
+  message('Verify account access before opening this item.');
+  return;
+ }
+ if(destination==='case')return $('session-case-code').focus();
+ if(destination==='save')return $('session-save').focus();
+ if(destination==='evidence'){
+  const controls=$('evidence-readiness').querySelectorAll('[data-evidence-edit]');
+  const item=[...controls].find(button=>button.dataset.evidenceEdit===id);
+  if(item){
+   window.NavigatorEvidenceUI.open();
+   item.click();
+  }
+  return;
+ }
+ $('session-review-dates').click();
+ const index=T.getResult().items.findIndex(item=>item.id===id);
+ const target=$('timeline-status').querySelector('[data-item="'+index+'"]');
+ if(target){
+  target.tabIndex=-1;
+  target.focus();
+  target.scrollIntoView({block:'center'});
+ }
+}
 function resumeList(id,rows,empty){
  const target=$(id);
- const lines=rows.length?rows:[empty];
- if(target.children.length===lines.length&&lines.every((text,index)=>target.children[index].textContent===text))return;
- target.replaceChildren(...lines.map(text=>{
+ const lines=(rows.length?rows:[empty]).map(row=>typeof row==='string'?{text:row}:row);
+ if(target.children.length===lines.length&&lines.every((row,index)=>target.children[index].dataset.key===JSON.stringify(row)))return;
+ target.replaceChildren(...lines.map(row=>{
   const item=document.createElement('li');
-  item.textContent=text;
+  item.dataset.key=JSON.stringify(row);
+  if(row.destination){
+   const button=document.createElement('button');
+   button.type='button';
+   button.className='session-open-item';
+   button.textContent=row.text;
+   button.onclick=()=>openResumeItem(row.destination,row.id);
+   item.append(button);
+  }else item.textContent=row.text;
   return item;
  }));
 }
@@ -38,10 +71,10 @@ function renderResume(changed){
  const review=window.NavigatorSessionReview.build(value,T.getResult());
  const deadlines=review.attention.filter(item=>item.due&&!item.done);
  const open=review.attention.filter(item=>!item.due||item.done);
- const items=open.map(item=>[item.label||item.message,item.owner,item.action].filter(Boolean).join(' · '));
- if(!caseCode.value.trim())items.unshift('Add a coded case reference.');
- if(changed)items.unshift('Save and verify the current recovery file.');
- for(const entry of review.evidence?.pending||[])items.push([entry.annexure,entry.label,...entry.gaps].filter(Boolean).join(' · '));
+ const items=open.map(item=>({destination:'timeline',id:item.id,text:[item.label||item.message,item.owner,item.action].filter(Boolean).join(' · ')}));
+ if(!caseCode.value.trim())items.unshift({destination:'case',text:'Add a coded case reference.'});
+ if(changed)items.unshift({destination:'save',text:'Save and verify the current recovery file.'});
+ for(const entry of review.evidence?.pending||[])items.push({destination:'evidence',id:entry.id,text:[entry.annexure,entry.label,...entry.gaps].filter(Boolean).join(' · ')});
  resumeList('session-resume-deadlines',deadlines.map(item=>[item.due,item.label||item.message,deadlineStatuses[item.status],item.owner].filter(Boolean).join(' · ')),'No upcoming or overdue dates from recorded milestones.');
  resumeList('session-resume-items',items,'No open items in the recorded checks.');
 }

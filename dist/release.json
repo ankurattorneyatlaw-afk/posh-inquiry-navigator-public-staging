@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.50-resume-inquiry",
+  "version": "6.35.51-resume-open-items",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -34,7 +34,7 @@
     "finder.js": "bdcc5a31863e1cb1716a91c07f718069fe533ac097033dc054d2cc3ffe270c57",
     "guidance-context.js": "5b3fa9f587ce7c8d0ef6b5655adaa247f761223f53313bc0705e6ca23ba8e587",
     "guided-continuation.js": "b16343b50aa02d80ebee75afd4759f177a43878263b7c79cabe9c8266f57901d",
-    "guided.html": "295ef5a886c80ff1ef0db408dbad590845c237d44c1d15e3e01efe50ba89b85a",
+    "guided.html": "20643ecbdad46d9d0e8db9b8cec61402e08b23f8b3ad56be88b0ab292023d5b9",
     "guided.js": "a95d34e034bbce25ae20d9a602971e6ee7effc661f731938c5803c68b573b053",
     "help.html": "e413ce133bf7ada41ecba657ca54585741a9a05884d32f5156cee4292fe0edbd",
     "index.html": "b5cc91a9c9739dac55ec0afe306b7c891b7c276afcbe25dccfa18d806c7e19ff",
@@ -85,7 +85,7 @@
     "report-assembly.js": "5344242d65086fe5377f365ff5ddc9df39b17a638e31bdbabb42c8a7ea0a64f2",
     "resources.html": "60c7bb0fc4cad896c6c4023a6f48c897374b3f3c719d50af1543a6f6778cbc17",
     "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
-    "session-experience.js": "991b420934638587016bae22618cb8c68ee1d68fdb150f2b882c5c1b9b625dd1",
+    "session-experience.js": "0f070e96df6560943749a8a35a26e2a2bfea2d42ef43501104fdfcbea5a69ad4",
     "session-review.js": "a0febb219edd23dc4cc5d427e22125fb5dee624cbc95824e6113a55322b75789",
     "shop.html": "3c67d1a3c1ff55ae7509758bb95092ba6de16acca653540b3b50c0ce79a859eb",
     "shop.js": "63c1ee879b024f838e5574e7198c7db7c5b2f76d3d0e8d3e9ca3446c66eaabc4",
