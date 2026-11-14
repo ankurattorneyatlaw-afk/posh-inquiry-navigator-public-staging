@@ -7,7 +7,7 @@ const question=require('../dist/finder.js').records[0].id;
 test('one browser can replace or remove its reaction while the public tally includes other browsers',async()=>{
  const votes=new Map();
  const origin='https://staging.example.test';
- const handle=createKnowledgeReactions({enabled:true,url:'https://demo.supabase.co',key:'fixture',origin,fetchImpl:async(url,options)=>{
+ const handle=createKnowledgeReactions({connectionString:null,enabled:true,url:'https://demo.supabase.co',key:'fixture',origin,fetchImpl:async(url,options)=>{
   const data=options.body&&JSON.parse(options.body);
   if(url.includes('/rpc/')){
    const counts={useful:0,loved:0,review:0,selected:votes.get(data.p_browser_hash)||null};
@@ -42,7 +42,7 @@ test('review reasons are private and editor routes require operator verification
  const q=question;
  const origin='https://staging.example.test';
  const writes=[];
- const handler=createKnowledgeReactions({enabled:true,url:'https://demo.supabase.co',key:'fixture',origin,fetchImpl:async(url,options)=>{
+ const handler=createKnowledgeReactions({connectionString:null,enabled:true,url:'https://demo.supabase.co',key:'fixture',origin,fetchImpl:async(url,options)=>{
   const body=JSON.parse(options.body||'null');
   writes.push([url,body]);
   return {ok:true,json:async()=>url.includes('queue')?[{question:q,total:2,reasons:{citation:1}}]:{useful:0,loved:0,review:1,selected:null,reason:null}};
