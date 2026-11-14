@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.54-plan-governance",
+  "version": "6.35.55-plan-governance",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -70,7 +70,7 @@
     "partners.html": "01bad149c205a36fe4c9d4ae61b476ca190ce7af7eb1554e10bff5d74492623c",
     "personal-docx.js": "995e5d94e983b9fc998c77f2abee0e7d243cc4ddbd134bcb92f12ae56330127b",
     "plan-tools.html": "7e9be50f2a834a226791bd1efc78c258ff82a87264ec79ed9cd43c191e0b17e3",
-    "plan-tools.js": "9306204abdc2908ac87ebb2ee10bef318cd1990d3e4d695b65179805ce34edf8",
+    "plan-tools.js": "28e7ffabc3643d29efad729581bfcd3b6c858887a757b335c46932babe470825",
     "plans.js": "92d35bebd569ed3c6f4620a4eeded5fa4e114f1922f1bb1042a9479fdc40f6a2",
     "preview.html": "54f1046510e5b5e1eccdcfe2f170837ed4e56a981bcb3c3cdac41a7e8c8e95c7",
     "pricing.html": "56995affa1b64574d3250da0fea8c89c8d0e13429dcc91cf0c0140a861088e37",

@@ -441,7 +441,7 @@ access().then(data=>{
   el('h2','Tools in this plan',index);
   const list=el('ul','',index);
   for(const [i,panel] of Array.from($('tools-panels').children).entries()){
-    panel.id='plan-tool-'+(i+1);
+    if(!panel.id)panel.id='plan-tool-'+(i+1);
     link(el('li','',list),panel.querySelector('h2').textContent,'#'+panel.id);
   }
   index.hidden=false;
