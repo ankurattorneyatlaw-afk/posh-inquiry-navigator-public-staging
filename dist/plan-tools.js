@@ -426,6 +426,16 @@ access().then(data=>{
   exportButton(toolkit,'Download the readiness toolkit','POSH-Readiness-Toolkit',data.plan,toolkitItems);
   if(data.readiness)professionalTools(data);
   if(data.advanced)advancedTools(data);
+  for(const [key,title,name] of [
+    ['institutionalControls','Institutional Committee oversight','Institutional-Committee-oversight'],
+    ['enterpriseControls','Enterprise governance and escalation','Enterprise-governance-and-escalation']
+  ]){
+    if(!data[key])continue;
+    const controls=section(title);
+    controls.id=key;
+    const items=reviewList(controls,data[key],true);
+    exportButton(controls,'Download '+title.toLowerCase()+' checklist',name,data.plan,items);
+  }
   showSeats(data);
   const index=$('tools-index');
   el('h2','Tools in this plan',index);

@@ -91,11 +91,22 @@ const advanced={
   ]
 };
 
+const institutionalControls=[
+  ['Committee coverage and continuity',['Verify the constitution order and coverage for each site.','Record vacancy, recusal and handover arrangements.','Name the restricted records custodian and backup.']],
+  ['Implementation oversight',['Assign owners to outstanding recommendations and review dates.','Reconcile aggregate figures before annual reporting.']]
+];
+const enterpriseControls=[
+  ['Multi-unit oversight',['Map branch, district and employing authority coverage.','Assign an escalation owner for cross-unit or cross-employer cases.']],
+  ['Assurance and continuity',['Track open directions, review dates and transfer of responsibility across units.','Review access controls, retention requirements and aggregate-only reporting.']]
+];
+
 function getPlanTools(plan) {
   if (!Object.hasOwn(tiers,plan)) return null;
   const level=tiers[plan];
   return {
     plan, label:labels[plan], reportAssembly:plan!=='essential', sources:{act:ACT,rules:RULES}, toolkit,
+    ...(level>=4?{institutionalControls}:{}),
+    ...(level>=5?{enterpriseControls}:{}),
     legalAudit:v4.publicData(),
     reportOutline:reportSections,reportTypeChapters,allegationMatrixFields,
     ...(level>=2?{readiness,reportSections,knowledge}:{}),
