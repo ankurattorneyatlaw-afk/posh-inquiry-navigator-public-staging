@@ -132,6 +132,7 @@ const server = http.createServer(async(req,res)=>{
     payload=Buffer.from(body,'utf8');
   }
   if(name==='guided.html'&&(guidedPlan==='essential'||(accounts.enabled&&!guidedPlan)))payload=Buffer.from(payload.toString('utf8').replace(/<body\b/,'<body data-no-inquiry-report'));
+  if(['professional','advanced','institutional','enterprise'].includes(guidedPlan))payload=Buffer.from(payload.toString('utf8').replace(/<body\b/,'<body data-premium-resume'));
   res.writeHead(200);res.end(req.method==='HEAD'?undefined:payload);
 });
 server.requestTimeout=15000;
