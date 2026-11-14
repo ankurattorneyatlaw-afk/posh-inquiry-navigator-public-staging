@@ -83,8 +83,92 @@ const tabs=()=>`<nav class="knowledge-tabs" aria-label="Knowledge library"><a hr
 const faqPageSize=20;
 const faqPageGroupSize=10;
 let lastResultsHash='#faq';
+let reactionLoad=Promise.resolve();
+function attachReactions(answer,id){
+ if(!answer||answer.querySelector('.question-reactions'))return;
+ const row=document.createElement('div');
+ row.className='question-reactions';
+ row.setAttribute('role','group');
+ row.setAttribute('aria-label','Reactions to this answer');
+ answer.append(row);
+ const note=document.createElement('p');
+ note.setAttribute('role','status');
+ note.textContent='Loading reactions…';
+ const options=[['useful','Useful'],['loved','Loved it'],['review','Needs review']];
+ const endpoint='/api/knowledge/reactions?question='+encodeURIComponent(id);
+ let selected=null;
+ const reasonLabels={outdated:'Possibly outdated',citation:'Citation issue',unclear:'Unclear wording',context:'Missing context'};
+ const reasonBox=document.createElement('label');
+ reasonBox.textContent='Private reason (optional) ';
+ reasonBox.hidden=true;
+ const reason=document.createElement('select');
+ for(const [key,label] of Object.entries({'':'Skip reason',...reasonLabels})){
+  const option=new Option(label,key);
+  reason.add(option);
+ }
+ reasonBox.append(reason);
+ const editorial=document.createElement('p');
+ editorial.hidden=true;
+ let confirmedReason='';
+ async function save(value,why){
+  buttons.forEach(control=>control.disabled=true);
+  reason.disabled=true;
+  try{
+   show(await request({method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reaction:value,reason:why||null})}));
+  }catch{
+   reason.value=confirmedReason;
+   note.textContent='Could not confirm the save. Reopen this answer to refresh the totals.';
+  }finally{
+   buttons.forEach(control=>control.disabled=false);
+   reason.disabled=false;
+  }
+ }
+ reason.onchange=()=>save('review',reason.value);
+ const request=async (options)=>{
+  const response=await fetch(endpoint,options);
+  if(!response.ok)throw Error('Reactions are temporarily unavailable.');
+  return response.json();
+ };
+ const buttons=options.map(([value,label])=>{
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='btn btn-light';
+  button.textContent=label;
+  button.disabled=true;
+  button.onclick=()=>save(selected===value?null:value);
+  row.append(button);
+  return button;
+ });
+ row.append(reasonBox,note,editorial);
+ function show(data){
+  selected=data.selected;
+  confirmedReason=data.reason||'';
+  reason.value=confirmedReason;
+  reasonBox.hidden=selected!=='review';
+  editorial.hidden=!data.editorial?.note;
+  editorial.textContent=data.editorial?.note?'Editorial update · '+new Date(data.editorial.date).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'})+' · '+data.editorial.note:'';
+  buttons.forEach((button,i)=>{
+   const [value,label]=options[i];
+   button.textContent=label+' '+data[value];
+   button.setAttribute('aria-pressed',String(selected===value));
+   button.disabled=false;
+  });
+  note.textContent='Totals count browser reactions. “Needs review” is a reader suggestion.';
+ }
+ reactionLoad=reactionLoad.catch(()=>{}).then(async()=>{
+  if(!row.isConnected)return;
+  try{show(await request());}
+  catch{
+   note.textContent='Reactions are temporarily unavailable.';
+   const retry=document.createElement('button');
+   retry.type='button';retry.textContent='Retry reactions';
+   retry.onclick=()=>{row.remove();attachReactions(answer,id);};
+   row.append(retry);
+  }
+ });
+}
 function render(app){let page=0;const params=new URLSearchParams(location.hash.split('?')[1]||'');
-app.innerHTML=`<section class="app-heading"><div class="wrap"><div><a class="app-back" href="#home">← Homepage</a><small>THE COSMIC ENERGIZERS · POSH KNOWLEDGE LIBRARY</small><h1>POSH Knowledge Library</h1><p class="library-tagline"><strong>Knowledge for Everyone. Compliance Made Practical.</strong></p><p>A free legal knowledge resource from POSH Legal Navigator.</p><h2>488 Expert-Curated Questions. Statutory References. Judicial Insights. Practical Guidance.</h2><p><strong>No subscription. No payment. No compulsory registration for essential legal information.</strong></p><p>Browse in number order, select a topic or search by question number.</p>${tabs()}</div></div></section><div class="app-bg"><div class="wrap workspace finder-shell"><section class="finder-controls" aria-label="Find an answer"><label for="finder-search">What would you like to know?</label><input id="finder-search" type="search" maxlength="160" autocomplete="off" placeholder="Try: external member, LC, maternity leave, evidence or UGC"><div class="finder-filters"><label>Browse a topic<select id="finder-topic"><option value="All topics">All ${topics.length} topics</option>${topics.map(t=>`<option value="${esc(t)}">${esc(t)} (${records.filter(x=>x.topic===t).length})</option>`).join('')}</select></label></div><button type="button" id="finder-reset" class="btn btn-light">Show all questions</button><p class="finder-privacy">Search text remains in your browser. Anonymous counts of question openings, broad topics and unsuccessful searches help us improve the library. Approximate country statistics use your browser time zone. We do not store raw searches, visitor identifiers or case details. Use general terms only.</p></section><details class="topic-directory"><summary>Browse ${topics.length} topics</summary><nav aria-label="FAQ topics">${topics.map(t=>`<button type="button" data-faq-topic="${esc(t)}">${esc(t)}<span>${records.filter(x=>x.topic===t).length} FAQs</span></button>`).join('')}</nav></details><p class="faq-general-note">General educational guidance. Apply the law and rules relevant to your workplace and circumstances.</p><p id="finder-count" role="status" aria-live="polite"></p><nav class="library-pagination finder-jump" aria-label="Jump to FAQ page"><button type="button" class="btn btn-light" id="finder-first">First page</button><label for="finder-jump">Go to page <select id="finder-jump"></select></label><button type="button" class="btn btn-light" id="finder-last">Last page</button></nav><div id="finder-results"></div><p id="finder-empty" hidden>No matching FAQ. Try fewer words or choose another topic.</p><nav class="library-pagination" aria-label="FAQ pages"><button type="button" class="btn btn-light" id="finder-prev">Previous</button><span id="finder-page" aria-live="polite"></span><button type="button" class="btn btn-light" id="finder-next">Next</button></nav><p><a href="#community/suggest-faq">Suggest a question</a></p></div></div>`;
+app.innerHTML=`<section class="app-heading"><div class="wrap"><div><a class="app-back" href="#home">← Homepage</a><small>THE COSMIC ENERGIZERS · POSH KNOWLEDGE LIBRARY</small><h1>POSH Knowledge Library</h1><p class="library-tagline"><strong>Knowledge for Everyone. Compliance Made Practical.</strong></p><p>A free legal knowledge resource from POSH Legal Navigator.</p><h2>488 Expert-Curated Questions. Statutory References. Judicial Insights. Practical Guidance.</h2><p><strong>No subscription. No payment. No compulsory registration for essential legal information.</strong></p><p>Browse in number order, select a topic or search by question number.</p>${tabs()}</div></div></section><div class="app-bg"><div class="wrap workspace finder-shell"><section class="finder-controls" aria-label="Find an answer"><label for="finder-search">What would you like to know?</label><input id="finder-search" type="search" maxlength="160" autocomplete="off" placeholder="Try: external member, LC, maternity leave, evidence or UGC"><div class="finder-filters"><label>Browse a topic<select id="finder-topic"><option value="All topics">All ${topics.length} topics</option>${topics.map(t=>`<option value="${esc(t)}">${esc(t)} (${records.filter(x=>x.topic===t).length})</option>`).join('')}</select></label></div><button type="button" id="finder-reset" class="btn btn-light">Show all questions</button><p class="finder-privacy">Search text remains in your browser. Anonymous counts of question openings, broad topics and unsuccessful searches help us improve the library. Approximate country statistics use your browser time zone. We do not store raw searches or case details. Question reactions use a separate browser cookie to remember your selection. Use general terms only.</p></section><details class="topic-directory"><summary>Browse ${topics.length} topics</summary><nav aria-label="FAQ topics">${topics.map(t=>`<button type="button" data-faq-topic="${esc(t)}">${esc(t)}<span>${records.filter(x=>x.topic===t).length} FAQs</span></button>`).join('')}</nav></details><p class="faq-general-note">General educational guidance. Apply the law and rules relevant to your workplace and circumstances.</p><p id="finder-count" role="status" aria-live="polite"></p><nav class="library-pagination finder-jump" aria-label="Jump to FAQ page"><button type="button" class="btn btn-light" id="finder-first">First page</button><label for="finder-jump">Go to page <select id="finder-jump"></select></label><button type="button" class="btn btn-light" id="finder-last">Last page</button></nav><div id="finder-results"></div><p id="finder-empty" hidden>No matching FAQ. Try fewer words or choose another topic.</p><nav class="library-pagination" aria-label="FAQ pages"><button type="button" class="btn btn-light" id="finder-prev">Previous</button><span id="finder-page" aria-live="polite"></span><button type="button" class="btn btn-light" id="finder-next">Next</button></nav><p><a href="#community/suggest-faq">Suggest a question</a></p></div></div>`;
 const input=app.querySelector('#finder-search'),topic=app.querySelector('#finder-topic');
  const track=(event,item)=>root.NavigatorKnowledgeAnalytics?.emit(event,item);
  let searchTimer=null;
@@ -112,7 +196,11 @@ function updatePager(total){
   first.disabled=page===0;
   last.disabled=page+1===total;
 }
-function apply(persist=true){const list=search(input.value,topic.value);const total=Math.max(1,Math.ceil(list.length/faqPageSize));page=Math.min(page,total-1);updatePager(total);const visible=list.slice(page*faqPageSize,(page+1)*faqPageSize);app.querySelector('#finder-count').textContent=input.value||topic.value!=='All topics'?`${list.length} matching FAQs · ${records.length} in total`:`All ${records.length} FAQs · ${topics.length} topics`;let previous='';app.querySelector('#finder-results').innerHTML=visible.map((x,i)=>{const heading=!input.value&&topic.value!=='All topics'&&x.topic!==previous?`<h2 class="finder-group-heading">${esc(x.topic)}</h2>`:'';previous=x.topic;return `${heading}<article class="finder-result" data-finder-id="${x.id}"><div><span class="finder-number">FAQ ${x.number}</span><span>${esc(x.topic)}</span></div><h3><a href="#faq/${esc(x.id)}">${esc(x.question)}</a></h3><details class="finder-answer" ${input.value&&i===0?'open':''}><summary>Read the complete answer</summary>${root.NavigatorLegal.fullAnswer(x)}</details></article>`}).join('');app.querySelector('#finder-empty').hidden=!!list.length;app.querySelector('#finder-prev').disabled=page===0;app.querySelector('#finder-next').disabled=page+1>=total;app.querySelector('#finder-page').textContent='Page '+(page+1)+' of '+total;const p=new URLSearchParams();if(input.value)p.set('q',input.value);if(topic.value!=='All topics')p.set('topic',topic.value);if(page)p.set('page',String(page+1));lastResultsHash='#faq/find'+(p.size?'?'+p.toString():'');if(persist)history.replaceState(null,'',lastResultsHash);}
+function apply(persist=true){const list=search(input.value,topic.value);const total=Math.max(1,Math.ceil(list.length/faqPageSize));page=Math.min(page,total-1);updatePager(total);const visible=list.slice(page*faqPageSize,(page+1)*faqPageSize);app.querySelector('#finder-count').textContent=input.value||topic.value!=='All topics'?`${list.length} matching FAQs · ${records.length} in total`:`All ${records.length} FAQs · ${topics.length} topics`;let previous='';app.querySelector('#finder-results').innerHTML=visible.map((x,i)=>{const heading=!input.value&&topic.value!=='All topics'&&x.topic!==previous?`<h2 class="finder-group-heading">${esc(x.topic)}</h2>`:'';previous=x.topic;return `${heading}<article class="finder-result" data-finder-id="${x.id}"><div><span class="finder-number">FAQ ${x.number}</span><span>${esc(x.topic)}</span></div><h3><a href="#faq/${esc(x.id)}">${esc(x.question)}</a></h3><details class="finder-answer" ${input.value&&i===0?'open':''}><summary>Read the complete answer</summary>${root.NavigatorLegal.fullAnswer(x)}</details></article>`}).join('');for(const answer of app.querySelectorAll('.finder-answer')){
+ if(answer.open)attachReactions(answer,answer.closest('[data-finder-id]').dataset.finderId);
+ answer.addEventListener('toggle',()=>{if(answer.open)attachReactions(answer,answer.closest('[data-finder-id]').dataset.finderId);});
+}
+app.querySelector('#finder-empty').hidden=!!list.length;app.querySelector('#finder-prev').disabled=page===0;app.querySelector('#finder-next').disabled=page+1>=total;app.querySelector('#finder-page').textContent='Page '+(page+1)+' of '+total;const p=new URLSearchParams();if(input.value)p.set('q',input.value);if(topic.value!=='All topics')p.set('topic',topic.value);if(page)p.set('page',String(page+1));lastResultsHash='#faq/find'+(p.size?'?'+p.toString():'');if(persist)history.replaceState(null,'',lastResultsHash);}
 input.addEventListener('input',()=>{page=0;apply()});topic.addEventListener('change',()=>{page=0;apply();if(topic.value!=='All topics')track('topic_select',topic.value)});for(const button of app.querySelectorAll('[data-faq-topic]'))button.onclick=()=>{input.value='';topic.value=button.dataset.faqTopic;page=0;apply();track('topic_select',topic.value);app.querySelector('.topic-directory').open=false;focus();};app.querySelector('#finder-reset').onclick=()=>{input.value='';topic.value='All topics';page=0;apply();input.focus()};const focus=()=>{const count=app.querySelector('#finder-count');count.tabIndex=-1;count.focus();count.scrollIntoView({block:'start'})};const goToPage=(index)=>{page=index;apply();focus()};
 first.onclick=()=>goToPage(0);
 last.onclick=()=>goToPage(pageCount-1);
@@ -120,6 +208,6 @@ jump.onchange=()=>goToPage(Number(jump.value)-1);
 app.querySelector('#finder-prev').onclick=()=>goToPage(page-1);
 app.querySelector('#finder-next').onclick=()=>goToPage(page+1);apply(false);document.title="POSH Knowledge Library — 488 Free Legal Questions | POSH Legal Navigator";
 }
-function renderDetail(app,id){const x=byAlias.get(id);if(!x){render(app);app.querySelector('#finder-count').textContent='That answer link was not found. Browse all '+records.length+' FAQs below.';return;}const nearby=relatedTo(x);root.NavigatorKnowledgeAnalytics?.emit('question_open',x.id);app.innerHTML=`<section class="app-heading"><div class="wrap"><div><a class="app-back" href="${esc(lastResultsHash)}">← Back to FAQ results</a><small>THE COSMIC ENERGIZERS · ${esc(x.topic)}</small><h1>${esc(x.question)}</h1>${tabs()}</div></div></section><div class="app-bg"><div class="wrap workspace finder-shell"><details open class="faq-detail finder-detail" id="faq-${esc(id)}" data-faq-id="${esc(x.id)}"><summary>FAQ ${x.number} · ${esc(x.topic)}</summary><div class="faq-answer">${root.NavigatorLegal.fullAnswer(x)}</div></details><nav class="faq-related" aria-label="Related FAQs"><h2>Related FAQs</h2>${nearby.map(y=>`<a href="#faq/${esc(y.id)}">FAQ ${y.number} · ${esc(y.question)}</a>`).join('')}</nav><p><a href="#faq/find?topic=${encodeURIComponent(x.topic)}">Browse this topic</a> · <a href="#community/suggest-faq">Suggest a question</a></p></div></div>`;document.title=`Question ${x.number} | POSH Knowledge Library`;}
+function renderDetail(app,id){const x=byAlias.get(id);if(!x){render(app);app.querySelector('#finder-count').textContent='That answer link was not found. Browse all '+records.length+' FAQs below.';return;}const nearby=relatedTo(x);root.NavigatorKnowledgeAnalytics?.emit('question_open',x.id);app.innerHTML=`<section class="app-heading"><div class="wrap"><div><a class="app-back" href="${esc(lastResultsHash)}">← Back to FAQ results</a><small>THE COSMIC ENERGIZERS · ${esc(x.topic)}</small><h1>${esc(x.question)}</h1>${tabs()}</div></div></section><div class="app-bg"><div class="wrap workspace finder-shell"><details open class="faq-detail finder-detail" id="faq-${esc(id)}" data-faq-id="${esc(x.id)}"><summary>FAQ ${x.number} · ${esc(x.topic)}</summary><div class="faq-answer">${root.NavigatorLegal.fullAnswer(x)}</div></details><nav class="faq-related" aria-label="Related FAQs"><h2>Related FAQs</h2>${nearby.map(y=>`<a href="#faq/${esc(y.id)}">FAQ ${y.number} · ${esc(y.question)}</a>`).join('')}</nav><p><a href="#faq/find?topic=${encodeURIComponent(x.topic)}">Browse this topic</a> · <a href="#community/suggest-faq">Suggest a question</a></p></div></div>`;attachReactions(app.querySelector(".finder-detail"),x.id);document.title=`Question ${x.number} | POSH Knowledge Library`;}
 root.NavigatorFinder={render,renderDetail,numberFor,count:records.length,audit,topics,recordFor:id=>byAlias.get(id),getIndex:()=>records};
 })(typeof window==='undefined'?globalThis:window);
