@@ -108,7 +108,7 @@ function createKnowledgeReactions({
    const tally=await response.json();
    if(!token)res.setHeader('Set-Cookie',cookieName+'='+browser+'; Max-Age=31536000; Path=/api/knowledge/reactions; HttpOnly; SameSite=Lax'+(origin.startsWith('https:')?'; Secure':''));
    return send(200,tally);
-  }catch{return send(503,{error:'Reactions are temporarily unavailable'});}
+  }catch(error){if(pool)console.error('Knowledge reactions query:',error.code||error.name);return send(503,{error:'Reactions are temporarily unavailable'});}
  };
 }
 module.exports={createKnowledgeReactions};

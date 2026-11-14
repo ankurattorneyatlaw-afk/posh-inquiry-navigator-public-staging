@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.46-knowledge-sources-and-credential",
+  "version": "6.35.47-knowledge-source-review",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -50,7 +50,7 @@
     "knowledge-insights.html": "8648033dbaff065e5accd993bfca06776e553376afff4b6cdab8e05cd42d6c4c",
     "knowledge-insights.js": "fabd7ef3e143f4d024817e84083b548333d388d6964e8c96bd77472c3218714d",
     "legal-audit-v4.js": "cde8927305ee4049077a3726513a481d1d4187b4335d14586325097730322512",
-    "legal.js": "329dc5c20bdb6108bc47269130416e9368a8e64dee348881fb4caca8bb39a481",
+    "legal.js": "66e5f0dfd160f66b77ff72443b2b221dca4641331209aa3f1642a1c217f91814",
     "library.js": "ca30172c6f9722f57f12c017c881c82ec086e69664548de1e8005656365e8209",
     "main.js": "44d1382b4875b04a7d4f63619666672ddb1108cf5f84e7a760081a3ae7ca0afb",
     "partner-finance.html": "9e4998db0cb3d0eea442edfebf6c6164fd4fef4378266060fb55ff5a2112862f",
