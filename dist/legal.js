@@ -76,18 +76,32 @@ const verifiedCases=typeof module==='object'&&module.exports?require('./library.
 const checkedCases=Object.fromEntries(verifiedCases.filter(c=>c.verificationLevel==='primary-verified').map(c=>[c.id,{title:c.title,citation:[c.caseNumber,c.citation].join('; '),pinpoint:c.pinpoint,url:c.url,status:c.status}]));
 const directCases={'ic-contact-disclosure':['C05'],'ic-information-online':['C05'],'annual-awareness-planning':['C05'],'awareness-training-mandatory':['C05']};
 function citationHTML(x){if(x.approvedFaq)return '';const ids=new Set([...(x.cases||[]),...(directCases[x.id]||[]),...(x.members||[]).flatMap(m=>m.cases||[])]);const checked=[...ids].filter(id=>checkedCases[id]);return checked.length?`<div class="finder-citations"><strong>Verified judgment references</strong>${checked.map(id=>{const c=checkedCases[id];return `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.title)} — ${esc(c.citation)}; ${esc(c.pinpoint)}</a><small>${esc(c.status)}</small>`}).join('')}</div>`:'';}
+// Page numbers are the PDF viewer pages of the linked India Code edition.
+const actPages={2:3,3:5,4:5,5:6,6:6,7:7,8:7,9:8,10:8,11:8,12:9,13:9,14:10,15:10,16:10,17:10,18:10,19:11,20:11,21:11,22:11,23:12,24:12,25:12,26:12,27:12,28:13,29:13};
+const reviewedAnswers={'ic-contact-disclosure':'2026-11-13','ic-information-online':'2026-11-13'};
+function preciseActLinks(basis,mixed){
+ const targets=new Map();
+ for(const match of basis.matchAll(/\b(?:POSH )?(?:Act )?Sections?\s+(\d{1,2}(?:\([a-z0-9]+\))?)/gi)){
+  if(mixed&&!/^POSH|^Act/i.test(match[0]))continue;
+  const [section]=match[1].split('(');
+  const page=actPages[section];
+  if(page)targets.set(match[1],page);
+ }
+ return [...targets].map(([section,page])=>` · <a href="https://www.indiacode.nic.in/bitstream/123456789/2104/1/A2013-14.pdf#page=${page}" target="_blank" rel="noopener noreferrer">POSH Act §${esc(section)} (p. ${page})</a>`).join('');
+}
 function basisHTML(x){
  const b=String(x.basis||'');
  const mixed=mixedLawBasis.test(b);
  const hasAct=mixed?/\bPOSH (?:Act|Sections?)\b|^Act Sections?\b/i.test(b):/Sections?|§|\bAct\b/i.test(b);
  const hasRules=mixed?/\bCentral (?:POSH )?Rules?\b/i.test(b):/\bRules?\b|\bR\d/i.test(b);
-return `<p class="faq-basis"><strong>Legal basis / context:</strong> ${referenceHTML(b.replace(/§§/g,'Sections ').replace(/§/g,'Section ').replace(/\bR(\d+)/g,'Central Rule $1'))}${hasAct?` · <a href="${act}" target="_blank" rel="noopener noreferrer">POSH Act</a>`:''}${hasRules?` · <a href="${rules}" target="_blank" rel="noopener noreferrer">Central Rules</a>`:''}</p>`;}
+const linked=preciseActLinks(b,mixed);
+return `<p class="faq-basis"><strong>Legal basis / context:</strong> ${referenceHTML(b.replace(/§§/g,'Sections ').replace(/§/g,'Section ').replace(/\bR(\d+)/g,'Central Rule $1'))}${linked||(hasAct?` · <a href="${act}" target="_blank" rel="noopener noreferrer">POSH Act</a>`:'')}${hasRules?` · <a href="${rules}" target="_blank" rel="noopener noreferrer">Central Rules</a>`:''}</p>`;}
 function answerLink(link,faq){
   if(!/^\/?#faq\/case-[a-z0-9]+$/i.test(link.url))return link.url;
   const hash=link.url.slice(link.url.indexOf('#'));
   return hash+'?from='+encodeURIComponent(faq.id);
 }
-function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Sources and related FAQs">${x.links.map(link=>`<a href="${esc(answerLink(link,x))}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
+function fullAnswer(x){const paragraphs=Array.isArray(x.answer)?x.answer:[x.answer];return `<div class="finder-full-answer">${Object.hasOwn(reviewedAnswers,x.id)?`<p class="faq-basis">Last legally reviewed <time datetime="${reviewedAnswers[x.id]}">13 November 2026</time></p>`:''}${paragraphs.map(p=>`<p>${esc(p)}</p>`).join('')}${x.contacts?`<div class="faq-contacts">${x.contacts.map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.experience)}</p><a href="tel:${esc(c.tel)}">${esc(c.phone)}</a><a href="mailto:${esc(c.email)}">${esc(c.email).replace(/([.@])/g,'<wbr>$1')}</a></article>`).join('')}</div>`:''}${x.links?.length?`<nav class="faq-related" aria-label="Sources and related FAQs">${x.links.map(link=>`<a href="${esc(answerLink(link,x))}">${esc(link.label)}</a>`).join('')}</nav>`: ''}${basisHTML(x)}${citationHTML(x)}</div>`;}
 if(typeof module==='object'&&module.exports){module.exports={terms,provisions,referenceHTML,checkedCases,fullAnswer,basisHTML,citationHTML};return;}
 root.NavigatorLegal={terms,provisions,referenceHTML,fullAnswer,basisHTML,citationHTML};
 let referenceActive=null,referencePinned=false,ignoreReferenceFocus=false,referenceHoverBlocked=false,referencePointer=null;

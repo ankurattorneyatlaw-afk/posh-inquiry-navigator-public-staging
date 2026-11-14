@@ -8,6 +8,7 @@ const reactions=new Set(['useful','loved','review']);
 const cookieName='navigator-question-reactions';
 
 function createKnowledgeReactions({
+ connectionString=process.env.KNOWLEDGE_REACTIONS_DATABASE_URL,
  enabled=process.env.KNOWLEDGE_REACTIONS_ENABLED==='true',
  url=process.env.ENQUIRY_SUPABASE_URL||process.env.COMMUNITY_SUPABASE_URL,
  key=process.env.ENQUIRY_SUPABASE_KEY||process.env.COMMUNITY_SUPABASE_KEY,
@@ -16,8 +17,34 @@ function createKnowledgeReactions({
 }={}){
  const writes=new Map();
  let reset=0;
- const configured=enabled&&/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url||'')&&!!key;
+ const pool=connectionString?new (require('pg').Pool)({connectionString,max:3,connectionTimeoutMillis:5000,statement_timeout:4500,ssl:{rejectUnauthorized:true}}):null;
+ pool?.on('error',error=>console.error('Knowledge reactions database connection:',error.code||error.name));
+ const configured=enabled&&(!!pool||(/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url||'')&&!!key));
  async function request(path,method,body,prefer){
+  if(pool){
+   const args=body||{};
+   if(path.startsWith('rpc/')){
+    const query=path.endsWith('review_queue')?['select public.navigator_knowledge_review_queue() as value',[]]:
+      ['select public.navigator_question_reactions($1,$2) as value',[args.p_question,args.p_browser_hash]];
+    const result=await pool.query(...query);
+    return {json:async()=>result.rows[0].value};
+   }
+   if(method==='DELETE'){
+    const params=new URLSearchParams(path.split('?')[1]);
+    await pool.query('delete from public.navigator_knowledge_reactions where question=$1 and browser_hash=$2',[params.get('question').slice(3),params.get('browser_hash').slice(3)]);
+   }else if(path.startsWith('navigator_knowledge_editorial')){
+    await pool.query(`insert into public.navigator_knowledge_editorial(question,status,updated_at,note,published_at)
+      values($1,$2,$3,$4,$5) on conflict(question) do update set status=excluded.status,updated_at=excluded.updated_at,
+      note=coalesce(excluded.note,navigator_knowledge_editorial.note),published_at=coalesce(excluded.published_at,navigator_knowledge_editorial.published_at)`,
+      [args.question,args.status,args.updated_at,args.note||null,args.published_at||null]);
+   }else{
+    await pool.query(`insert into public.navigator_knowledge_reactions(question,browser_hash,reaction,reason,updated_at)
+      values($1,$2,$3,$4,$5) on conflict(question,browser_hash) do update set reaction=excluded.reaction,reason=excluded.reason,updated_at=excluded.updated_at
+      where (navigator_knowledge_reactions.reaction,navigator_knowledge_reactions.reason) is distinct from (excluded.reaction,excluded.reason)`,
+      [args.question,args.browser_hash,args.reaction,args.reason,args.updated_at]);
+   }
+   return {};
+  }
   const response=await fetchImpl(url+'/rest/v1/'+path,{method,body:body===undefined?undefined:JSON.stringify(body),
    headers:{apikey:key,...(/^eyJ/.test(key)?{Authorization:'Bearer '+key}:{}),'Content-Type':'application/json',...(prefer?{Prefer:prefer}:{})},
    signal:AbortSignal.timeout(4500)});
