@@ -1,6 +1,6 @@
 {
   "product": "POSH Legal Navigator",
-  "version": "6.35.52-inquiry-routes",
+  "version": "6.35.53-jurisdiction-protection",
   "environment": "staging",
   "search": {
     "indexable": false,
@@ -35,7 +35,7 @@
     "guidance-context.js": "5b3fa9f587ce7c8d0ef6b5655adaa247f761223f53313bc0705e6ca23ba8e587",
     "guided-continuation.js": "b16343b50aa02d80ebee75afd4759f177a43878263b7c79cabe9c8266f57901d",
     "guided.html": "20643ecbdad46d9d0e8db9b8cec61402e08b23f8b3ad56be88b0ab292023d5b9",
-    "guided.js": "641d223a3b0bca9eba66de2e1af44b137819711e8f79e23ff30ddb55f4c3f94d",
+    "guided.js": "5eb79b15c6de42b54cd18c537a00a6c25c9325909e13f1bd1c1b9e45f8d7dc3b",
     "help.html": "e413ce133bf7ada41ecba657ca54585741a9a05884d32f5156cee4292fe0edbd",
     "index.html": "b5cc91a9c9739dac55ec0afe306b7c891b7c276afcbe25dccfa18d806c7e19ff",
     "individual-guide.html": "2d309234c5634aae65598f6f3475981e4658b514a69f47a5f18d092d296a1dee",

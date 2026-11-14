@@ -32,7 +32,7 @@ function launch(scenario='manual',timeline=null){
 }
 const registry=launch().model;
 assert.equal(registry.Q.length,53,'Expected P01-P47 plus conciliation information and C01-C03');
-assert.equal(Object.keys(registry.REV).length,36,'All foundational and continuation review types required');
+assert.equal(Object.keys(registry.REV).length,42,'All foundational and continuation review types required');
 const validTargets=new Set(['NEXT','NOTICE','CONCILIATION','NO_REPLY','REPLY_RECEIVED','OUTCOME','EDIT','C01']);
 const knownStages=new Set(registry.Q.map(q=>q.id).concat(['P48','C04']));
 for(const q of registry.Q){
@@ -177,3 +177,12 @@ for(const value of ['different_organisation','outsider']){const c=launch('extern
 assert(openRoutes>5);console.log('All '+openRoutes+' exceptional route destinations offer guidance, owned follow-up and reassessment; external respondent routes continue after verified competence.');
 
 const catalog=require('../dist/workflow-documents.js');const contextual=new Set(registry.Q.flatMap(q=>q.opts.flatMap(o=>catalog.phasesForStage(q.id,o.value).flatMap(p=>p.ids))));for(const e of catalog.entries)assert(contextual.has(e.id),'Draft not offered at a relevant stage: '+e.id);console.log('All '+catalog.entries.length+' drafts have contextual access.');
+
+for(const [choice,title] of [['urgent_safety','Urgent safety action'],['retaliation_risk','Retaliation or pressure response'],['disclosure_risk','Confidentiality and disclosure response'],['multiple_concerns','Concurrent protection concerns']]){
+ const c=launch();
+ c.model.loadReview('P09',choice);
+ assert(c.body.innerHTML.includes(title));
+ assert(c.body.innerHTML.includes('id="g-review-followup"'));
+ c.resolution('yes');c.action('safeguards_recorded');c.check();c.click({id:'g-proceed'});
+ assert(c.body.innerHTML.includes('Has the committee documented preliminary procedural decisions?'));
+}
