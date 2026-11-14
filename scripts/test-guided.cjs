@@ -31,8 +31,8 @@ function launch(scenario='manual',timeline=null){
  return {get,model,body,answer,resolution,action,check,click,get printed(){return prints}};
 }
 const registry=launch().model;
-assert.equal(registry.Q.length,51,'Expected P01-P47 plus conciliation information and C01-C03');
-assert.equal(Object.keys(registry.REV).length,33,'All foundational and continuation review types required');
+assert.equal(registry.Q.length,53,'Expected P01-P47 plus conciliation information and C01-C03');
+assert.equal(Object.keys(registry.REV).length,36,'All foundational and continuation review types required');
 const validTargets=new Set(['NEXT','NOTICE','CONCILIATION','NO_REPLY','REPLY_RECEIVED','OUTCOME','EDIT','C01']);
 const knownStages=new Set(registry.Q.map(q=>q.id).concat(['P48','C04']));
 for(const q of registry.Q){
@@ -141,7 +141,11 @@ reviewScenario('jurisdiction_concern','disputed','conditions_verified','Does the
  c.answer('recorded');c.answer('completed');c.answer('breached');
  assert(c.body.innerHTML.includes('Conciliation non-compliance'),'Breach must be reviewed');
  c.resolution('yes');c.action('breach_and_inquiry');c.check();c.click({id:'g-proceed'});
- assert(c.body.innerHTML.includes('What is the status of forwarding the complaint'),'Breach did not route into inquiry');
+ assert(c.body.innerHTML.includes('Which employment framework governs the respondent?'),'Breach skipped verification of applicable procedure');
+ c.answer('central');
+ assert(c.body.innerHTML.includes('Has the prescribed procedure been verified?'));
+ c.answer('confirmed');
+ assert(c.body.innerHTML.includes('What is the status of forwarding the complaint'),'Verified procedure did not route into inquiry');
 }
 console.log('Guided flow tests: 7 exception scenarios, 2 terminal outcomes, P18–P47, findings gate and settlement breach PASS.');
 
@@ -157,9 +161,15 @@ for(const q of registry.Q)for(const opt of q.opts){const r=registry.REV[opt.next
  c.resolution('yes');
  if(!c.body.innerHTML.includes('value="'+a.id+'"'))continue;
  c.action(a.id);c.check();c.click({id:'g-proceed'});
+ if(r.id==='DOMESTIC_WORKER_REVIEW'){
+  assert(c.body.innerHTML.includes('Local Committee domestic-worker follow-up'));
+  assert(c.body.innerHTML.includes('Record LC follow-up'));
+  if(a.id==='domestic_forward')assert(c.body.innerHTML.includes('seven-day'));
+ }else{
  assert(c.body.innerHTML.includes('Open procedural follow-up'),q.id+' referral left blank');
  for(const text of ['How to follow this lawful route','Record next follow-up','Review response and reassess','receiving authority','review date'])assert(c.body.innerHTML.includes(text),q.id+' missing '+text);
  assert(!c.body.innerHTML.includes('g-print-preview'));
+ }
  c.click({id:'g-route-reassess'});assert(c.body.innerHTML.includes('Has this issue been resolved now?'));
  openRoutes++;
 }}
