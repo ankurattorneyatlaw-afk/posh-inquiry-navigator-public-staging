@@ -19,13 +19,17 @@ const pages = ['index', 'about', 'contact', 'digital-delivery', 'help', 'individ
 const assets = ['styles.css', 'digital.css', 'library.js', 'faq.js', 'cases.js', 'legal.js', 'finder.js',
   'engine.js', 'docx.js', 'guidance-context.js', 'essential-sample-invoice.pdf', 'social-preview.png'];
 const { records, search } = require('../dist/finder.js');
-assert.equal(records.length, 488, 'All 488 approved Knowledge Library questions must exist');
-assert.deepEqual(search().map(item => Number(item.number)), Array.from({length:488}, (_, i)=>i+1),
-  'Public Knowledge Library must display questions 001–488 in the correct numerical order');
+assert.equal(records.length, 489, 'All 489 approved Knowledge Library questions must exist');
+assert.deepEqual(search().map(item => Number(item.number)), Array.from({length:489}, (_, i)=>i+1),
+  'Public Knowledge Library must display questions 001–489 in the correct numerical order');
+const referralConflict = 'presiding-officer-referral-commission-conflict';
+assert.equal(search('FAQ 264')[0]?.id, referralConflict);
+assert.equal(search('presiding officer referral commission')[0]?.id, referralConflict);
+assert.equal(search('FAQ 381')[0]?.id, 'ref-079');
 for(const sourceName of ['index.html','main.js','finder.js']){
   assert(source(sourceName).includes('POSH Knowledge Library'), sourceName + ' is missing the locked Library name');
   assert(source(sourceName).includes('Knowledge for Everyone. Compliance Made Practical.'), sourceName + ' is missing the agreed tagline');
-  assert(source(sourceName).includes('488 Expert-Curated Questions. Statutory References. Judicial Insights. Practical Guidance.'), sourceName + ' is missing the promotional headline');
+  assert(source(sourceName).includes('489 Expert-Curated Questions. Statutory References. Judicial Insights. Practical Guidance.'), sourceName + ' is missing the promotional headline');
   assert(source(sourceName).includes('No subscription. No payment. No compulsory registration for essential legal information.'), sourceName + ' is missing the access message');
 }
 assert([...assets, ...pages.map(name => name + '.html')].every(name => !PROTECTED.has(name)));
