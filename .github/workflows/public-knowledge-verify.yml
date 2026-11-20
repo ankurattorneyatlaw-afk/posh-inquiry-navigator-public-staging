@@ -1,4 +1,4 @@
-name: Public Knowledge Library 488 regression checks
+name: Public Knowledge Library 489 regression checks
 on:
   pull_request:
     branches: [public-guidance-launch-2026-11-09]
@@ -26,7 +26,7 @@ jobs:
             assert(src.includes('Knowledge for Everyone. Compliance Made Practical.'),file+' missing tagline');
           }
           const f=require('./dist/finder.js');
-          assert.equal(f.records.length,488);
-          assert.deepEqual(f.search().map(x=>Number(x.number)),Array.from({length:488},(_,i)=>i+1));
-          console.log('Public 488 numbered Knowledge Library questions and brand verified');
+          assert.equal(f.records.length,489);
+          assert.deepEqual(f.search().map(x=>Number(x.number)),Array.from({length:489},(_,i)=>i+1));
+          console.log('Public 489 numbered Knowledge Library questions and brand verified');
           NODE
