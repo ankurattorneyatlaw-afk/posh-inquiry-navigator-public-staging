@@ -32,18 +32,21 @@ console.log('Integrated guided inquiry staging safeguards verified.');
 require('./test-guided.cjs');
 
 
-const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,58);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
+const library=require('../dist/library.js');assert.equal(library.entries.length,400);assert.equal(library.categories.length,25);assert.equal(library.cases.length,61);assert(fs.readFileSync('dist/index.html','utf8').includes('library.js'));
 assert.deepEqual(require('./payment-api.cjs').plans,require('../dist/plans.js').checkoutPlans);
 
 const finder=require('../dist/finder.js');assert.equal(finder.audit.referenceQuestions,400);assert.equal(finder.audit.practicalQuestions,115);assert.equal(finder.records.length,489);
 assert.deepEqual(finder.search().map(x=>Number(x.number)),Array.from({length:489},(_,i)=>i+1));
 assert.equal(finder.search('FAQ 489')[0].number,'489');
 const caseDirectory=require('../dist/cases.js');
-assert.equal(caseDirectory.data.length,58);
-assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,58);
-assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,58);
+assert.equal(caseDirectory.data.length,61);
+assert.equal(new Set(caseDirectory.data.map(c=>c.id)).size,61);
+assert.equal(new Set(caseDirectory.data.map(c=>c.directoryNumber)).size,61);
 assert.equal(caseDirectory.data.filter(caseDirectory.checked).length,58);
-assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),[]);
+assert.deepEqual(caseDirectory.data.filter(c=>!caseDirectory.checked(c)).map(c=>c.id),['HC110','HC111','SC030']);
+assert.equal(caseDirectory.filter('Judgment 103')[0].id,'HC110');
+assert.equal(caseDirectory.filter('Judgment 104')[0].id,'HC111');
+assert(caseDirectory.filter('Novasoft 2025 INSC 605').some(c=>c.id==='SC030'));
 assert.deepEqual(caseDirectory.data.filter(c=>c.sourceHost==='publisher').map(c=>c.id),['C20','C21']);
 assert(caseDirectory.filter('Judgment 011')[0].linkedOrders.some(o=>o.date==='2025-09-15'&&o.url));
 assert(caseDirectory.filter('2025 INSC 1106')[0].linkedOrders.some(o=>o.date==='2025-11-17'&&o.url));
