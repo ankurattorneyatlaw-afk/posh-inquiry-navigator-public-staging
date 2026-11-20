@@ -2,7 +2,7 @@
 'use strict';
 const candidates=typeof module==='object'&&module.exports?require('./library.js').cases:root.NavigatorLibrary.getCases();
 const checked=c=>c.verificationLevel==='primary-verified'&&c.verifiedAt&&/^[a-f0-9]{64}$/.test(c.sourceSha256||'')&&['identity','primaryText','proposition','pinpoint','disposition'].every(k=>c.verification?.[k]===true);
-const readable=c=>checked(c)||c.verificationLevel==='public-court-text'&&Boolean(c.url&&c.checkedAt);
+const readable=c=>checked(c)||c.verificationLevel==='public-court-text'&&Boolean((c.url||c.redactedSource)&&c.checkedAt);
 const data=candidates.filter(readable);
 const tier=c=>c.publicationTier||'Other authorities';
 const tierOptions=['Core authority','Supporting authority','Context or case history','Procedural orders','Other authorities'].filter(option=>data.some(c=>tier(c)===option));
